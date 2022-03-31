@@ -1,41 +1,41 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index 11a1b3e..a1a8de1 100644
+index 57e2172..bc59bae 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -1823,6 +1823,7 @@ name = "webrtcsink"
+@@ -1834,6 +1834,7 @@ name = "webrtcsink"
  version = "0.1.0"
  dependencies = [
   "anyhow",
-+ "async-native-tls",
++ "async-native-tls 0.4.0",
   "async-std",
   "async-tungstenite",
   "clap",
 diff --git a/plugins/Cargo.toml b/plugins/Cargo.toml
-index 015c4e1..c71e7e3 100644
+index 5cf7176..b74cfa8 100644
 --- a/plugins/Cargo.toml
 +++ b/plugins/Cargo.toml
 @@ -21,6 +21,7 @@ anyhow = "1"
  thiserror = "1"
  futures = "0.3"
  async-std = { version = "1", features = ["unstable"] }
-+async-native-tls = { version = "0.3.0" }
- async-tungstenite = { version = "0.16", features = ["async-std-runtime", "async-native-tls"] }
++async-native-tls = { version = "0.4.0" }
+ async-tungstenite = { version = "0.17", features = ["async-std-runtime", "async-native-tls"] }
  serde = "1"
- serde_derive = "1"
+ serde_json = "1"
 diff --git a/plugins/src/signaller/imp.rs b/plugins/src/signaller/imp.rs
-index 6eafd3c..0bfb815 100644
+index 1779695..5576d5f 100644
 --- a/plugins/src/signaller/imp.rs
 +++ b/plugins/src/signaller/imp.rs
-@@ -10,6 +10,7 @@ use gst::subclass::prelude::*;
+@@ -9,6 +9,7 @@ use gst::glib::prelude::*;
+ use gst::subclass::prelude::*;
  use gst::{gst_debug, gst_error, gst_info, gst_trace, gst_warning};
  use once_cell::sync::Lazy;
- use serde_derive::{Deserialize, Serialize};
 +use std::path::PathBuf;
  use std::sync::Mutex;
+ use webrtcsink_protocol as p;
  
- static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
-@@ -56,14 +57,17 @@ struct JsonMsg {
-     inner: JsonMsgInner,
+@@ -28,14 +29,17 @@ struct State {
+     receive_task_handle: Option<task::JoinHandle<()>>,
  }
  
 +#[derive(Clone)]
@@ -52,7 +52,7 @@ index 6eafd3c..0bfb815 100644
          }
      }
  }
-@@ -76,16 +80,22 @@ pub struct Signaller {
+@@ -48,16 +52,22 @@ pub struct Signaller {
  
  impl Signaller {
      async fn connect(&self, element: &WebRTCSink) -> Result<(), Error> {
@@ -64,6 +64,8 @@ index 6eafd3c..0bfb815 100644
 -            .as_ref()
 -            .unwrap()
 -            .clone();
+-
+-        let (ws, _) = async_tungstenite::async_std::connect_async(address).await?;
 +        let settings = self.settings.lock().unwrap().clone();
 +
 +        let connector = if let Some(path) = settings.cafile {
@@ -74,8 +76,7 @@ index 6eafd3c..0bfb815 100644
 +        } else {
 +            None
 +        };
- 
--        let (ws, _) = async_tungstenite::async_std::connect_async(address).await?;
++
 +        let (ws, _) = async_tungstenite::async_std::connect_async_with_tls_connector(
 +            settings.address.unwrap(),
 +            connector,
@@ -84,7 +85,7 @@ index 6eafd3c..0bfb815 100644
  
          gst_info!(CAT, obj: element, "connected");
  
-@@ -346,13 +356,22 @@ impl ObjectSubclass for Signaller {
+@@ -347,13 +357,22 @@ impl ObjectSubclass for Signaller {
  impl ObjectImpl for Signaller {
      fn properties() -> &'static [glib::ParamSpec] {
          static PROPERTIES: Lazy<Vec<glib::ParamSpec>> = Lazy::new(|| {
@@ -114,14 +115,13 @@ index 6eafd3c..0bfb815 100644
          });
  
          PROPERTIES.as_ref()
-@@ -378,15 +397,22 @@ impl ObjectImpl for Signaller {
+@@ -379,15 +398,21 @@ impl ObjectImpl for Signaller {
                      gst_error!(CAT, "address can't be None");
                  }
              }
 +            "cafile" => {
 +                let value: String = value.get().unwrap();
-+                let mut settings = self.settings.lock().unwrap();
-+                settings.cafile = Some(value.into());
++                self.settings.lock().unwrap().cafile = Some(value.into());
 +            }
              _ => unimplemented!(),
          }

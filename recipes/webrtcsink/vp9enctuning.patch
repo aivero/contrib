@@ -1,28 +1,26 @@
 diff --git a/plugins/src/webrtcsink/imp.rs b/plugins/src/webrtcsink/imp.rs
-index 71f357f..9dff4e6 100644
+index eb94f1c..c9e40c7 100644
 --- a/plugins/src/webrtcsink/imp.rs
 +++ b/plugins/src/webrtcsink/imp.rs
-@@ -376,17 +376,21 @@ fn setup_encoding(
-             enc.set_property("deadline", 1i64);
-             enc.set_property("threads", 12i32);
-             enc.set_property("target-bitrate", 2560000i32);
--            enc.set_property("cpu-used", -16i32);
-+            enc.set_property("cpu-used", 16i32);
-             enc.set_property("keyframe-max-dist", 2000i32);
-             enc.set_property_from_str("keyframe-mode", "disabled");
-             enc.set_property_from_str("end-usage", "cbr");
-             enc.set_property("buffer-initial-size", 100i32);
-             enc.set_property("buffer-optimal-size", 120i32);
-             enc.set_property("buffer-size", 150i32);
--            enc.set_property("resize-allowed", true);
-+            enc.set_property("resize-allowed", false);
-             enc.set_property("max-intra-bitrate", 250i32);
-             enc.set_property_from_str("error-resilient", "default");
-             pay.set_property_from_str("picture-id-mode", "15-bit");
-+            pay.set_property_from_str("picture-id-mode", "15-bit");
-+            enc.set_property("lag-in-frames", 0i32);
-+            enc.set_property("row-mt", true);
-+            enc.set_property("tile-rows", 2i32);
-         }
-         "x264enc" => {
-             enc.set_property("bitrate", 2048u32);
+@@ -303,17 +303,19 @@ fn configure_encoder(enc: &gst::Element) {
+                 enc.set_property("deadline", 1i64);
+                 enc.set_property("threads", 12i32);
+                 enc.set_property("target-bitrate", 2560000i32);
+-                enc.set_property("cpu-used", -16i32);
++                enc.set_property("cpu-used", 16i32);
+                 enc.set_property("keyframe-max-dist", 2000i32);
+                 enc.set_property_from_str("keyframe-mode", "disabled");
+                 enc.set_property_from_str("end-usage", "cbr");
+                 enc.set_property("buffer-initial-size", 100i32);
+                 enc.set_property("buffer-optimal-size", 120i32);
+                 enc.set_property("buffer-size", 150i32);
+-                enc.set_property("resize-allowed", true);
++                enc.set_property("resize-allowed", false);
+                 enc.set_property("max-intra-bitrate", 250i32);
+                 enc.set_property_from_str("error-resilient", "default");
+                 enc.set_property("lag-in-frames", 0i32);
++                enc.set_property("row-mt", true);
++                enc.set_property("tile-rows", 2i32);
+             }
+             "x264enc" => {
+                 enc.set_property("bitrate", 2048u32);

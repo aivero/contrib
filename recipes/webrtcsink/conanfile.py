@@ -17,8 +17,8 @@ class GstRecipe(GstRustProject):
         self.patch("cafile.patch")
         self.patch("vp9enctuning.patch")
 
-        project_files = os.listdir(os.path.join(self.src, "plugins"))
+        project_files = os.listdir(os.path.join(self.src))
         for pfile in project_files:
-            shutil.move(os.path.join(self.src, "plugins", pfile), self.source_folder)
+            shutil.move(os.path.join(self.src, pfile), self.source_folder)
 
         shutil.rmtree(self.src)

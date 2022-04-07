@@ -1,2 +1,16 @@
 - version: f6eb967cbea265881d39831d45c746a8d94158a5
   profiles: ["linux-x86_64", "linux-x86_64-dev"]
+
+- name: webrtc-signalling
+  mode: docker
+  profiles:
+    - linux-x86_64
+  before_script:
+    - apk add py3-pip  && pip install conan
+    - conan config install $CONAN_CONFIG_URL -sf $CONAN_CONFIG_DIR
+    - conan user $CONAN_LOGIN_USERNAME -p $CONAN_LOGIN_PASSWORD -r $CONAN_REPO_ALL
+    - conan user $CONAN_LOGIN_USERNAME -p $CONAN_LOGIN_PASSWORD -r $CONAN_REPO_DEV_ALL
+    - conan config set general.default_profile=linux-x86_64
+    - conan install webrtcsink/${CI_COMMIT_REF_NAME}@ -if webrtcsink
+  docker:
+    file: linux-x86_64.Dockerfile

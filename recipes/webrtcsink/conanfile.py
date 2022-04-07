@@ -22,3 +22,7 @@ class GstRecipe(GstRustProject):
             shutil.move(os.path.join(self.src, pfile), self.source_folder)
 
         shutil.rmtree(self.src)
+    
+    def deploy(self):
+        # webrtc-signalling server
+        self.copy("*server", src="bin", dst="bin", keep_path=False)

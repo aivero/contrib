@@ -91,6 +91,7 @@ def find_parent_branch():
             print(f"Failed with output:\n{output}")
             return [99999, "00000000000", branch]
 
+        print(f"Merge base output: {output}")
         merge_base = output[:-1]
 
         output = call(

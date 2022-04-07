@@ -1,5 +1,6 @@
 - version: f6eb967cbea265881d39831d45c746a8d94158a5
   profiles: ["linux-x86_64", "linux-x86_64-dev"]
+  trigger: [webrtc-signalling]
 
 - name: webrtc-signalling
   mode: docker

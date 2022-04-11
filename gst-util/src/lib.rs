@@ -21,6 +21,9 @@ extern crate gst_sdp;
 pub mod bin;
 pub mod element;
 pub mod error;
+pub mod message;
+pub mod object;
+pub mod sdp;
 pub mod taglist;
 
 #[macro_export]

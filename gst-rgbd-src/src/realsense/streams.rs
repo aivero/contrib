@@ -13,7 +13,7 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA 02110-1301, USA.
 
-use std::convert::TryFrom;
+use glib::*;
 use std::fmt::{Display, Formatter};
 
 use super::settings::EnabledStreams;
@@ -35,16 +35,26 @@ pub(crate) type Streams = Vec<(StreamId, StreamDescriptor)>;
 
 /// Unique identified of each RealSense stream that is currently supported.
 /// Note that this enum contains conversions to many useful types.
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Enum)]
+#[repr(u32)]
+#[enum_type(name = "GstRealsenseSrcStreamId")]
 pub(crate) enum StreamId {
-    /// Depth stream.
+    #[enum_value(name = "Ignored", nick = "none")]
+    None,
+    #[enum_value(name = "Depth stream", nick = "depth")]
     Depth,
-    /// Infra1 stream.
+    #[enum_value(name = "Infra1 stream", nick = "infra1")]
     Infra1,
-    /// Infra2 stream.
+    #[enum_value(name = "Infra2 stream", nick = "infra2")]
     Infra2,
-    /// Color stream.
+    #[enum_value(name = "Color stream", nick = "color")]
     Color,
+}
+
+impl Default for StreamId {
+    fn default() -> Self {
+        Self::None
+    }
 }
 
 impl Display for StreamId {
@@ -53,6 +63,7 @@ impl Display for StreamId {
             f,
             "{}",
             match self {
+                StreamId::None => "none",
                 StreamId::Depth => STREAM_ID_DEPTH,
                 StreamId::Infra1 => STREAM_ID_INFRA1,
                 StreamId::Infra2 => STREAM_ID_INFRA2,
@@ -62,34 +73,10 @@ impl Display for StreamId {
     }
 }
 
-impl TryFrom<&str> for StreamId {
-    type Error = gst::ErrorMessage;
-
-    fn try_from(stream: &str) -> Result<Self, Self::Error> {
-        match stream {
-            "depth" => Ok(Self::Depth),
-            "color" => Ok(Self::Color),
-            "infra1" => Ok(Self::Infra1),
-            "infra2" => Ok(Self::Infra2),
-            _ => Err(gst::error_msg!(
-                gst::StreamError::Failed,
-                ["{} is not a valid stream", stream]
-            )),
-        }
-    }
-}
-
-impl TryFrom<String> for StreamId {
-    type Error = gst::ErrorMessage;
-
-    fn try_from(stream: String) -> Result<Self, Self::Error> {
-        StreamId::try_from(stream.as_str())
-    }
-}
-
 impl From<StreamId> for RsStreamDescriptor {
     fn from(id: StreamId) -> RsStreamDescriptor {
         match id {
+            StreamId::None => unreachable!(),
             StreamId::Depth => RsStreamDescriptor::new(
                 rs2::rs2_stream::RS2_STREAM_DEPTH,
                 rs2::rs2_format::RS2_FORMAT_Z16,
@@ -138,6 +125,7 @@ impl From<RsStreamDescriptor> for StreamId {
 impl From<StreamId> for gst_video::VideoFormat {
     fn from(id: StreamId) -> gst_video::VideoFormat {
         match id {
+            StreamId::None => unreachable!(),
             StreamId::Depth => gst_video::VideoFormat::Gray16Le,
             StreamId::Infra1 | StreamId::Infra2 => gst_video::VideoFormat::Gray8,
             StreamId::Color => gst_video::VideoFormat::Rgb,

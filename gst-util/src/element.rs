@@ -25,13 +25,13 @@ use gst_sdp::*;
 pub trait ElementExtension {
     /// Creates a ghost pad with the same name and direction as the pad named `pad_name` in
     /// `element`. This function only ghosts static pads.
-    fn ghost_static_pad(&self, pad_name: &str) -> Result<GhostPad, ErrorMessage>;
+    fn ghost_static_pad(&self, pad_name: &str) -> Result<GhostPad, BoolError>;
 
     /// Links all `elements` together in the same way that `Element::link_many` does. Unlike
     /// `Element::link_many`, this function takes an `IntoIterator` of elements instead of a
     /// slice, which can allow one to avoid creating a slice when not necessary. On failure,
     /// this function might have linked some, but not all, the elements.
-    fn link_iter<Elems, ElemRef>(elements: Elems) -> Result<(), ErrorMessage>
+    fn link_iter<Elems, ElemRef>(elements: Elems) -> Result<(), BoolError>
     where
         Elems: IntoIterator<Item = ElemRef>,
         ElemRef: AsRef<gst::Element>;
@@ -41,18 +41,16 @@ impl<T> ElementExtension for T
 where
     T: IsA<gst::Element>,
 {
-    fn ghost_static_pad(&self, pad_name: &str) -> Result<GhostPad, ErrorMessage> {
-        let pad = self.static_pad(pad_name).ok_or_else(|| {
-            gst::error_msg!(CoreError::Pad, ["Element did not have pad '{}'", pad_name])
-        })?;
+    fn ghost_static_pad(&self, pad_name: &str) -> Result<GhostPad, BoolError> {
+        let pad = self
+            .static_pad(pad_name)
+            .ok_or_else(|| glib::bool_error!("Element did not have pad '{}'", pad_name))?;
 
         let direction = pad.direction();
-        gst::GhostPad::builder(Some(pad_name), direction)
-            .build_with_target(&pad)
-            .map_err(|e| gst::error_msg!(CoreError::Pad, ["{}", e]))
+        gst::GhostPad::builder(Some(pad_name), direction).build_with_target(&pad)
     }
 
-    fn link_iter<Elems, ElemRef>(elements: Elems) -> Result<(), ErrorMessage>
+    fn link_iter<Elems, ElemRef>(elements: Elems) -> Result<(), BoolError>
     where
         Elems: IntoIterator<Item = ElemRef>,
         ElemRef: AsRef<gst::Element>,
@@ -60,9 +58,7 @@ where
         let mut iter = elements.into_iter();
         let mut prev = orelse!(iter.next(), return Ok(()));
         for elem in iter {
-            prev.as_ref()
-                .link(elem.as_ref())
-                .map_err(|e| gst::error_msg!(CoreError::Pad, ["{}", e]))?;
+            prev.as_ref().link(elem.as_ref())?;
             prev = elem;
         }
         Ok(())

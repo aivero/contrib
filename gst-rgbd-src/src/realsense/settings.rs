@@ -63,7 +63,7 @@ pub(crate) struct Settings {
     pub(crate) real_time_rosbag_playback: bool,
     pub(crate) attach_camera_meta: bool,
     /// The stream identifier of the stream to align to.
-    pub(crate) align_to: Option<StreamId>,
+    pub(crate) align_to: StreamId,
 }
 
 /// A struct containing properties of `realsensesrc` about streams
@@ -114,10 +114,9 @@ impl StreamsSettings {
     /// `(i32, i32)` - Resolution of the stream formated as tuple=(width, height).
     pub(crate) fn get_stream_resolution(&self, stream_id: StreamId) -> (i32, i32) {
         // Depth, infra1 and infra2 streams share the same resolution.
-        if stream_id == StreamId::Color {
-            (self.color_resolution.width, self.color_resolution.height)
-        } else {
-            (self.depth_resolution.width, self.depth_resolution.height)
+        match stream_id {
+            StreamId::Color => (self.color_resolution.width, self.color_resolution.height),
+            _ => (self.depth_resolution.width, self.depth_resolution.height),
         }
     }
 }
@@ -150,7 +149,7 @@ impl Default for Settings {
             include_per_frame_metadata: DEFAULT_ENABLE_METADATA,
             real_time_rosbag_playback: DEFAULT_REAL_TIME_ROSBAG_PLAYBACK,
             attach_camera_meta: DEFAULT_ATTACH_CAMERA_META,
-            align_to: None,
+            align_to: StreamId::default(),
         }
     }
 }

@@ -15,6 +15,7 @@
 // Boston, MA 02110-1301, USA.
 
 use crate::element::*;
+use crate::message::*;
 use crate::orelse;
 use glib::*;
 use gst::prelude::*;
@@ -112,7 +113,7 @@ pub trait BinExtension {
     /// turn on more things this function should do while adding elements to the bin.
     /// On failure, this function might leave `bin` with some of, but not all, the elements
     /// added.
-    fn add_iter<Elems, ElemRef>(&self, opt: Add, elements: Elems) -> Result<(), ErrorMessage>
+    fn add_iter<Elems, ElemRef>(&self, opt: Add, elements: Elems) -> Result<(), BoolError>
     where
         Elems: IntoIterator<Item = ElemRef>,
         ElemRef: AsRef<Element>;
@@ -123,17 +124,20 @@ pub trait BinExtension {
     /// turn on more things this function should do while adding elements to the bin.
     /// On failure, this function might leave `bin` with some of, but not all, the elements
     /// removed.
-    fn remove_iter<Elems, ElemRef>(&self, opt: Remove, elements: Elems) -> Result<(), ErrorMessage>
+    fn remove_iter<Elems, ElemRef>(&self, opt: Remove, elements: Elems) -> Result<(), BoolError>
     where
         Elems: IntoIterator<Item = ElemRef>,
         ElemRef: AsRef<Element>;
+
+    /// Hook into the bins bus and dump debug dots when certain messages are posted.
+    fn dump_dot_on_important_messages(&self);
 }
 
 impl<T> BinExtension for T
 where
-    T: IsA<Bin> + IsA<Element>,
+    T: IsA<Bin> + IsA<Element> + IsA<gst::Object> + std::marker::Send,
 {
-    fn add_iter<Elems, ElemRef>(&self, opt: Add, elements: Elems) -> Result<(), ErrorMessage>
+    fn add_iter<Elems, ElemRef>(&self, opt: Add, elements: Elems) -> Result<(), BoolError>
     where
         Elems: IntoIterator<Item = ElemRef>,
         ElemRef: AsRef<Element>,
@@ -141,60 +145,61 @@ where
         let mut iter = elements.into_iter();
         let mut prev = orelse!(iter.next(), return Ok(()));
 
-        self.add(prev.as_ref())
-            .map_err(|e| gst::error_msg!(ResourceError::NoSpaceLeft, ["{}", e]))?;
+        self.add(prev.as_ref())?;
         if opt.ghost_sink {
             let pad = prev.as_ref().ghost_static_pad("sink")?;
-            self.add_pad(&pad)
-                .map_err(|e| gst::error_msg!(CoreError::Pad, ["{}", e]))?;
+            self.add_pad(&pad)?;
         }
         if opt.sync {
-            prev.as_ref()
-                .sync_state_with_parent()
-                .map_err(|e| gst::error_msg!(CoreError::StateChange, ["{}", e]))?;
+            prev.as_ref().sync_state_with_parent()?;
         }
 
         for elem in iter {
-            self.add(elem.as_ref())
-                .map_err(|e| gst::error_msg!(ResourceError::NoSpaceLeft, ["{}", e]))?;
+            self.add(elem.as_ref())?;
 
             if opt.link {
-                prev.as_ref()
-                    .link(elem.as_ref())
-                    .map_err(|e| gst::error_msg!(CoreError::Pad, ["{}", e]))?;
+                prev.as_ref().link(elem.as_ref())?;
             }
             if opt.sync {
-                elem.as_ref()
-                    .sync_state_with_parent()
-                    .map_err(|e| gst::error_msg!(CoreError::StateChange, ["{}", e]))?;
+                elem.as_ref().sync_state_with_parent()?;
             }
             prev = elem;
         }
 
         if opt.ghost_src {
             let pad = prev.as_ref().ghost_static_pad("src")?;
-            self.add_pad(&pad)
-                .map_err(|e| gst::error_msg!(CoreError::Pad, ["{}", e]))?;
+            self.add_pad(&pad)?;
         }
         Ok(())
     }
 
-    fn remove_iter<Elems, ElemRef>(&self, opt: Remove, elements: Elems) -> Result<(), ErrorMessage>
+    fn remove_iter<Elems, ElemRef>(&self, opt: Remove, elements: Elems) -> Result<(), BoolError>
     where
         Elems: IntoIterator<Item = ElemRef>,
         ElemRef: AsRef<Element>,
     {
         for elem in elements.into_iter() {
             let elem = elem.as_ref();
-            self.remove(elem)
-                .map_err(|e| gst::error_msg!(ResourceError::NoSpaceLeft, ["{}", e]))?;
+            self.remove(elem)?;
 
             if opt.null {
                 let _ = elem
                     .set_state(gst::State::Null)
-                    .map_err(|e| gst::error_msg!(CoreError::StateChange, ["{}", e]))?;
+                    .map_err(|e| glib::bool_error!("{}", e))?;
             }
         }
         Ok(())
+    }
+
+    fn dump_dot_on_important_messages(&self) {
+        let _ = self.bus().map(|bus| {
+            bus.add_watch({
+                let this = self.clone();
+                move |_, msg| {
+                    msg.dump_dot_if_important(this.upcast_ref());
+                    glib::Continue(true)
+                }
+            })
+        });
     }
 }

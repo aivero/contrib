@@ -14,15 +14,10 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA 02110-1301, USA.
 
-use std::{
-    collections::HashMap,
-    convert::TryFrom,
-    convert::TryInto,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Mutex, RwLock,
-    },
-};
+use std::collections::HashMap;
+use std::convert::TryInto;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Mutex, RwLock};
 
 use gst::subclass::prelude::*;
 use gst_base::prelude::*;
@@ -190,18 +185,16 @@ impl BaseSrcImpl for RealsenseSrc {
                 );
 
                 // Add resolution fields for the stream.
-                let (width, height) =
-                    if settings.align_to.is_none() || stream_id.to_string().contains("infra") {
-                        // Use the configured resolution if aligning is disabled. Infra streams are
-                        // not supported by align processing block and always keep their resolution.
+                let (width, height) = match settings.align_to {
+                    // Use the configured resolution if aligning is disabled. Infra streams are
+                    // not supported by align processing block and always keep their resolution.
+                    StreamId::None | StreamId::Infra1 | StreamId::Infra2 => {
                         settings.streams.get_stream_resolution(*stream_id)
-                    } else {
-                        // Resolution of the target stream must be used when aligning the stream.
-                        // Applies to depth and color streams.
-                        settings
-                            .streams
-                            .get_stream_resolution(settings.align_to.unwrap())
-                    };
+                    }
+                    // Resolution of the target stream must be used when aligning the stream.
+                    // Applies to depth and color streams.
+                    _ => settings.streams.get_stream_resolution(settings.align_to),
+                };
                 s.set(&format!("{}_width", stream_id), &width);
                 s.set(&format!("{}_height", stream_id), &height);
             }
@@ -582,19 +575,23 @@ impl RealsenseSrc {
         }
 
         // Create align processing block if enabled
-        if let Some(align_to) = settings.align_to {
+        if !matches!(
+            settings.align_to,
+            StreamId::Infra1 | StreamId::Infra2 | StreamId::None
+        ) {
             if !settings.streams.enabled_streams.depth {
-                return Err(gst::error_msg!(
-                    gst::LibraryError::Settings,
-                    ["Can not perform alignment if depth stream is not enabled"]
-                ));
+                gst_warning!(
+                    CAT,
+                    "Can not perform alignment if depth stream is not enabled"
+                );
+                return Ok(());
             }
-            if !settings.streams.enabled_streams.color && settings.align_to == Some(StreamId::Color)
-            {
-                return Err(gst::error_msg!(
-                    gst::LibraryError::Settings,
-                    ["Can not align depth to color if color stream is not enabled."]
-                ));
+            if !settings.streams.enabled_streams.color && settings.align_to == StreamId::Color {
+                gst_warning!(
+                    CAT,
+                    "Can not align depth to color if color stream is not enabled"
+                );
+                return Ok(());
             }
             // librealsense segfaults if we try to align zero streams to depth.
             // We prefer it warns and then operates as if no alignment was requested.
@@ -602,7 +599,7 @@ impl RealsenseSrc {
             if enabled_streams.len() > 1 {
                 *self.align_processing_block.lock().unwrap() = Some(
                     ProcessingBlock::create_align(
-                        Into::<RsStreamDescriptor>::into(align_to).rs2_stream,
+                        Into::<RsStreamDescriptor>::into(settings.align_to).rs2_stream,
                     )
                     .map_err(|e| gst::error_msg!(gst::LibraryError::Settings, ["{}", e]))?,
                 )
@@ -1639,13 +1636,14 @@ impl ObjectImpl for RealsenseSrc {
                     DEFAULT_ATTACH_CAMERA_META,
                     glib::ParamFlags::READWRITE,
                 ),
-                glib::ParamSpecString::new(
+                glib::ParamSpecEnum::new(
                     "align-to",
                     "The stream to align to",
                     "The name of the stream to align to (target). Supported values are 'depth'
                      and 'color'. Note that aligning of 'infra1' and 'infra2' streams to
                      'color' is not supported.",
-                    None,
+                    StreamId::static_type(),
+                    StreamId::default() as i32,
                     glib::ParamFlags::READWRITE,
                 ),
             ]
@@ -1961,26 +1959,14 @@ impl ObjectImpl for RealsenseSrc {
                 settings.attach_camera_meta = attach_camera_meta;
             }
             "align-to" => {
-                let target = value.get::<String>().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `align-to` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                let align_to = StreamId::try_from(target).unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `align-to` due to invalid value: {:?}",
-                        err
-                    )
-                });
-
+                let align_to = value.get::<StreamId>().unwrap();
                 gst_info!(
                     CAT,
                     obj: obj,
                     "Changing property `align-to` to {:?}",
                     align_to
                 );
-                settings.align_to = Some(align_to);
+                settings.align_to = align_to;
             }
             _ => unimplemented!("Property is not implemented"),
         };
@@ -2007,13 +1993,7 @@ impl ObjectImpl for RealsenseSrc {
             "include-per-frame-metadata" => settings.include_per_frame_metadata.to_value(),
             "real-time-rosbag-playback" => settings.real_time_rosbag_playback.to_value(),
             "attach-camera-meta" => settings.attach_camera_meta.to_value(),
-            "align-to" => {
-                if let Some(stream_name) = settings.align_to {
-                    stream_name.to_string().to_value()
-                } else {
-                    None::<String>.to_value()
-                }
-            }
+            "align-to" => settings.align_to.to_value(),
             _ => unimplemented!("Property is not implemented"),
         }
     }

@@ -37,19 +37,38 @@ class GstVaapi(GstRecipe):
         self.requires(f"gst-plugins-bad/[~{self.settings.gstreamer}]")
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz")
+        if "1.21" in self.version:
+            # until https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 is merged (and tagged) we need to use slomos branch
+            self.get(f"https://gitlab.freedesktop.org/slomo/gstreamer/-/archive/rfc6051.tar.gz")
+        else:
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"
+            )
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gstreamer-vaapi")
-        opts = {
-            "with_drm": self.options.drm,
-            "with_egl": self.options.egl,
-            "with_encoders": self.options.encoders,
-            "with_glx": self.options.glx,
-            "with_x11": self.options.x11,
-            "with_wayland": self.options.wayland,
-            "tests": self.options.tests,
-        }
+        opts = {}
+        if "1.21" in self.version:
+            opts = {
+                "drm": self.options.drm,
+                "egl": self.options.egl,
+                "encoders": self.options.encoders,
+                "glx": self.options.glx,
+                "x11": self.options.x11,
+                "wayland": self.options.wayland,
+                "tests": self.options.tests,
+            }
+        else:
+            opts = {
+                "with_drm": self.options.drm,
+                "with_egl": self.options.egl,
+                "with_encoders": self.options.encoders,
+                "with_glx": self.options.glx,
+                "with_x11": self.options.x11,
+                "with_wayland": self.options.wayland,
+                "tests": self.options.tests,
+            }
+
         self.meson(opts, source_folder)
 
     def package(self):

@@ -1,0 +1,104 @@
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
+index 0c0622f6a4..99c3facffe 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
+@@ -6476,6 +6476,48 @@ gst_matroska_demux_video_caps (GstMatroskaTrackVideoContext *
+     caps = gst_video_info_to_caps (&info);
+     *codec_name = gst_pb_utils_get_codec_description (caps);
+     context->alignment = 32;
++  } else if (!strcmp (codec_id, GST_MATROSKA_CODEC_ID_VIDEO_RVL)) {
++    GstVideoFormat format;
++
++    switch (videocontext->fourcc) {
++      case GST_MAKE_FOURCC ('I', '4', '2', '0'):
++        format = GST_VIDEO_FORMAT_I420;
++        break;
++      case GST_MAKE_FOURCC ('Y', 'U', 'Y', '2'):
++        format = GST_VIDEO_FORMAT_YUY2;
++        break;
++      case GST_MAKE_FOURCC ('Y', 'V', '1', '2'):
++        format = GST_VIDEO_FORMAT_YV12;
++        break;
++      case GST_MAKE_FOURCC ('U', 'Y', 'V', 'Y'):
++        format = GST_VIDEO_FORMAT_UYVY;
++        break;
++      case GST_MAKE_FOURCC ('A', 'Y', 'U', 'V'):
++        format = GST_VIDEO_FORMAT_AYUV;
++        break;
++      case GST_MAKE_FOURCC ('Y', '8', '0', '0'):
++      case GST_MAKE_FOURCC ('Y', '8', ' ', ' '):
++        format = GST_VIDEO_FORMAT_GRAY8;
++        break;
++      case GST_MAKE_FOURCC ('R', 'G', 'B', 24):
++        format = GST_VIDEO_FORMAT_RGB;
++        break;
++      case GST_MAKE_FOURCC ('B', 'G', 'R', 24):
++        format = GST_VIDEO_FORMAT_BGR;
++        break;
++      case GST_MAKE_FOURCC ('Y', '1', '6', ' '):
++        format = GST_VIDEO_FORMAT_GRAY16_LE;
++        break;
++      default:
++        GST_DEBUG ("Unknown fourcc %" GST_FOURCC_FORMAT,
++            GST_FOURCC_ARGS (videocontext->fourcc));
++        return NULL;
++    }
++
++    caps = gst_caps_new_simple ("video/rvl",
++        "format", G_TYPE_STRING, gst_video_format_to_string (format), NULL);
++    context->intra_only = TRUE;
++    *codec_name = g_strdup ("RVL depth map");
+   } else if (!strcmp (codec_id, GST_MATROSKA_CODEC_ID_VIDEO_MPEG4_SP)) {
+     caps = gst_caps_new_simple ("video/x-divx",
+         "divxversion", G_TYPE_INT, 4, NULL);
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
+index 0b350aadac..e87fed768c 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
+@@ -381,6 +381,9 @@
+ #define GST_MATROSKA_CODEC_ID_VIDEO_MPEGH_HEVC   "V_MPEGH/ISO/HEVC"
+ #define GST_MATROSKA_CODEC_ID_VIDEO_PRORES       "V_PRORES"
+ #define GST_MATROSKA_CODEC_ID_VIDEO_FFV1         "V_FFV1"
++/* Aivero-specific: RVL encoded depth map */
++#define GST_MATROSKA_CODEC_ID_VIDEO_RVL          "V_RVL"
++
+ 
+ #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L1       "A_MPEG/L1"
+ #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L2       "A_MPEG/L2"
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
+index 1bf856cd4a..0f6846f838 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
+@@ -143,6 +143,9 @@ static GstStaticPadTemplate videosink_templ =
+         "video/x-raw, "
+         "format = (string) { YUY2, I420, YV12, UYVY, AYUV, GRAY8, BGR, RGB }, "
+         COMMON_VIDEO_CAPS "; "
++        "video/rvl, "
++        "format = (string) { YUY2, I420, YV12, UYVY, AYUV, GRAY8, BGR, RGB, GRAY16_LE }, "
++        COMMON_VIDEO_CAPS "; "
+         "video/x-prores, "
+         COMMON_VIDEO_CAPS "; "
+         "video/x-wmv, " "wmvversion = (int) [ 1, 3 ], " COMMON_VIDEO_CAPS "; "
+@@ -1240,6 +1243,22 @@ skip_details:
+       else if (!strcmp (fstr, "RGB"))
+         videocontext->fourcc = GST_MAKE_FOURCC ('R', 'G', 'B', 24);
+     }
++  } else if (!strcmp (mimetype, "video/rvl")) {
++    const gchar *fstr;
++    gst_matroska_mux_set_codec_id (context, GST_MATROSKA_CODEC_ID_VIDEO_RVL);
++    fstr = gst_structure_get_string (structure, "format");
++    if (fstr) {
++      if (strlen (fstr) == 4)
++        videocontext->fourcc = GST_STR_FOURCC (fstr);
++      else if (!strcmp (fstr, "GRAY8"))
++        videocontext->fourcc = GST_MAKE_FOURCC ('Y', '8', '0', '0');
++      else if (!strcmp (fstr, "BGR"))
++        videocontext->fourcc = GST_MAKE_FOURCC ('B', 'G', 'R', 24);
++      else if (!strcmp (fstr, "RGB"))
++        videocontext->fourcc = GST_MAKE_FOURCC ('R', 'G', 'B', 24);
++      else if (!strcmp (fstr, "GRAY16_LE"))
++        videocontext->fourcc = GST_MAKE_FOURCC ('Y', '1', '6', ' ');
++    }
+   } else if (!strcmp (mimetype, "video/x-huffyuv")      /* MS/VfW compatibility cases */
+       ||!strcmp (mimetype, "video/x-divx")
+       || !strcmp (mimetype, "video/x-dv")

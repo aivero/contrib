@@ -1,8 +1,8 @@
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-index 52a76b9d9c..56fbb02426 100644
+index 64cc6be60b..0586df132e 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-@@ -6476,6 +6476,48 @@ gst_matroska_demux_video_caps (GstMatroskaTrackVideoContext *
+@@ -6473,6 +6473,48 @@ gst_matroska_demux_video_caps (GstMatroskaTrackVideoContext *
      caps = gst_video_info_to_caps (&info);
      *codec_name = gst_pb_utils_get_codec_description (caps);
      context->alignment = 32;
@@ -52,21 +52,20 @@ index 52a76b9d9c..56fbb02426 100644
      caps = gst_caps_new_simple ("video/x-divx",
          "divxversion", G_TYPE_INT, 4, NULL);
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
-index c4fc73caad..a86b8d520b 100644
+index acfae58877..9f4b3ec9b7 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
-@@ -382,6 +382,9 @@
+@@ -381,6 +381,8 @@
+ #define GST_MATROSKA_CODEC_ID_VIDEO_MPEGH_HEVC   "V_MPEGH/ISO/HEVC"
  #define GST_MATROSKA_CODEC_ID_VIDEO_PRORES       "V_PRORES"
  #define GST_MATROSKA_CODEC_ID_VIDEO_FFV1         "V_FFV1"
- 
 +/* Aivero-specific: RVL encoded depth map */
 +#define GST_MATROSKA_CODEC_ID_VIDEO_RVL          "V_RVL"
-+
+ 
  #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L1       "A_MPEG/L1"
  #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L2       "A_MPEG/L2"
- #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L3       "A_MPEG/L3"
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
-index 5d48b67c8d..2ba8a9b7fc 100644
+index 25c0162689..6d9bdcbe4c 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 @@ -148,6 +148,9 @@ static GstStaticPadTemplate videosink_templ =
@@ -79,7 +78,7 @@ index 5d48b67c8d..2ba8a9b7fc 100644
          "video/x-prores, "
          COMMON_VIDEO_CAPS "; "
          "video/x-wmv, " "wmvversion = (int) [ 1, 3 ], " COMMON_VIDEO_CAPS "; "
-@@ -1214,6 +1217,22 @@ skip_details:
+@@ -1263,6 +1266,22 @@ skip_details:
        else if (!strcmp (fstr, "RGB"))
          videocontext->fourcc = GST_MAKE_FOURCC ('R', 'G', 'B', 24);
      }
@@ -102,6 +101,3 @@ index 5d48b67c8d..2ba8a9b7fc 100644
    } else if (!strcmp (mimetype, "video/x-huffyuv")      /* MS/VfW compatibility cases */
        ||!strcmp (mimetype, "video/x-divx")
        || !strcmp (mimetype, "video/x-dv")
--- 
-2.34.1
-

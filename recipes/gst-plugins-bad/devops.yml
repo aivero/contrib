@@ -1,4 +1,4 @@
-- version: 1.20.0
+- version: 1.21.0
   profiles: ["linux-x86_64", "linux-x86_64-dev", "linux-armv8"]
-
-
+- version: 1.20.1
+  profiles: ["linux-armv8-gst1.20", "linux-x86_64-gst1.20"]

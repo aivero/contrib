@@ -83,12 +83,19 @@ class GstPluginsGood(GstRecipe):
             self.requires("libjpeg-turbo/[^2.0.3]")
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz")
-        self.patch("0001-matroska-Support-any-tag.patch")
-
-        # Add our own custom changes
-        if self.options.aivero_rvl_matroska:
-            self.patch("0001-matroska-add-support-for-custom-video-rvl-depth-map-.patch")
+        if "1.21" in self.version:
+            # until https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 is merged (and tagged) we need to use slomos branch
+            self.get(f"https://gitlab.freedesktop.org/slomo/gstreamer/-/archive/rfc6051.tar.gz")
+            self.patch("0001-matroska-Support-any-tag-1.21.0.patch")
+            # Add our own custom changes
+            if self.options.aivero_rvl_matroska:
+                self.patch("0002-matroska-add-support-for-custom-video-rvl-depth-map-1.21.0.patch")
+        else:           
+            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz")
+            self.patch("0001-matroska-Support-any-tag-1.20.0.patch")
+            # Add our own custom changes
+            if self.options.aivero_rvl_matroska:
+                self.patch("0002-matroska-add-support-for-custom-video-rvl-depth-map-1.20.0.patch")
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gst-plugins-good")

@@ -1,7 +1,14 @@
-- version: 1.20.0
+- version: 1.21.0
   profiles:
     - linux-armv8-rpi-pi4
     - linux-armv8-l4t-t210
     - linux-armv8-l4t-t186
     - linux-armv8
     - linux-x86_64
+- version: 1.20.1
+  profiles:
+    - linux-armv8-rpi-pi4-gst1.20
+    - linux-armv8-l4t-t210-gst1.20
+    - linux-armv8-l4t-t186-gst1.20
+    - linux-armv8-gst1.20
+    - linux-x86_64-gst1.20

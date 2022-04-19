@@ -14,8 +14,6 @@ class GstRecipe(GstRustProject):
 
     def source(self):
         self.get(f"https://github.com/centricular/webrtcsink/archive/{self.version}.tar.gz")
-        self.patch("cafile.patch")
-        self.patch("vp9enctuning.patch")
 
         project_files = os.listdir(os.path.join(self.src))
         for pfile in project_files:

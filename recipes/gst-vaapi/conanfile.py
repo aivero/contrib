@@ -38,8 +38,8 @@ class GstVaapi(GstRecipe):
 
     def source(self):
         if "1.21" in self.version:
-            # until https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 is merged (and tagged) we need to use slomos branch
-            self.get(f"https://gitlab.freedesktop.org/slomo/gstreamer/-/archive/rfc6051.tar.gz")
+            # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 are tagged we need to use a commit of the main branch
+            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz")
         else:
             self.get(
                 f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"

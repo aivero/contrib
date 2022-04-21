@@ -47,9 +47,13 @@ class GstPluginsBase(GstRecipe):
     def source(self):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 are tagged we need to use a commit of the main branch
-            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz")
-        else:           
-            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz")
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz"
+            )
+        else:
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"
+            )
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gst-plugins-base")
@@ -74,5 +78,6 @@ class GstPluginsBase(GstRecipe):
             "encoding": True,
             "audiomixer": True,
             "videorate": True,
+            "tools": True,
         }
         self.meson(opts, source_folder)

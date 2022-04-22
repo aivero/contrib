@@ -1,0 +1,75 @@
+From 6d9ca220eb2b3e3d8ab06f20efb5ba2e1422c143 Mon Sep 17 00:00:00 2001
+From: kayou <pierre.moltess@gmail.com>
+Date: Tue, 15 Feb 2022 13:39:43 +0000
+Subject: [PATCH] [fix] deadlock in gst_rtsp_client_sink_collect_streams
+
+---
+ .../gst/rtsp-sink/gstrtspclientsink.c         | 31 +++++++++++--------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
+
+diff --git a/subprojects/gst-rtsp-server/gst/rtsp-sink/gstrtspclientsink.c b/subprojects/gst-rtsp-server/gst/rtsp-sink/gstrtspclientsink.c
+index 3573e2088b..bb3953c5ed 100644
+--- a/subprojects/gst-rtsp-server/gst/rtsp-sink/gstrtspclientsink.c
++++ b/subprojects/gst-rtsp-server/gst/rtsp-sink/gstrtspclientsink.c
+@@ -3601,6 +3601,18 @@ request_fec_encoder (GstElement * rtpbin, guint sessid,
+   return ret;
+ }
+ 
++static gboolean
++gst_rtsp_client_sink_is_stopping (GstRTSPClientSink * sink)
++{
++  gboolean is_stopping;
++
++  GST_OBJECT_LOCK (sink);
++  is_stopping = sink->task == NULL;
++  GST_OBJECT_UNLOCK (sink);
++
++  return is_stopping;
++}
++
+ static gboolean
+ gst_rtsp_client_sink_collect_streams (GstRTSPClientSink * sink)
+ {
+@@ -3640,7 +3652,8 @@ gst_rtsp_client_sink_collect_streams (GstRTSPClientSink * sink)
+       continue;
+ 
+     g_mutex_lock (&sink->preroll_lock);
+-    while (!context->prerolled && !sink->conninfo.flushing) {
++    while (!context->prerolled && !sink->conninfo.flushing
++        && !gst_rtsp_client_sink_is_stopping (sink)) {
+       GST_DEBUG_OBJECT (sink, "Waiting for caps on stream %d", context->index);
+       g_cond_wait (&sink->preroll_cond, &sink->preroll_lock);
+     }
+@@ -4374,18 +4387,6 @@ done:
+   return res;
+ }
+ 
+-static gboolean
+-gst_rtsp_client_sink_is_stopping (GstRTSPClientSink * sink)
+-{
+-  gboolean is_stopping;
+-
+-  GST_OBJECT_LOCK (sink);
+-  is_stopping = sink->task == NULL;
+-  GST_OBJECT_UNLOCK (sink);
+-
+-  return is_stopping;
+-}
+-
+ static GstRTSPResult
+ gst_rtsp_client_sink_record (GstRTSPClientSink * sink, gboolean async)
+ {
+@@ -4989,6 +4990,10 @@ gst_rtsp_client_sink_stop (GstRTSPClientSink * sink)
+     g_cond_broadcast (&sink->block_streams_cond);
+     g_mutex_unlock (&sink->block_streams_lock);
+ 
++    g_mutex_lock (&sink->preroll_lock);
++    g_cond_broadcast (&sink->preroll_cond);
++    g_mutex_unlock (&sink->preroll_lock);
++
+     /* make sure it is not running */
+     GST_RTSP_STREAM_LOCK (sink);
+     GST_RTSP_STREAM_UNLOCK (sink);
+-- 
+2.36.0
+

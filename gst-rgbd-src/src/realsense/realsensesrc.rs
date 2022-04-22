@@ -496,9 +496,9 @@ impl RealsenseSrc {
                 )
                 .ok_or_else(|| gst::error_msg!(gst::StreamError::Failed, [""]))?;
 
-            // Load JSON if `json-location` is defined
-            if let Some(json_location) = &settings.json_location {
-                Self::load_json(&device, json_location)?;
+            // Load JSON if `config` is defined
+            if let Some(config) = &settings.config {
+                Self::load_json(&device, config)?;
             }
 
             // Store in internals, so that the device can be hardware reset after stream is over
@@ -642,7 +642,7 @@ impl RealsenseSrc {
     ///     * Invalid `serial` is passed
     ///     * Json file cannot be read
     ///     * Json config is invalid
-    fn load_json(device: &rs2::device::Device, json_location: &str) -> Result<(), ErrorMessage> {
+    fn load_json(device: &rs2::device::Device, config: &str) -> Result<(), ErrorMessage> {
         if !device
             .is_advanced_mode_enabled()
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?
@@ -651,19 +651,9 @@ impl RealsenseSrc {
                 .set_advanced_mode(true)
                 .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
         }
-        let json_content = std::fs::read_to_string(json_location).map_err(|e| {
-            gst::error_msg!(
-                gst::StreamError::Failed,
-                [
-                    "Cannot read RealSense configuration from \"{}\": {:?}",
-                    json_location,
-                    e
-                ]
-            )
-        })?;
 
         device
-            .load_json(&json_content)
+            .load_json(config)
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
         Ok(())
     }
@@ -1508,12 +1498,10 @@ impl ObjectImpl for RealsenseSrc {
                     glib::ParamFlags::READWRITE,
                 ),
                 glib::ParamSpecString::new(
-                    "json-location",
-                    "JSON File Location",
-                    "Location of a JSON file to load the RealSense device configuration from.
-                     This property applies only if `serial` is specified. If unchanged or empty,
-                     previous JSON configuration is used. If no previous configuration is present
-                     due to hardware reset, default configuration is used.",
+                    "config",
+                    "Realsense config json string",
+                    "The string to configure RealSense device from. This property applies only \
+                     if `serial` is specified.",
                     None,
                     glib::ParamFlags::READWRITE,
                 ),
@@ -1719,34 +1707,7 @@ impl ObjectImpl for RealsenseSrc {
                     }
                 }
             }
-            "json-location" => {
-                match value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `json-location` due to incorrect type: {:?}",
-                        err
-                    )
-                }) {
-                    Some(mut jl) => {
-                        expand_tilde_as_home_dir(&mut jl);
-                        gst_info!(
-                            CAT,
-                            obj: obj,
-                            "Changing property `json-location` from {:?} to {:?}",
-                            settings.json_location,
-                            jl
-                        );
-                        settings.json_location = Some(jl);
-                    }
-                    None => {
-                        gst_info!(
-                            CAT,
-                            obj: obj,
-                            "`json-location` property not set, setting from {:?} to None",
-                            settings.json_location,
-                        );
-                    }
-                }
-            }
+            "config" => settings.config = value.get().ok(),
             "enable-depth" => {
                 let enable_depth = value.get().unwrap_or_else(|err| {
                     panic!(
@@ -1978,7 +1939,7 @@ impl ObjectImpl for RealsenseSrc {
         match pspec.name() {
             "serial" => settings.serial.to_value(),
             "rosbag-location" => settings.rosbag_location.to_value(),
-            "json-location" => settings.json_location.to_value(),
+            "config" => settings.config.to_value(),
             "enable-depth" => settings.streams.enabled_streams.depth.to_value(),
             "enable-infra1" => settings.streams.enabled_streams.infra1.to_value(),
             "enable-infra2" => settings.streams.enabled_streams.infra2.to_value(),

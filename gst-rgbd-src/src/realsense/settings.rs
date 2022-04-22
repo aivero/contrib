@@ -55,7 +55,7 @@ pub(crate) const DEFAULT_COLOR_HEIGHT: i32 = 720;
 pub(crate) struct Settings {
     pub(crate) serial: Option<String>,
     pub(crate) rosbag_location: Option<String>,
-    pub(crate) json_location: Option<String>,
+    pub(crate) config: Option<String>,
     pub(crate) streams: StreamsSettings,
     pub(crate) loop_rosbag: bool,
     pub(crate) wait_for_frames_timeout: u32,
@@ -126,7 +126,7 @@ impl Default for Settings {
         Settings {
             rosbag_location: None,
             serial: None,
-            json_location: None,
+            config: None,
             streams: StreamsSettings {
                 enabled_streams: EnabledStreams {
                     depth: DEFAULT_ENABLE_DEPTH,

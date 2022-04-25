@@ -32,6 +32,11 @@ fn main() {
         .rustified_enum("rs2_sr300_visual_preset")
         .rustified_enum("rs2_rs400_visual_preset")
         .rustified_enum("rs2_l500_visual_preset")
+        .blocklist_item("FP_NAN")
+        .blocklist_item("FP_INFINITE")
+        .blocklist_item("FP_ZERO")
+        .blocklist_item("FP_SUBNORMAL")
+        .blocklist_item("FP_NORMAL")
         .clang_args(path_args)
         .generate()
         .expect("Unable to generate bindings");

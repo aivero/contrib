@@ -1,10 +1,16 @@
 from build import *
 
+
 class LibRealsenseRecipe(PythonRecipe):
     description = "Intel RealSense SDK"
     license = "Apache"
     settings = PythonRecipe.settings
-    exports = "libusb-fix.patch", "pkgconfig-fix.patch", "cuda-clang-support.patch"
+    exports = (
+        "libusb-fix.patch",
+        "pkgconfig-fix.patch",
+        "cuda-clang-support.patch",
+        "0001-Add-udev-include-dir.patch",
+    )
     options = {"cuda": [True, False], "python": [True, False], "libuvc": [True, False]}
     default_options = ("cuda=False", "python=False", "libuvc=False")
     build_requires = (
@@ -29,6 +35,7 @@ class LibRealsenseRecipe(PythonRecipe):
         self.patch("pkgconfig-fix.patch")
         self.patch("libusb-fix.patch")
         self.patch("cuda-clang-support.patch")
+        self.patch("0001-Add-udev-include-dir.patch")
 
     def build(self):
         defs = {

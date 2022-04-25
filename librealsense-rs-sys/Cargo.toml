@@ -10,5 +10,5 @@ edition = "2018"
 readme = "README.md"
 
 [build-dependencies]
-pkg-config = "0.3.19"
-bindgen = "0.59.1"
+pkg-config = "0.3.25"
+bindgen = "0.59.2"

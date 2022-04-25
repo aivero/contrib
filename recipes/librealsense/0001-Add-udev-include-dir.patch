@@ -1,0 +1,24 @@
+From 4fa9d9c0caa1e5b7c3d7d333f759805f2f87f02d Mon Sep 17 00:00:00 2001
+From: Jimmi Holst Christensen <jhc@dismail.de>
+Date: Mon, 25 Apr 2022 15:29:55 +0200
+Subject: [PATCH] Add udev include dir
+
+---
+ src/linux/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/linux/CMakeLists.txt b/src/linux/CMakeLists.txt
+index 4da5bfe9a..7a2fc0333 100644
+--- a/src/linux/CMakeLists.txt
++++ b/src/linux/CMakeLists.txt
+@@ -21,6 +21,7 @@ if(UDEV_FOUND)
+             "${CMAKE_CURRENT_LIST_DIR}/udev-device-watcher.cpp"
+             "${CMAKE_CURRENT_LIST_DIR}/udev-device-watcher.h"
+     )
++    target_include_directories(${LRS_TARGET} PRIVATE ${UDEV_INCLUDE_DIRS})
+     target_link_libraries(${LRS_TARGET} PRIVATE udev)
+     add_definitions(-DUSING_UDEV)
+ else()
+-- 
+2.36.0
+

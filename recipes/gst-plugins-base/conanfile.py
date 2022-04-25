@@ -65,7 +65,6 @@ class GstPluginsBase(GstRecipe):
             "gl": True,
             "videotestsrc": True,
             "audiotestsrc": True,
-            "videoconvertscale": True,
             "app": True,
             "playback": True,
             "typefind": True,
@@ -79,4 +78,10 @@ class GstPluginsBase(GstRecipe):
             "videorate": True,
             "tools": True,
         }
+        if "1.21" in self.version:
+            opts["videoconvertscale"] = True
+        else:
+            opts["videoconvert"] = True
+            opts["videoscale"] = True
+
         self.meson(opts, source_folder)

@@ -32,11 +32,8 @@ class GstRtspServer(GstRecipe):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 are tagged we need to use a commit of the main branch
             self.get(
-                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz"
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/3391a7d4998f301a2d1f5b255adf7a8d9b32ebb6.tar.gz"
             )
-            # Remove this once merged:
-            # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/1696
-            self.patch("0001-fix-deadlock-in-gst_rtsp_client_sink_collect_streams.patch")
         else:
             self.get(
                 f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"

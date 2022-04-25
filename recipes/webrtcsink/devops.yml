@@ -1,4 +1,4 @@
-- version: ee200326efd650b339cd21b5beaf561b2c22e5c4
+- version: b51cdb9de0a85ecd90ea0d91742d0b79637ebdfd
   profiles: ["linux-x86_64", "linux-x86_64-gst1.20", "linux-x86_64-dev"]
   trigger: [webrtc-signalling]
 

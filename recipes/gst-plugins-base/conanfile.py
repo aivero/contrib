@@ -48,7 +48,7 @@ class GstPluginsBase(GstRecipe):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 are tagged we need to use a commit of the main branch
             self.get(
-                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz"
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/3391a7d4998f301a2d1f5b255adf7a8d9b32ebb6.tar.gz"
             )
         else:
             self.get(
@@ -65,14 +65,13 @@ class GstPluginsBase(GstRecipe):
             "gl": True,
             "videotestsrc": True,
             "audiotestsrc": True,
-            "videoconvert": True,
+            "videoconvertscale": True,
             "app": True,
             "playback": True,
             "typefind": True,
             "orc": True,
             "opus": True,
             "pango": True,
-            "videoscale": True,
             "audioconvert": True,
             "compositor": True,
             "encoding": True,

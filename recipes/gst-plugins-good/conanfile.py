@@ -85,14 +85,19 @@ class GstPluginsGood(GstRecipe):
     def source(self):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 are tagged we need to use a commit of the main branch
-            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz")
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/02115a5efc697845b6328d26a50b756dcf9b4549.tar.gz"
+            )
             self.patch("0001-matroska-Support-any-tag-1.21.0.patch")
             self.patch("2250.patch")
+            self.patch("0001-v4l2deviceprovider-Return-device-even-if-caps-is-EMP.patch")
             # Add our own custom changes
             if self.options.aivero_rvl_matroska:
                 self.patch("0002-matroska-add-support-for-custom-video-rvl-depth-map-1.21.0.patch")
-        else:           
-            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz")
+        else:
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"
+            )
             self.patch("0001-matroska-Support-any-tag-1.20.0.patch")
             # Add our own custom changes
             if self.options.aivero_rvl_matroska:

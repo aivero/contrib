@@ -20,6 +20,8 @@ class Libglvnd(Recipe):
 
     def source(self):
         self.get(f"https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/v{self.version}/libglvnd-v{self.version}.tar.gz")
+        # Hardcode glvnd vendor path, since conan prefixes the package name in env vars starting with __, so __DEFAULT_EGL_VENDOR_CONFIG_DIRS cannot be set
+        tools.replace_in_file(os.path.join(self.src, "src", "EGL", "libeglvendor.c"), "DEFAULT_EGL_VENDOR_CONFIG_DIRS", '"/usr/share/glvnd/egl_vendor.d"')
 
     def build(self):
         opts = {
@@ -27,6 +29,3 @@ class Libglvnd(Recipe):
             "glx": self.options.x11,
         }
         self.meson(opts)
-
-    def package_info(self):
-        self.env_info.__EGL_VENDOR_LIBRARY_DIRS.append("/usr/share/glvnd/egl_vendor.d")

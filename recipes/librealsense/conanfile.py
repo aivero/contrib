@@ -21,8 +21,6 @@ class LibRealsenseRecipe(PythonRecipe):
     requires = ("libusb/[^1.0.23]",)
 
     def requirements(self):
-        if self.options.cuda:
-            self.requires("cuda/[^11.2.1]")
         if self.options.python:
             self.requires(f"python/[~{self.settings.python}]")
 

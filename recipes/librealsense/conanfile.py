@@ -4,7 +4,7 @@ from build import *
 class LibRealsenseRecipe(PythonRecipe):
     description = "Intel RealSense SDK"
     license = "Apache"
-    settings = PythonRecipe.settings
+    settings = PythonRecipe.settings + ("hardware",)
     exports = (
         "libusb-fix.patch",
         "pkgconfig-fix.patch",

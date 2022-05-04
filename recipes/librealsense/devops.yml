@@ -1,14 +1,23 @@
 - version: 2.50.0
   profiles: ["linux-x86_64"]
+
 - version: 2.50.0
   profiles: ["linux-armv8-rpi-rpi4"]
+
 - version: 2.50.0
   profiles: ["linux-armv8-l4t-t186"]
-  image: registry.gitlab.com/aivero/prop/workspace/deepcore-daemon-docker/linux-armv8-l4t-t186:latest
+  image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t186:latest
+  conan:
+    options:
+      cuda: True
   before_script:
     - apt-get update && apt-get install -y cuda-toolkit-10-2
+
 - version: 2.50.0
   profiles: ["linux-armv8-l4t-t210"]
-  image: registry.gitlab.com/aivero/prop/workspace/deepcore-daemon-docker/linux-armv8-l4t-t186:latest
+  image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t210:latest
+  conan:
+    options:
+      cuda: True
   before_script:
     - apt-get update && apt-get install -y cuda-toolkit-10-2

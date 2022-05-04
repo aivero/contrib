@@ -27,6 +27,8 @@ class LibRealsenseRecipe(PythonRecipe):
     def configure(self):
         if self.settings.arch == "armv8":
             self.options.libuvc = True
+        if self.settings.hardware == "l4t":
+            self.options.cuda = True
 
     def source(self):
         self.get(f"https://github.com/IntelRealSense/librealsense/archive/v{self.version}.tar.gz")

@@ -44,6 +44,7 @@ class LibRealsenseRecipe(PythonRecipe):
             "BUILD_PCL_EXAMPLES": False,
             "BUILD_NODEJS_BINDINGS": False,
             "BUILD_UNIT_TESTS": False,
+            "CMAKE_CUDA_COMPILER": "clang++",
         }
         if self.options.libuvc:
             # Workaround for https://github.com/IntelRealSense/librealsense/issues/6656

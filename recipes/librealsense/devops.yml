@@ -7,9 +7,6 @@
 - version: 2.50.0
   profiles: ["linux-armv8-l4t-t186"]
   image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t186:latest
-  conan:
-    options:
-      cuda: True
   before_script:
     - apt-get update
     - apt-get install -y cuda-toolkit-10-2 python3-pip
@@ -18,9 +15,6 @@
 - version: 2.50.0
   profiles: ["linux-armv8-l4t-t210"]
   image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t210:latest
-  conan:
-    options:
-      cuda: True
   before_script:
     - apt-get update
     - apt-get install -y cuda-toolkit-10-2 python3-pip

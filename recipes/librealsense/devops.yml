@@ -11,7 +11,9 @@
     options:
       cuda: True
   before_script:
-    - apt-get update && apt-get install -y cuda-toolkit-10-2
+    - apt-get update
+    - apt-get install -y cuda-toolkit-10-2 python-pip
+    - pip install conan
 
 - version: 2.50.0
   profiles: ["linux-armv8-l4t-t210"]
@@ -20,4 +22,6 @@
     options:
       cuda: True
   before_script:
-    - apt-get update && apt-get install -y cuda-toolkit-10-2
+    - apt-get update
+    - apt-get install -y cuda-toolkit-10-2 python-pip
+    - pip install conan

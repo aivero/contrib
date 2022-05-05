@@ -28,7 +28,8 @@ Please adhere to the following standards:
 - Every example/source file must include correct copyright notice
 - For indentation we are using spaces and not tabs
 - Line-endings must be Unix and not DOS style
-- Use `cargo fmt` to format code before committing
+- Use `cargo clippy` to lint your code - fix all issues before commiting
+- Use `cargo fmt` to format code before commiting
 
 ## Setup Conan
 
@@ -36,7 +37,7 @@ Please adhere to the following standards:
 # Install Conan (Requires Python 3 and pip)
 pip3 install conan
 # Install Conan config
-conan config install https://gitlab.com/aivero/open-source/conan-config.git
+conan config install https://gitlab.com/aivero/open-source/conan-config/-/archive/master/conan-config-master.tar.gz -sf conan-config-master
 # Set arch specific profile
 conan config set general.default_profile=linux-x86_64
 ```

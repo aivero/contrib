@@ -15,39 +15,22 @@ make sure to use multiple terminals (or terminal tabs).
 == Installation
 
 You have 4 options for installation; 
-- tarball
-- conan
+- Conan direnv
+- Conan install
 - docker (using conan)
 - cargo (individual packages only)
 
-In most cases the
-tarball installation will suffice, but special cases (such as developing on sub elements) will require a conan installation.
+Please but special cases (such as developing on sub elements) will require a conan installation.
 
-=== Install from tarball
+=== Conan
 
-Download the latest release from:
+You can use Aivero's artifactory instance at https://aivero.jfrog.io/ui/repos/tree/General/aivero-all[https://aivero.jfrog.io] to install the newest release straight from our CICD.
 
-https://gitlab.com/aivero/contrib/-/releases
-
-.Install aivero-rgbd-toolkit from tarball.
-[source,bash]
-----
-# Create an installation directory and set permissions
-sudo mkdir -p /opt/aivero
-sudo chown $USER:$USER /opt/aivero
-
-# And extract the files into that directory
-tar -C /opt/aivero -xvf aivero-rgbd-toolkit_master.tar.bz2
-source /opt/aivero/rgbd_toolkit/aivero_environment.sh
-----
-
-=== Build and install from conan
-
-Alternatively, you can use Aivero's artifactory instance at https://aivero.jfrog.io/ui/repos/tree/General/aivero-all[https://aivero.jfrog.io] to install the newest release straight from our CICD.
+==== Conan Setup
 
 First you need to install and setup conan, as we use that to handle our dependencies. Before you start, please make sure
 that your default python version is 3.X and that pip installs packages for python 3.
-We build on conan with a non-standard profile, which you can keep updated using our https://github.com/aivero/conan-config.git[conan config]
+We build on conan with a non-standard profile, which you can keep updated using our https://gitlab.com/aivero/open-source/conan-config[conan config]
 
 Please install conan by running:
 
@@ -57,35 +40,53 @@ Please install conan by running:
 pip install conan --user
 # You may need to source ~/.profile here, please see https://docs.conan.io/en/latest/installation.html#known-installation-issues-with-pip
 # Install the conan repositories, as well as conan profiles
-conan config install https://github.com/aivero/conan-config.git
+conan config install https://gitlab.com/aivero/open-source/conan-config/-/archive/master/conan-config-master.tar.gz -sf conan-config-master
 
 # Select one of the provided conan profiles as default:
 conan config set general.default_profile=linux-x86_64
+
 # When running on i.e. a NVIDIA TX2 or Xavier use:
 # conan config set general.default_profile=linux-armv8-l4t-t186
 
-
 # And to ensure that the remote is configured properly:
-conan search -r aivero-all gst-realsense
-# You should now see a list of all the releases of gst-realsense
+conan search -r aivero-all gst-rgbd-src
+# You should now see a list of all the releases of our GStreamer RGB-D source elements.
 ----
+
+==== Install toolkit via conan and direnv
+
+Install direnv: https://direnv.net/ making sure to add it to your shell.
+
+[source,bash]
+----
+cd aivero-rgbd-toolkit
+# Generate a .envrc file that will load the correct paths into your environment
+conan install . -g direnv -u
+# Allow direnv to automatically load the file when entering the directory
+direnv allow
+
+# Now test if you e.g. can access realsensesrc
+gst-inspect-1.0 realsensesrc
+----
+
+==== Install toolkit via conan install
 
 Now you can locally build and install the toolkit:
 
 .Install aivero-rgbd-toolkit using conan
 [source,bash]
 ----
-git clone https://gitlab.com/aivero/contrib.git
+git clone https://gitlab.com/aivero/open-source/contrib.git
 conan create aivero-rgbd-toolkit
 # This will assemble the toolkit based on our pre-build elements on the conan server.
 # It will create a conan package name based on the current git sha ref, i.e. `aivero-rgbd-toolkit/5e686b7103ac12b9a9e6c690edb0503b86005531` 
-# In addition it will create a conan alias of your current branch to the git sha based git packge
+# In addition it will create a CONAN ALIAS of your current branch to the git sha based git package. You may use either to install:
 # `aivero-rgbd-toolkit/master`
 conan install aivero-rgbd-toolkit/master@ -if rgbd_toolkit
 # This will deploy the toolkit into `./rgbd_toolkit` and configure the `aivero_environment.sh` with an absolute path. 
 ----
 
-NOTE: When installing for a second time, please clear /opt/aivero/rgbd_toolkit first.
+NOTE: When installing for a second time, please clear `rgbd_toolkit` first.
 
 NOTE: If you want to move the deployment folder, please reflect the new location in the PREFIX variable inside the `aivero_environment.sh`.
 
@@ -143,7 +144,7 @@ gst-inspect-1.0 realsensesrc
 You can build the rust based gstreamer elements (`realsensesrc`, `k4asrc`, `rgbdmux` and `rgbddemux` using cargo and the `colorizer` using cmake:
 [source,bash]
 ----
-git clone https://gitlab.com/aivero/contrib.git
+git clone https://gitlab.com/aivero/open-source/contrib.git
 cd gst-realsense
 cargo build --release
 cd ../gst-k4a
@@ -179,6 +180,7 @@ After installing from either tarball or conan, you may want to verify that the i
 
 [source,bash]
 ----
+# adjust to point to your aivero_environment.sh file
 source /opt/aivero/rgbd_toolkit/aivero_environment.sh
 gst-inspect-1.0 realsensesrc
 # Should show the man page for the realsensesrc
@@ -205,7 +207,7 @@ you're using _mug.bag_.
 ....
 # Replace with the path to your rosbag
 export ROSBAG=~/Downloads/mug.bag
-gst-launch-1.0 realsensesrc rosbag-location=$ROSBAG timestamp-mode=clock_all real-time-rosbag-playback=true  ! \
+gst-launch-1.0 realsensesrc rosbag-location=$ROSBAG real-time-rosbag-playback=true  ! \
 rgbddemux name=demux \
 demux.src_depth ! queue ! colorizer near-cut=300 far-cut=700 ! videoconvert ! glimagesink
 ....
@@ -217,7 +219,7 @@ may also look at infrared and colour streams:
 ....
 # Replace with the path to your rosbag
 export ROSBAG=~/Downloads/mug.bag
-gst-launch-1.0 realsensesrc rosbag-location=$ROSBAG timestamp-mode=clock_all real-time-rosbag-playback=true enable-infra1=true  ! \
+gst-launch-1.0 realsensesrc rosbag-location=$ROSBAG real-time-rosbag-playback=true enable-infra1=true  ! \
 rgbddemux name=demux \
 demux.src_depth ! queue ! colorizer near-cut=300 far-cut=700 ! videoconvert ! glimagesink \
 demux.src_infra1 ! queue ! videoconvert ! glimagesink
@@ -234,7 +236,7 @@ and colour video recorded by a RealSense camera:
 ....
 # Replace with the serial of your camera
 export SERIAL=XXXXXXXXXXXX
-gst-launch-1.0 realsensesrc serial=$SERIAL timestamp-mode=clock_all enable-color=true  ! \
+gst-launch-1.0 realsensesrc serial=$SERIAL enable-color=true  ! \
 rgbddemux name=demux \
 demux.src_depth ! queue ! colorizer near-cut=300 far-cut=700 ! videoconvert ! glimagesink \
 demux.src_color ! queue ! videoconvert ! glimagesink
@@ -253,7 +255,7 @@ simple syntax.
 source /opt/aivero/rgbd-toolkit/aivero_environment.sh
 # Replace this with your ROSBAG
 export ROSBAG=~/Downloads/mug.bag
-GST_DEBUG=3 gst-launch-1.0 realsensesrc rosbag-location=$ROSBAG timestamp-mode=clock_all real-time-rosbag-playback=true  ! \
+GST_DEBUG=3 gst-launch-1.0 realsensesrc rosbag-location=$ROSBAG real-time-rosbag-playback=true  ! \
 rgbddemux name=demux \
 demux.src_depth ! queue ! colorizer near-cut=300 far-cut=700 ! videoconvert ! glimagesink
 ....
@@ -266,7 +268,7 @@ as such: `GST_DEBUG=3,realsensesrc:6`.
 
 . `gst-launch-1.0` - The start of a every command.
 
-. `realsensesrc rosbag-location=$ROSBAG timestamp-mode=clock_all real-time-rosbag-playback=true` - A source element with
+. `realsensesrc rosbag-location=$ROSBAG real-time-rosbag-playback=true` - A source element with
 three of its parameters specified. You can access the man page of an element using i.e. `gst-inspect-1.0 realsensesrc`.
 The different timestamp modes and playback modes are explained below.
 
@@ -295,42 +297,9 @@ Little Endian gray-scale video.
 
 Check out the issues for
 
-* https://gitlab.com/aivero/public/contrib/-/issues[Aivero Contrib issue tracker for gst-realsense, gst-k4a, gst-rgbd]
+* https://gitlab.com/aivero/open-source/contrib/-/issues[Aivero Contrib issue tracker]
 
+=== Missing a rust installation
 
+If you are compiling you need to install rust. You may do this via the usual rust channels.
 
-== Pipeline displays only a single image and freezes
-
-Most likely you are not using the right combination of `timestamp_mode` and `real-time-rosbag-playback`.
-`real-time-rosbag-playback` only applies when playing from ROSBAG, and determines whether the `realsensesrc` should
-try to play the rosbag at the speed it was recorded, or as fast as possible.
-
-For both the `realsensesrc` and the `k4asrc`, five timestamp-modes are supported:
-
-1. `ignore` - The source does not timestamp the buffers.
-2. `clock_main` - The source uses the GStreamer clock to timestamp the main (often depth) buffer.
-3. `clock_all` - The source uses the GStreamer clock to timestamp all the buffers.
-4. `camera_common` - The source timestamps all buffers, using the camera firmware, with the timestamp of the main buffer.
-5. `camera_individual` - The source timestamps all buffers, using the camera firmware, with their individual timestamp.
-
-For starters, the `clock_all` and `camera_common` modes should be your first choices, but there may be edge-cases,
-where the other mode are better. In the tables below, we provide a simple overview to get you started, but we recommend
-experimenting with different combinations of sources and sinks to get a feel of how the different modes operate.
-
-.Playback Modes `realsensesrc`
-|===
-| |Real Camera |Rosbag
-
-|**Live playback** |`realsensesrc serial=$SERIAL timestamp-mode=clock_all` | `realsensesrc rosbag-location=$ROSBAG timestamp-mode=clock_all real-time-rosbag-playback=true`
-
-|**non-live** i.e. transcoding | **N/A: a camera is always live** |`realsensesrc rosbag-location=$ROSBAG timestamp-mode=camera_common`
-|===
-
-.Playback Modes `k4asrc`
-|===
-| |Real Camera |Rosbag
-
-|**Live playback** |`k4asrc serial=$SERIAL timestamp-mode=clock_all` |`k4asrc recording-location=$k4bag timestamp_mode=clock_all real-time-playback=true`
-
-|**non-live** i.e. transcoding | **N/A: a camera is always live** |`realsensesrc rosbag-location=$ROSBAG timestamp-mode=camera_common`
-|===

@@ -9,8 +9,6 @@ class AiveroRgbDToolkit(GstProject):
         f"gst-rgbd/{branch()}",
         f"gst-rgbd-src/{branch()}",
         f"gst-colorizer/{branch()}",
-        ## `libglvnd` is currently removed because it causes problems for `glimagesink`
-        # self.requires("libglvnd/[>=1.2.0]@%s/stable" % self.user)
     )
 
     def requirements(self):

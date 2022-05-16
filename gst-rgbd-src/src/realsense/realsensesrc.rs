@@ -33,6 +33,7 @@ use rs2::{
 
 use super::d400_limits::*;
 use super::rs_meta::rs_meta_serialization::*;
+use super::settings::LogLevel;
 use super::settings::*;
 use super::streams::*;
 use gst_util::taglist::*;
@@ -118,13 +119,15 @@ impl BaseSrcImpl for RealsenseSrc {
     /// * `base_src` - Representation of `realsensesrc` element.
     fn start(&self, base_src: &Self::Type) -> Result<(), gst::ErrorMessage> {
         self.unlock_stop(base_src)?;
-        // Specify log severity level for RealSense
-        rs2::log::log_to_console(rs2::rs2_log_severity::RS2_LOG_SEVERITY_ERROR).map_err(|e| {
-            gst::error_msg!(
-                gst::ResourceError::OpenReadWrite,
-                (&format!("Cannot log librealsense to console: {}", e))
-            )
-        })?;
+        {
+            let settings = self.settings.read().unwrap(); // Specify log severity level for RealSense
+            rs2::log::log_to_console(settings.log_level.to_rs2_log_level()).map_err(|e| {
+                gst::error_msg!(
+                    gst::ResourceError::OpenReadWrite,
+                    (&format!("Cannot log librealsense to console: {}", e))
+                )
+            })?;
+        }
 
         // Make sure that the set properties are viable
         let config = self.configure()?;
@@ -1483,7 +1486,7 @@ impl ObjectImpl for RealsenseSrc {
     }
 
     fn properties() -> &'static [glib::ParamSpec] {
-        static PROPERTIES: Lazy<[glib::ParamSpec; 18]> = Lazy::new(|| {
+        static PROPERTIES: Lazy<[glib::ParamSpec; 19]> = Lazy::new(|| {
             [
                 glib::ParamSpecString::new(
                     "serial",
@@ -1638,6 +1641,14 @@ impl ObjectImpl for RealsenseSrc {
                     StreamId::default() as i32,
                     glib::ParamFlags::READWRITE,
                 ),
+                glib::ParamSpecEnum::new(
+                    "log-level",
+                    "The librealsense log level",
+                    "The log level to set librealsense to use",
+                    LogLevel::static_type(),
+                    LogLevel::default() as i32,
+                    glib::ParamFlags::READWRITE,
+                ),
             ]
         });
 
@@ -1653,287 +1664,66 @@ impl ObjectImpl for RealsenseSrc {
     ) {
         let mut settings = self.settings.write().unwrap();
 
+        gst_info!(
+            CAT,
+            obj: obj,
+            "Changing property '{}' to {:?}",
+            pspec.name(),
+            value
+        );
         match pspec.name() {
-            "serial" => {
-                match value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `serial` due to incorrect type: {:?}",
-                        err
-                    )
-                }) {
-                    Some(serial) => {
-                        gst_info!(
-                            CAT,
-                            obj: obj,
-                            "Changing property `serial` from {:?} to {:?}",
-                            settings.serial,
-                            serial
-                        );
-                        settings.serial = Some(serial);
-                        obj.set_live(true);
-                    }
-                    None => {
-                        gst_warning!(
-                            CAT,
-                            obj: obj,
-                            "`serial` property not set, setting from {:?} to None",
-                            settings.serial
-                        );
-                    }
+            "serial" => match value.get().unwrap() {
+                Some(serial) => {
+                    settings.serial = Some(serial);
+                    obj.set_live(true);
                 }
-            }
-            "rosbag-location" => {
-                match value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `rosbag-location` due to incorrect type: {:?}",
-                        err
-                    )
-                }) {
-                    Some(mut rl) => {
-                        expand_tilde_as_home_dir(&mut rl);
-                        gst_info!(
-                            CAT,
-                            obj: obj,
-                            "Changing property `rosbag-location` from {:?} to {:?}",
-                            settings.rosbag_location,
-                            rl
-                        );
-                        settings.rosbag_location = Some(rl);
-                        obj.set_live(settings.real_time_rosbag_playback);
-                    }
-                    None => {
-                        gst_warning!(
-                            CAT,
-                            obj: obj,
-                            "`rosbag-location` property not set, setting from {:?} to None",
-                            settings.rosbag_location
-                        );
-                    }
+                None => {
+                    gst_warning!(
+                        CAT,
+                        obj: obj,
+                        "`serial` property not set, setting from {:?} to None",
+                        settings.serial
+                    );
                 }
-            }
+            },
+            "rosbag-location" => match value.get().unwrap() {
+                Some(mut rl) => {
+                    expand_tilde_as_home_dir(&mut rl);
+                    settings.rosbag_location = Some(rl);
+                    obj.set_live(settings.real_time_rosbag_playback);
+                }
+                None => {
+                    gst_warning!(
+                        CAT,
+                        obj: obj,
+                        "`rosbag-location` property not set, setting from {:?} to None",
+                        settings.rosbag_location
+                    );
+                }
+            },
             "config" => settings.config = value.get().ok(),
-            "enable-depth" => {
-                let enable_depth = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `enable-depth` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `enable-depth` from {} to {}",
-                    settings.streams.enabled_streams.depth,
-                    enable_depth
-                );
-                settings.streams.enabled_streams.depth = enable_depth;
-            }
-            "enable-infra1" => {
-                let enable_infra1 = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `enable-infra1` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `enable-infra1` from {} to {}",
-                    settings.streams.enabled_streams.infra1,
-                    enable_infra1
-                );
-                settings.streams.enabled_streams.infra1 = enable_infra1;
-            }
-            "enable-infra2" => {
-                let enable_infra2 = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `enable-infra2` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `enable-infra2` from {} to {}",
-                    settings.streams.enabled_streams.infra2,
-                    enable_infra2
-                );
-                settings.streams.enabled_streams.infra2 = enable_infra2;
-            }
-            "enable-color" => {
-                let enable_color = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `enable-color` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `enable-color` from {} to {}",
-                    settings.streams.enabled_streams.color,
-                    enable_color
-                );
-                settings.streams.enabled_streams.color = enable_color;
-            }
-            "depth-width" => {
-                let depth_width = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `depth-width` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `depth-width` from {} to {}",
-                    settings.streams.depth_resolution.width,
-                    depth_width
-                );
-                settings.streams.depth_resolution.width = depth_width;
-            }
-            "depth-height" => {
-                let depth_height = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `depth-height` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `depth-height` from {} to {}",
-                    settings.streams.depth_resolution.height,
-                    depth_height
-                );
-                settings.streams.depth_resolution.height = depth_height;
-            }
-            "color-width" => {
-                let color_width = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `color-width` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `color-width` from {} to {}",
-                    settings.streams.color_resolution.width,
-                    color_width
-                );
-                settings.streams.color_resolution.width = color_width;
-            }
-            "color-height" => {
-                let color_height = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `color-height` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `color-height` from {} to {}",
-                    settings.streams.color_resolution.height,
-                    color_height
-                );
-                settings.streams.color_resolution.height = color_height;
-            }
-            "framerate" => {
-                let framerate = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `framerate` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `framerate` from {} to {}",
-                    settings.streams.framerate,
-                    framerate
-                );
-                settings.streams.framerate = framerate;
-                // let _ = obj.post_message(&gst::Message::new_latency().src(Some(obj)).build());
-            }
-            "loop-rosbag" => {
-                let loop_rosbag = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `loop-rosbag` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `loop-rosbag` from {} to {}",
-                    settings.loop_rosbag,
-                    loop_rosbag
-                );
-                settings.loop_rosbag = loop_rosbag;
-            }
-            "wait-for-frames-timeout" => {
-                let wait_for_frames_timeout = value.get().unwrap_or_else(|err| {panic!("Failed to set property `wait-for-frames-timeout` due to incorrect type: {:?}",err)});
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `wait-for-frames-timeout` from {} to {}",
-                    settings.wait_for_frames_timeout,
-                    wait_for_frames_timeout
-                );
-                settings.wait_for_frames_timeout = wait_for_frames_timeout;
-            }
+            "enable-depth" => settings.streams.enabled_streams.depth = value.get().unwrap(),
+            "enable-infra1" => settings.streams.enabled_streams.infra1 = value.get().unwrap(),
+            "enable-infra2" => settings.streams.enabled_streams.infra2 = value.get().unwrap(),
+            "enable-color" => settings.streams.enabled_streams.color = value.get().unwrap(),
+            "depth-width" => settings.streams.depth_resolution.width = value.get().unwrap(),
+            "depth-height" => settings.streams.depth_resolution.height = value.get().unwrap(),
+            "color-width" => settings.streams.color_resolution.width = value.get().unwrap(),
+            "color-height" => settings.streams.color_resolution.height = value.get().unwrap(),
+            "framerate" => settings.streams.framerate = value.get().unwrap(),
+            "loop-rosbag" => settings.loop_rosbag = value.get().unwrap(),
+            "wait-for-frames-timeout" => settings.wait_for_frames_timeout = value.get().unwrap(),
             "include-per-frame-metadata" => {
-                let do_metadata = value.get().unwrap_or_else(|err| {panic!("Failed to set property `include-per-frame-metadata` due to incorrect type: {:?}",err)});
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `include-per-frame-metadata` from {} to {}",
-                    settings.include_per_frame_metadata,
-                    do_metadata
-                );
-                settings.include_per_frame_metadata = do_metadata;
+                settings.include_per_frame_metadata = value.get().unwrap()
             }
             "real-time-rosbag-playback" => {
-                let real_time_rosbag_playback = value.get().unwrap_or_else(|err| {panic!("Failed to set property `real-time-rosbag-playback` due to incorrect type: {:?}",err)});
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `real-time-rosbag-playback` from {} to {}",
-                    settings.real_time_rosbag_playback,
-                    real_time_rosbag_playback
-                );
-                settings.real_time_rosbag_playback = real_time_rosbag_playback;
+                settings.real_time_rosbag_playback = value.get().unwrap();
                 obj.set_live(settings.real_time_rosbag_playback);
             }
-            "attach-camera-meta" => {
-                let attach_camera_meta = value.get().unwrap_or_else(|err| {
-                    panic!(
-                        "Failed to set property `attach-camera-meta` due to incorrect type: {:?}",
-                        err
-                    )
-                });
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `attach-camera-meta` from {} to {}",
-                    settings.attach_camera_meta,
-                    attach_camera_meta
-                );
-                settings.attach_camera_meta = attach_camera_meta;
-            }
-            "align-to" => {
-                let align_to = value.get::<StreamId>().unwrap();
-                gst_info!(
-                    CAT,
-                    obj: obj,
-                    "Changing property `align-to` to {:?}",
-                    align_to
-                );
-                settings.align_to = align_to;
-            }
-            _ => unimplemented!("Property is not implemented"),
+            "attach-camera-meta" => settings.attach_camera_meta = value.get().unwrap(),
+            "align-to" => settings.align_to = value.get().unwrap(),
+            "log-level" => settings.log_level = value.get().unwrap(),
+            _ => unreachable!(),
         };
     }
 
@@ -1959,6 +1749,7 @@ impl ObjectImpl for RealsenseSrc {
             "real-time-rosbag-playback" => settings.real_time_rosbag_playback.to_value(),
             "attach-camera-meta" => settings.attach_camera_meta.to_value(),
             "align-to" => settings.align_to.to_value(),
+            "log-level" => settings.log_level.to_value(),
             _ => unimplemented!("Property is not implemented"),
         }
     }

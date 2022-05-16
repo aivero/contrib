@@ -13,6 +13,7 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA 02110-1301, USA.
 
+use glib::*;
 use std::fmt::{Display, Formatter};
 
 pub(crate) use rs2::stream_profile::StreamResolution;
@@ -64,6 +65,7 @@ pub(crate) struct Settings {
     pub(crate) attach_camera_meta: bool,
     /// The stream identifier of the stream to align to.
     pub(crate) align_to: StreamId,
+    pub(crate) log_level: LogLevel,
 }
 
 /// A struct containing properties of `realsensesrc` about streams
@@ -150,6 +152,7 @@ impl Default for Settings {
             real_time_rosbag_playback: DEFAULT_REAL_TIME_ROSBAG_PLAYBACK,
             attach_camera_meta: DEFAULT_ATTACH_CAMERA_META,
             align_to: StreamId::default(),
+            log_level: LogLevel::default(),
         }
     }
 }
@@ -201,5 +204,42 @@ impl EnabledStreams {
             conflicting_streams.push(StreamId::Color);
         }
         conflicting_streams
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Enum)]
+#[repr(u32)]
+#[enum_type(name = "GstRealsenseSrcLogLevel")]
+pub(crate) enum LogLevel {
+    #[enum_value(name = "Debug", nick = "debug")]
+    Debug,
+    #[enum_value(name = "Info", nick = "info")]
+    Info,
+    #[enum_value(name = "Warn", nick = "warn")]
+    Warn,
+    #[enum_value(name = "Error", nick = "error")]
+    Error,
+    #[enum_value(name = "Fatal", nick = "fatal")]
+    Fatal,
+    #[enum_value(name = "None", nick = "none")]
+    None,
+}
+
+impl Default for LogLevel {
+    fn default() -> Self {
+        LogLevel::Error
+    }
+}
+
+impl LogLevel {
+    pub(crate) fn to_rs2_log_level(self) -> rs2::rs2_log_severity {
+        match self {
+            Self::Debug => rs2::rs2_log_severity::RS2_LOG_SEVERITY_DEBUG,
+            Self::Info => rs2::rs2_log_severity::RS2_LOG_SEVERITY_INFO,
+            Self::Warn => rs2::rs2_log_severity::RS2_LOG_SEVERITY_WARN,
+            Self::Error => rs2::rs2_log_severity::RS2_LOG_SEVERITY_ERROR,
+            Self::Fatal => rs2::rs2_log_severity::RS2_LOG_SEVERITY_FATAL,
+            Self::None => rs2::rs2_log_severity::RS2_LOG_SEVERITY_NONE,
+        }
     }
 }

@@ -690,6 +690,7 @@ impl RealsenseSrc {
             let timeout = self.settings.read().unwrap().wait_for_frames_timeout;
             let timeout = gst::ClockTime::from_mseconds(timeout.into());
             if waited > timeout {
+                gst::gst_error!(CAT, "Timed out while getting frameset");
                 return Err(gst::FlowError::CustomError);
             }
         }

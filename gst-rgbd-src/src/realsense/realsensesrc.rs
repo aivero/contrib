@@ -685,7 +685,10 @@ impl RealsenseSrc {
             }
             match pipeline.wait_for_frameset(10) {
                 Ok(frameset) => return Ok(frameset),
-                _ => waited += gst::ClockTime::from_mseconds(10),
+                Err(err) => {
+                    gst::gst_info!(CAT, "wait_for_frameset returned {}", err);
+                    waited += gst::ClockTime::from_mseconds(10);
+                }
             }
             let timeout = self.settings.read().unwrap().wait_for_frames_timeout;
             let timeout = gst::ClockTime::from_mseconds(timeout.into());

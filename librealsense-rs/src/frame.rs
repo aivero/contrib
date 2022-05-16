@@ -16,7 +16,9 @@ pub struct Frame {
 impl Drop for Frame {
     fn drop(&mut self) {
         unsafe {
-            rs2::rs2_release_frame(self.handle);
+            if !self.handle.is_null() {
+                rs2::rs2_release_frame(self.handle);
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ class env(Generator):
             if isinstance(val, str):
                 val = [val]
             if len(val) > 1 or (var in os.environ and os.pathsep in os.environ[var]):
-                content += 'export {0}={1}"${{{0}:+:${0}}}"\n'.format(var, os.pathsep.join('"%s"' % p for p in val))
+                content += 'export {0}={1}:"${{{0}:+:${0}}}"\n'.format(var, os.pathsep.join('"%s"' % p for p in val))
             else:
                 content += "export {0}={1}\n".format(var, '"%s"' % val[0])
 
@@ -35,7 +35,7 @@ class direnv(Generator):
             if isinstance(val, str):
                 val = [val]
             if len(val) > 1 or (var in os.environ and os.pathsep in os.environ[var]):
-                content += 'export {0}={1}"${{{0}:+:${0}}}"\n'.format(var, os.pathsep.join('"%s"' % p for p in val))
+                content += 'export {0}={1}:"${{{0}:+:${0}}}"\n'.format(var, os.pathsep.join('"%s"' % p for p in val))
             else:
                 content += "export {0}={1}\n".format(var, '"%s"' % val[0])
 

@@ -10,5 +10,4 @@ COPY --from=deno /bin/deno /usr/bin/deno
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
   apt install --no-install-recommends -y make clang libc6-dev cmake git gawk bison flex rsync valac python3-minimal python3-pkg-resources python3-distutils && \
-  apt remove -y gcc g++ && \
   rm -rf /var/lib/apt/lists/*

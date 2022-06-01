@@ -604,11 +604,15 @@ impl RgbdMux {
         // And send it downstream
         if agg_pad.push_event(gap_event) {
             gst_debug!(CAT, obj: aggregator, "Sending of GAP event was successful");
-            Ok(())
         } else {
+            // This might have been caused by a Flushing return, that
+            // information is lost by the conversion to boolean. The usual
+            // workaround is to ignore the error, and let the error happen further
+            // on on an actual pad push()
             gst_warning!(CAT, obj: aggregator, "Failed to send gap event");
-            Err(gst::error_msg!(gst::CoreError::Event, [""]))
         }
+
+        Ok(())
     }
 
     /// Extracts the relevant fields from the pad's CAPS and converts them into a tuple containing

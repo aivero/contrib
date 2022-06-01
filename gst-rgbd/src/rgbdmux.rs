@@ -32,10 +32,16 @@ lazy_static! {
     );
 }
 
+struct State {
+    /// The current framerate out the rgbd output
+    framerate: Option<gst::Fraction>,
+    /// Whether we are outputting our first buffer (after flush)
+    first: bool,
+}
+
 /// A struct representation of the `rgbdmux` element.
 pub struct RgbdMux {
-    /// The current framerate out the rgbd output
-    framerate: Mutex<Option<gst::Fraction>>,
+    state: Mutex<State>,
 }
 
 glib::wrapper! {
@@ -51,7 +57,10 @@ impl ObjectSubclass for RgbdMux {
 
     fn new() -> Self {
         Self {
-            framerate: Mutex::new(None),
+            state: Mutex::new(State {
+                framerate: None,
+                first: true,
+            }),
         }
     }
 }
@@ -107,6 +116,11 @@ impl AggregatorImpl for RgbdMux {
         }
     }
 
+    fn flush(&self, _aggregator: &RgbdMuxObject) -> Result<gst::FlowSuccess, gst::FlowError> {
+        self.state.lock().unwrap().first = true;
+        Ok(gst::FlowSuccess::Ok)
+    }
+
     /// Called when buffers are queued on all sinkpads. Classes should iterate the GstElement->sinkpads and peek or steal
     /// buffers from the GstAggregatorPad.
     /// # Arguments
@@ -143,8 +157,14 @@ impl AggregatorImpl for RgbdMux {
         let segment: gst::FormattedSegment<gst::ClockTime> = agg_pad.segment().downcast().unwrap();
         let segment_position = segment.position().or_else(|| segment.start());
         let position_running_time = segment.to_running_time(segment_position).unwrap();
-        let framerate = self.framerate.lock().unwrap().unwrap();
-        let duration = RgbdMux::get_duration_from_fps(framerate).unwrap();
+
+        let (duration, first) = {
+            let state = self.state.lock().unwrap();
+            (
+                RgbdMux::get_duration_from_fps(state.framerate.unwrap()).unwrap(),
+                state.first,
+            )
+        };
 
         gst_debug!(
             CAT,
@@ -161,6 +181,7 @@ impl AggregatorImpl for RgbdMux {
                 position_running_time,
                 duration,
                 sink_pad,
+                first,
             )?;
             has_all_buffers_in_range = has_all_buffers_in_range && buffer_in_range;
         }
@@ -217,7 +238,11 @@ impl AggregatorImpl for RgbdMux {
                 .map_err(|_| gst::FlowError::Error)?;
 
             gst_debug!(CAT, "Muxed buffers, finishing");
+
             self.finish_buffer(aggregator, outbuf)?;
+
+            self.state.lock().unwrap().first = false;
+
             Ok(gst::FlowSuccess::Ok)
         } else {
             gst_debug!(CAT, "need more data");
@@ -253,7 +278,7 @@ impl AggregatorImpl for RgbdMux {
                 structure.get::<gst::Fraction>("framerate").ok()
             })
             .min();
-        *self.framerate.lock().unwrap() = min_framerate;
+        self.state.lock().unwrap().framerate = min_framerate;
 
         if min_framerate.is_none() {
             gst_debug!(CAT, "None of the sink pads had a framerate");
@@ -310,7 +335,7 @@ impl AggregatorImpl for RgbdMux {
         caps: &gst::Caps,
     ) -> Result<(), gst::LoggableError> {
         // Framerate should be known at this point in time
-        let framerate = self.framerate.lock().unwrap().unwrap();
+        let framerate = self.state.lock().unwrap().framerate.unwrap();
         let duration = RgbdMux::get_duration_from_fps(framerate).unwrap();
 
         gst_debug!(CAT, "Setting latency to {}ms", duration.mseconds());
@@ -424,7 +449,7 @@ impl RgbdMux {
             .unwrap_or_else(|| segment.start().unwrap());
 
         //todo: Consider bubbling up some error if we fail to get the framerate
-        let framerate = self.framerate.lock().unwrap().unwrap();
+        let framerate = self.state.lock().unwrap().framerate.unwrap();
         let duration = RgbdMux::get_duration_from_fps(framerate);
         let new_position = pts + duration.unwrap();
         gst_debug!(CAT, "Advancing Segment to {}", new_position.display());
@@ -456,6 +481,7 @@ impl RgbdMux {
         position_running_time: gst::ClockTime,
         duration: gst::ClockTime,
         sink_pad: &gst_base::AggregatorPad,
+        first: bool,
     ) -> Result<bool, gst::FlowError> {
         while let Some(buffer) = sink_pad.peek_buffer() {
             let segment = sink_pad.segment().downcast::<gst::ClockTime>().unwrap();
@@ -481,7 +507,7 @@ impl RgbdMux {
                     buffer_running_time,
                     position_running_time
                 );
-            } else if buffer_running_time < position_running_time + duration {
+            } else if first || buffer_running_time < position_running_time + duration {
                 return Ok(true);
             } else {
                 gst_debug!(
@@ -595,7 +621,7 @@ impl RgbdMux {
         //todo: Unclear if we have to use the running_time to create the gap event
         // let running_time = segment.to_running_time(pts).unwrap();
 
-        let framerate = self.framerate.lock().unwrap().unwrap();
+        let framerate = self.state.lock().unwrap().framerate.unwrap();
         let duration = RgbdMux::get_duration_from_fps(framerate);
 
         // Create a GAP event with duration

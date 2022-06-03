@@ -8,7 +8,7 @@ class Libxxf86vm(Recipe):
         "cc/[^1.0.0]",
         "autotools/[^1.0.0]",
         "xorg-util-macros/[^1.19.2]",
-        "xorgproto/[^2020.1]",
+        "xorgproto/[>=2020.1]",
     )
     requires = ("libxext/[^1.3.4]",)
 

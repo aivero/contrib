@@ -9,7 +9,7 @@ class Sdl2(Recipe):
         "cmake/[^3.18.4]",
         "libxcb/[^1.13.1]",
         "libxext/[^1.3.4]",
-        "xorgproto/[^2020.1]",
+        "xorgproto/[>=2020.1]",
     )
 
     def source(self):

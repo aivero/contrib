@@ -10,7 +10,7 @@ class Libx11(Recipe):
         "pkgconf/[^1.7.3]",
         "perl/[^5.30.0]",
         "xorg-util-macros/[^1.19.2]",
-        "xorgproto/[^2020.1]",
+        "xorgproto/[>=2020.1]",
     )
     requires = (
         "xtrans/[^1.4.0]",

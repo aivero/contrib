@@ -10,8 +10,6 @@ class CMake(Recipe):
     def build_requirements(self):
         if self.name == "cmake":
             self.build_requires(f"cmake-bootstrap/{self.version}")
-        else:
-            self.build_requires(f"zig-bootstrap/[^0.9.0]")
 
     def requirements(self):
         if self.name == "cmake":
@@ -21,7 +19,9 @@ class CMake(Recipe):
             self.requires("openssl1/[>=1.1.1h]")
 
     def source(self):
-        self.get(f"https://github.com/Kitware/CMake/releases/download/v{self.version}/cmake-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/Kitware/CMake/releases/download/v{self.version}/cmake-{self.version}.tar.gz"
+        )
 
     def build(self):
         defs = {"CMAKE_USE_OPENSSL": self.name == "cmake"}

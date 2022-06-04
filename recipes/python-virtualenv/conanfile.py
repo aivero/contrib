@@ -9,7 +9,7 @@ class PythonVirtualenvRecipe(PythonRecipe):
         "python-distlib/[^0.3.0]",
         "python-filelock/[^3.0.12]",
         "python-six/[^1.15.0]",
-        "python-importlib-metadata/[^1.6.0]",
+        "python-importlib-metadata/[>=1.6.0]",
     )
 
     def source(self):

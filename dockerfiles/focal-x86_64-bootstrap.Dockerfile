@@ -9,5 +9,5 @@ COPY --from=builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python
 COPY --from=deno /deno /usr/bin/deno
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
-  apt install --no-install-recommends -y make clang libc6-dev cmake git gawk bison flex rsync valac python3-minimal python3-pkg-resources python3-distutils && \
+  apt install --no-install-recommends -y make clang gcc libc6-dev cmake git gawk bison flex rsync valac python3-minimal python3-pkg-resources python3-distutils && \
   rm -rf /var/lib/apt/lists/*

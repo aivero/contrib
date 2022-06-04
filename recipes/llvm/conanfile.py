@@ -31,6 +31,9 @@ class Llvm(Recipe):
         source_folder = os.path.join(self.src, "llvm")
         defs = {}
 
+        os.environ["CC"] = "clang"
+        os.environ["CXX"] = "clang++"
+
         # Enable parallel linking
         defs["LLVM_PARALLEL_LINK_JOBS"] = multiprocessing.cpu_count()
 

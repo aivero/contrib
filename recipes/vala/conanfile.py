@@ -10,7 +10,7 @@ class Vala(Recipe):
     )
     requires = (
         "autotools/[^1.0.0]",
-        "autoconf-archive/[^2019.01.06]",
+        "autoconf-archive/[>=2019.01.06]",
         "gobject-introspection/[^1.70.0]",
         "cc/[^1.0.0]",
         "graphviz/[^2.42.1]",
@@ -28,4 +28,7 @@ class Vala(Recipe):
 
     def package_info(self):
         # TODO: hardcoded version
-        self.env_info.LD_LIBRARY_PATH += [os.path.join(self.package_folder, "lib"), os.path.join(self.package_folder, "lib", "vala-0.56")]
+        self.env_info.LD_LIBRARY_PATH += [
+            os.path.join(self.package_folder, "lib"),
+            os.path.join(self.package_folder, "lib", "vala-0.56"),
+        ]

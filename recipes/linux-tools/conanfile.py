@@ -1,4 +1,4 @@
-rom build import *
+from build import *
 
 
 class LinuxTools(Recipe):
@@ -11,6 +11,5 @@ class LinuxTools(Recipe):
     def build(self):
         args = [
             "WERROR=0",
-            "HOSTCC=cc",
         ]
         self.make(args, os.path.join(self.src, "tools", "perf"))

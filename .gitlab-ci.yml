@@ -11,7 +11,6 @@ generate-config:
     CICD_BRANCH: stable
     GIT_DEPTH: 0
     GIT_FETCH_EXTRA_FLAGS: --prune --depth 50
-    GIT_SUBMODULE_STRATEGY: recursive
   script:
     - python3 scripts/create_aliases.py
     - deno run --unstable --allow-all --import-map https://gitlab.com/aivero/open-source/cicd/-/raw/$CICD_BRANCH/import_map.json https://gitlab.com/aivero/open-source/cicd/-/raw/$CICD_BRANCH/lib/es6/src/GenerateConfig.js

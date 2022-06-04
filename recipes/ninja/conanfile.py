@@ -10,8 +10,6 @@ class Ninja(Recipe):
         if self.name == "ninja":
             self.build_requires("cc/[^1.0.0]")
             self.build_requires("make/[^4.3]")
-        else:
-            self.build_requires(f"zig-bootstrap/[^0.9.0]")
 
     def source(self):
         self.get(f"https://github.com/ninja-build/ninja/archive/v{self.version}.tar.gz")

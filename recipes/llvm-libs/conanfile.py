@@ -1,6 +1,7 @@
 from build import *
 import multiprocessing
 
+
 class LlvmLibs(Recipe):
     description = "Collection of modular and reusable compiler and toolchain technologies"
     license = "custom"
@@ -8,19 +9,37 @@ class LlvmLibs(Recipe):
     build_requires = (
         "cmake-bootstrap/[^3.18.4]",
         "ninja-bootstrap/[^1.10.0]",
-        "zig-bootstrap/[^0.9.0]",
     )
     requires = "file/[^5.39]"
 
     def source(self):
         prefix = "https://github.com/llvm/llvm-project/releases/download/llvmorg-"
-        self.get(f"{prefix}{self.version}/llvm-{self.version}.src.tar.xz", os.path.join(self.src, "llvm"))
-        self.get(f"{prefix}{self.version}/clang-{self.version}.src.tar.xz", os.path.join(self.src, "clang"))
-        self.get(f"{prefix}{self.version}/lld-{self.version}.src.tar.xz", os.path.join(self.src, "lld"))
-        self.get(f"{prefix}{self.version}/compiler-rt-{self.version}.src.tar.xz", os.path.join(self.src, "compiler-rt"))
-        self.get(f"{prefix}{self.version}/libcxx-{self.version}.src.tar.xz", os.path.join(self.src, "libcxx"))
-        self.get(f"{prefix}{self.version}/libcxxabi-{self.version}.src.tar.xz", os.path.join(self.src, "libcxxabi"))
-        self.get(f"{prefix}{self.version}/libunwind-{self.version}.src.tar.xz", os.path.join(self.src, "libunwind"))
+        self.get(
+            f"{prefix}{self.version}/llvm-{self.version}.src.tar.xz", os.path.join(self.src, "llvm")
+        )
+        self.get(
+            f"{prefix}{self.version}/clang-{self.version}.src.tar.xz",
+            os.path.join(self.src, "clang"),
+        )
+        self.get(
+            f"{prefix}{self.version}/lld-{self.version}.src.tar.xz", os.path.join(self.src, "lld")
+        )
+        self.get(
+            f"{prefix}{self.version}/compiler-rt-{self.version}.src.tar.xz",
+            os.path.join(self.src, "compiler-rt"),
+        )
+        self.get(
+            f"{prefix}{self.version}/libcxx-{self.version}.src.tar.xz",
+            os.path.join(self.src, "libcxx"),
+        )
+        self.get(
+            f"{prefix}{self.version}/libcxxabi-{self.version}.src.tar.xz",
+            os.path.join(self.src, "libcxxabi"),
+        )
+        self.get(
+            f"{prefix}{self.version}/libunwind-{self.version}.src.tar.xz",
+            os.path.join(self.src, "libunwind"),
+        )
         self.patch("disable-system-libs.patch")
 
     def build(self):
@@ -45,10 +64,18 @@ class LlvmLibs(Recipe):
 
         defs["LLVM_EXTERNAL_CLANG_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "clang")
         defs["LLVM_EXTERNAL_LLD_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "lld")
-        defs["LLVM_EXTERNAL_COMPILER_RT_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "compiler-rt")
-        defs["LLVM_EXTERNAL_LIBCXX_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "libcxx")
-        defs["LLVM_EXTERNAL_LIBCXXABI_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "libcxxabi")
-        defs["LLVM_EXTERNAL_LIBUNWIND_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "libunwind")
+        defs["LLVM_EXTERNAL_COMPILER_RT_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "compiler-rt"
+        )
+        defs["LLVM_EXTERNAL_LIBCXX_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "libcxx"
+        )
+        defs["LLVM_EXTERNAL_LIBCXXABI_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "libcxxabi"
+        )
+        defs["LLVM_EXTERNAL_LIBUNWIND_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "libunwind"
+        )
 
         defs["LLVM_HOST_TRIPLE"] = f"{arch}-unknown-linux-{abi}"
 

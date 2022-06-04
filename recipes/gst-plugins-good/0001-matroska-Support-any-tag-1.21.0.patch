@@ -1,0 +1,392 @@
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
+index c4fc73caad..acfae58877 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
+@@ -467,7 +467,7 @@
+ #define GST_MATROSKA_TAG_ID_RECORDING_LOCATION "RECORDING_LOCATION"
+ #define GST_MATROSKA_TAG_ID_PRODUCTION_COPYRIGHT "PRODUCTION_COPYRIGHT"
+ #define GST_MATROSKA_TAG_ID_LICENSE "LICENSE"
+-
++#define GST_MATROSKA_TAG_ID_GST_TAG  "GSTREAMER_TAG"
+ /*
+  * TODO: add this tag & mappings
+  * "REPLAYGAIN_GAIN" -> GST_TAG_*_GAIN   see http://replaygain.hydrogenaudio.org/rg_data_format.html
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
+index 0147de216a..25c0162689 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
+@@ -40,6 +40,11 @@
+  * gst-launch-1.0 -v audiotestsrc num-buffers=100 ! audioconvert ! vorbisenc ! matroskamux ! filesink location=test.mka
+  * ]| This pipeline muxes a 440Hz sine wave encoded with the Vorbis codec into a Matroska file.
+  *
++ * GStreamer tags are mapped to official Matroska tags where possible. GST_TAG_TITLE is mapped
++ * to the TITLE Matroska tag for example. Gstreamer tags that does not have an obvious mapping
++ * (such as custom tags) are mapped to a non official GSTREAMER_TAG Matroska tag. This Matroska
++ * tag is understood by matroskademux which can turn this Matroska tag back into a Gstreamer tag.
++ *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+@@ -3470,23 +3475,16 @@ gst_matroska_mux_tag_list_is_empty (const GstTagList * list)
+   int i;
+   for (i = 0; i < gst_tag_list_n_tags (list); i++) {
+     const gchar *tag = gst_tag_list_nth_tag_name (list, i);
+-    int i;
+-    for (i = 0; i < G_N_ELEMENTS (gst_matroska_tag_conv); i++) {
+-      const gchar *tagname_gst = gst_matroska_tag_conv[i].gstreamer_tagname;
+-      if (strcmp (tagname_gst, tag) == 0) {
+-        GValue src = { 0, };
+-        gchar *dest;
+-
+-        if (!gst_tag_list_copy_value (&src, list, tag))
+-          break;
+-        dest = gst_value_serialize (&src);
++    GValue src = { 0, };
++    gchar *dest;
++    if (!gst_tag_list_copy_value (&src, list, tag))
++      break;
++    dest = gst_value_serialize (&src);
+ 
+-        g_value_unset (&src);
+-        if (dest) {
+-          g_free (dest);
+-          return FALSE;
+-        }
+-      }
++    g_value_unset (&src);
++    if (dest) {
++      g_free (dest);
++      return FALSE;
+     }
+   }
+   return TRUE;
+@@ -3499,32 +3497,45 @@ gst_matroska_mux_write_simple_tag (const GstTagList * list, const gchar * tag,
+   GstEbmlWrite *ebml = (GstEbmlWrite *) data;
+   guint i;
+   guint64 simpletag_master;
++  GValue src = { 0, };
++  gchar *dest, *formatted;
++
+ 
++  if (!gst_tag_list_copy_value (&src, list, tag))
++   return;
++  if (!(dest = gst_value_serialize (&src))) {
++    GST_WARNING ("Can't transform tag '%s' to string", tag);
++    g_value_unset (&src);
++    return;
++  }
+   for (i = 0; i < G_N_ELEMENTS (gst_matroska_tag_conv); i++) {
+     const gchar *tagname_gst = gst_matroska_tag_conv[i].gstreamer_tagname;
+     const gchar *tagname_mkv = gst_matroska_tag_conv[i].matroska_tagname;
+ 
+     if (strcmp (tagname_gst, tag) == 0) {
+-      GValue src = { 0, };
+-      gchar *dest;
+ 
+-      if (!gst_tag_list_copy_value (&src, list, tag))
+-        break;
+-      if ((dest = gst_value_serialize (&src))) {
+-
+-        simpletag_master = gst_ebml_write_master_start (ebml,
+-            GST_MATROSKA_ID_SIMPLETAG);
+-        gst_ebml_write_ascii (ebml, GST_MATROSKA_ID_TAGNAME, tagname_mkv);
+-        gst_ebml_write_utf8 (ebml, GST_MATROSKA_ID_TAGSTRING, dest);
+-        gst_ebml_write_master_finish (ebml, simpletag_master);
+-        g_free (dest);
+-      } else {
+-        GST_WARNING ("Can't transform tag '%s' to string", tagname_mkv);
+-      }
++      simpletag_master = gst_ebml_write_master_start (ebml,
++          GST_MATROSKA_ID_SIMPLETAG);
++      gst_ebml_write_ascii (ebml, GST_MATROSKA_ID_TAGNAME, tagname_mkv);
++      gst_ebml_write_utf8 (ebml, GST_MATROSKA_ID_TAGSTRING, dest);
++      gst_ebml_write_master_finish (ebml, simpletag_master);
++      g_free (dest);
+       g_value_unset (&src);
+-      break;
++      return;
+     }
+   }
++  /* This Gstreamer tag did not have an official Matroska tag to map to.
++     Instead map it to the unofficial GSTREAMER_TAG Matroska tag. */
++  simpletag_master = gst_ebml_write_master_start (ebml,
++      GST_MATROSKA_ID_SIMPLETAG);
++  gst_ebml_write_ascii (ebml, GST_MATROSKA_ID_TAGNAME,
++      GST_MATROSKA_TAG_ID_GST_TAG);
++  formatted = g_strdup_printf ("%s@%s", tag, dest);
++  gst_ebml_write_utf8 (ebml, GST_MATROSKA_ID_TAGSTRING, formatted);
++  gst_ebml_write_master_finish (ebml, simpletag_master);
++  g_free (formatted);
++  g_free (dest);
++  g_value_unset (&src);  
+ }
+ 
+ static void
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
+index eb317644cc..2804b1710a 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
+@@ -2337,6 +2337,37 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
+         matched = TRUE;
+       }
+     }
++    if (!matched && strcmp (GST_MATROSKA_TAG_ID_GST_TAG, tag) == 0 ) {
++      gchar **tokenized = g_strsplit(value, "@", 2);
++      gchar *tagname_gst, *value_gst;
++      /* The format of the GSTREAMER_TAG Matroska should be
++       * `<tag_name>@<tag_value>. We ensure that `tag_name` actually exists
++       * otherwise we cannot deserialize the tags value. */
++      if ((tagname_gst = tokenized[0]) && (value_gst = tokenized[1]) &&
++          gst_tag_exists(tagname_gst))
++      {
++        GValue dest = { 0, };
++        GType dest_type = gst_tag_get_type (tagname_gst);
++        g_value_init (&dest, dest_type);
++
++        if (gst_value_deserialize (&dest, value_gst)) {
++          gst_tag_list_add_values (*p_taglist, GST_TAG_MERGE_APPEND,
++              tagname_gst, &dest, NULL);
++          matched = TRUE;
++        } else {
++          GST_WARNING_OBJECT (common->sinkpad, "Can't transform tag '%s' with "
++              "value '%s' to target type '%s'", tagname_gst, value_gst,
++              g_type_name (dest_type));
++        }
++        g_value_unset (&dest);
++      } else {
++        GST_WARNING_OBJECT (common->sinkpad, "Invalid GST_TAG format '%s'",
++            value);
++      }
++
++      g_strfreev(tokenized);
++    }
++
+     if (!matched) {
+       gchar *key_val;
+       /* TODO: read LANGUAGE sub-tag, and use "key[lc]=val" form */
+diff --git a/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c b/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c
+index 5081c8494a..5e512516eb 100644
+--- a/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c
++++ b/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c
+@@ -305,8 +305,106 @@ GST_START_TEST (test_toc_demux)
+   gst_harness_teardown (h);
+ }
+ 
++ 
++static void
++test_tags (const gchar * input, const GstTagList * expected_tags)
++{
++  GstHarness *h;
++  GstBuffer *buf;
++  GstEvent *ev;
++  GstTagList *tags;
++  guchar *mkv_data;
++  gsize mkv_size;
++  gboolean found_match = FALSE;
++
++  h = gst_harness_new_with_padnames ("matroskademux", "sink", NULL);
++  g_signal_connect (h->element, "pad-added", G_CALLBACK (pad_added_cb), h);
++
++  mkv_data = g_base64_decode (input, &mkv_size);
++  fail_unless (mkv_data != NULL);
++
++  gst_harness_set_src_caps_str (h, "video/x-matroska");
++
++  buf = gst_buffer_new_wrapped (mkv_data, mkv_size);
++  GST_BUFFER_OFFSET (buf) = 0;
++
++  fail_unless_equals_int (GST_FLOW_OK, gst_harness_push (h, buf));
++  gst_harness_push_event (h, gst_event_new_eos ());
++
++  while ((ev = gst_harness_try_pull_event (h))) {
++    if (ev->type != GST_EVENT_TAG) {
++      gst_event_unref (ev);
++      continue;
++    }
++
++    gst_event_parse_tag (ev, &tags);
++    fail_unless (tags != NULL);
++
++    found_match = found_match || gst_tag_list_is_equal (tags, expected_tags);
++    gst_event_unref (ev);
++  }
++  fail_unless (found_match);
++
++  gst_harness_teardown (h);
++}
++
++GST_START_TEST (test_tags_artist)
++{
++  const gchar mkv_with_artist_tag[] =
++      "GkXfowEAAAAAAAAUQoKJbWF0cm9za2EAQoeBAkKFgQIYU4BnAQAAAAAAAx4RTZt0AQAAAAAAAIxN"
++      "uwEAAAAAAAASU6uEFUmpZlOsiAAAAAAAAACYTbsBAAAAAAAAElOrhBZUrmtTrIgAAAAAAAABGOya"
++      "AQAAAAAAABJTq4QQQ6dwU6yI//////////9NuwEAAAAAAAASU6uEHFO7a1OsiAAAAAAAAAKqTbsB"
++      "AAAAAAAAElOrhBJUw2dTrIgAAAAAAAAC0hVJqWYBAAAAAAAAdHOkkDrxg6dOcJxELBMQsYWwiPEq"
++      "17GDD0JARImIQECqqqfe1rtNgKVHU3RyZWFtZXIgbWF0cm9za2FtdXggdmVyc2lvbiAxLjE4LjQA"
++      "V0GZR1N0cmVhbWVyIE1hdHJvc2thIG11eGVyAERhiAkPgnAAW+JIFlSuawEAAAAAAABwrgEAAAAA"
++      "AABn14EBg4EBc8WISmtlOk1rCJoj44OEAfygVVNuhlZpZGVvAOABAAAAAAAAK7CBELqBEJqBAi61"
++      "JIRZODAwVbABAAAAAAAAEFW5gQBVsYECVbqBAlW7gQKGj1ZfVU5DT01QUkVTU0VEAB9DtnUBAAAA"
++      "AAABCueBAKNBBIEAAIDr69LSqqqRkZFqalFRKSkp6+vS0qqqkZGRampRUSkpKevr0tKqqpGRkWpq"
++      "UVEpKSnr69LSqqqRkZFqalFRKSkp6+vS0qqqkZGRampRUSkpKevr0tKqqpGRkWpqUVEpKSnr69LS"
++      "qqqRkZFqalFRKSkp6+vS0qqqkZGRampRUSkpKevr0tKqqpGRkWpqUVEpKSnr69LSqqqRkZFqalFR"
++      "KSkpKSkQEGpqEBAQqqoQEOvr6ykpEBBqahAQEKqqEBDr6+sQEOvr6xAQEAAQICAQzRNnEBDr6+sQ"
++      "EBAAECAgoiulKRAQ6+vrEBAQABAgIF3L1aQQEOvr6xAQEAAQICAnKmIgHFO7awEAAAAAAAAcuwEA"
++      "AAAAAAATs4EAtwEAAAAAAAAH94EB8YIBlBJUw2cBAAAAAAAAQHNzAQAAAAAAADZjwAEAAAAAAAAL"
++      "Y8WISmtlOk1rCJpnyAEAAAAAAAAXRaOHQVJUSVNUAESHimdzdHJlYW1lcgA=";
++
++  GstTagList *tags = gst_tag_list_new (GST_TAG_VIDEO_CODEC, "Uncompressed gray",
++      GST_TAG_ARTIST, "gstreamer",
++      NULL);
++  test_tags (mkv_with_artist_tag, tags);
++}
++
++GST_END_TEST;
++
++GST_START_TEST (test_tags_gstreamer)
++{
++  const gchar mkv_with_gstreamer_tag[] =
++      "GkXfowEAAAAAAAAUQoKJbWF0cm9za2EAQoeBAkKFgQIYU4BnAQAAAAAAAzARTZt0AQAAAAAAAIxN"
++      "uwEAAAAAAAASU6uEFUmpZlOsiAAAAAAAAACYTbsBAAAAAAAAElOrhBZUrmtTrIgAAAAAAAABGOya"
++      "AQAAAAAAABJTq4QQQ6dwU6yI//////////9NuwEAAAAAAAASU6uEHFO7a1OsiAAAAAAAAAKqTbsB"
++      "AAAAAAAAElOrhBJUw2dTrIgAAAAAAAAC0hVJqWYBAAAAAAAAdHOkkDqsFMHTSyJXw8TRxM7B41Aq"
++      "17GDD0JARImIQECqqqfe1rtNgKVHU3RyZWFtZXIgbWF0cm9za2FtdXggdmVyc2lvbiAxLjE4LjQA"
++      "V0GZR1N0cmVhbWVyIE1hdHJvc2thIG11eGVyAERhiAkPgRThiY9IFlSuawEAAAAAAABwrgEAAAAA"
++      "AABn14EBg4EBc8WImUznKWYeOFcj44OEAfygVVNuhlZpZGVvAOABAAAAAAAAK7CBELqBEJqBAi61"
++      "JIRZODAwVbABAAAAAAAAEFW5gQBVsYECVbqBAlW7gQKGj1ZfVU5DT01QUkVTU0VEAB9DtnUBAAAA"
++      "AAABCueBAKNBBIEAAIDr69LSqqqRkZFqalFRKSkp6+vS0qqqkZGRampRUSkpKevr0tKqqpGRkWpq"
++      "UVEpKSnr69LSqqqRkZFqalFRKSkp6+vS0qqqkZGRampRUSkpKevr0tKqqpGRkWpqUVEpKSnr69LS"
++      "qqqRkZFqalFRKSkp6+vS0qqqkZGRampRUSkpKevr0tKqqpGRkWpqUVEpKSnr69LSqqqRkZFqalFR"
++      "KSkpKSkQEGpqEBAQqqoQEOvr6ykpEBBqahAQEKqqEBDr6+sQEOvr6xAQEAAQICAQzRNnEBDr6+sQ"
++      "EBAAECAgoiulKRAQ6+vrEBAQABAgIF3L1aQQEOvr6xAQEAAQICAnKmIgHFO7awEAAAAAAAAcuwEA"
++      "AAAAAAATs4EAtwEAAAAAAAAH94EB8YIBlBJUw2cBAAAAAAAAUnNzAQAAAAAAAEhjwAEAAAAAAAAL"
++      "Y8WImUznKWYeOFdnyAEAAAAAAAApRaOOR1NUUkVBTUVSX1RBRwBEh5V0aXRsZS1zb3J0bmFtZUB0"
++      "aXRsZQA=";
++
++  GstTagList *tags = gst_tag_list_new (GST_TAG_VIDEO_CODEC, "Uncompressed gray",
++      GST_TAG_TITLE_SORTNAME, "title",
++      NULL);
++  test_tags (mkv_with_gstreamer_tag, tags);
++}
++
+ GST_END_TEST;
+ 
++
++
+ static Suite *
+ matroskademux_suite (void)
+ {
+@@ -316,7 +414,8 @@ matroskademux_suite (void)
+   suite_add_tcase (s, tc_chain);
+   tcase_add_test (tc_chain, test_sub_terminator);
+   tcase_add_test (tc_chain, test_toc_demux);
+-
++  tcase_add_test (tc_chain, test_tags_artist);
++  tcase_add_test (tc_chain, test_tags_gstreamer);
+   return s;
+ }
+ 
+diff --git a/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c b/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c
+index fa53c7ad68..f74c48bdca 100644
+--- a/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c
++++ b/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c
+@@ -63,6 +63,13 @@ fail_unless_equals_int (data_size, gst_buffer_get_size (buffer));   \
+ fail_unless (gst_buffer_memcmp (buffer, 0, data, data_size) == 0);  \
+ } G_STMT_END
+ 
++#define compare_sub_buffer_to_data(buffer, offset, data, data_size)     \
++G_STMT_START {                                                          \
++fail_unless (data_size + offset <= gst_buffer_get_size (buffer));       \
++fail_unless (gst_buffer_memcmp (buffer, offset, data, data_size) == 0); \
++} G_STMT_END
++
++
+ static void
+ test_ebml_header_with_version (gint version,
+     gconstpointer data, gsize data_size)
+@@ -994,6 +1001,77 @@ GST_START_TEST (test_toc_without_edition)
+ 
+ GST_END_TEST;
+ 
++static void
++test_tags (GstTagList * tags, gconstpointer data, gsize data_size)
++{
++  GstHarness *h;
++  GstBuffer *outbuffer;
++  GstEvent *ev;
++
++  h = setup_matroskamux_harness (AC3_CAPS_STRING);
++
++  ev = gst_event_new_tag (tags);
++  fail_unless_equals_int (TRUE, gst_harness_push_event (h, ev));
++
++  ev = gst_event_new_eos ();
++  fail_unless_equals_int (TRUE, gst_harness_push_event (h, ev));
++
++  outbuffer = gst_harness_take_all_data_as_buffer (h);
++
++  /* Ensure tags are where we think they are by checking for ID_TAG and
++   * ID_SIMPLETAG */
++  /* GST_MATROSKA_ID_TAG */
++  compare_sub_buffer_to_data (outbuffer, 56, "\x73\x73", 2);
++  /* GST_MATROSKA_ID_SIMPLETAG */
++  compare_sub_buffer_to_data (outbuffer, 87, "\x67\xC8", 2);
++  compare_sub_buffer_to_data (outbuffer, 97, data, data_size);
++
++  gst_buffer_unref (outbuffer);
++  gst_harness_teardown (h);
++}
++
++GST_START_TEST (test_tags_title)
++{
++  guint8 data[] = {
++    0x45, 0xA3,                 /* GST_MATROSKA_ID_TAGNAME */
++    0x86,                       /* size: 6 */
++    /* TITLE\0 */
++    0x54, 0x49, 0x54, 0x4c, 0x45, 0x00,
++    0x44, 0x87,                 /* GST_MATROSKA_ID_TAGSTRING */
++    0x8e,                       /* size: 14 */
++    /* "Cool\ Title"\0 */
++    0x22, 0x43, 0x6f, 0x6f, 0x6c, 0x5c, 0x20, 0x54, 0x69, 0x74, 0x6c, 0x65,
++    0x22, 0x00,
++  };
++  GstTagList *tags = gst_tag_list_new (GST_TAG_TITLE, "Cool Title", NULL);
++  test_tags (tags, data, sizeof (data));
++}
++
++GST_END_TEST;
++
++GST_START_TEST (test_tags_title_sortname)
++{
++  guint8 data[] = {
++    0x45, 0xA3,                 /* GST_MATROSKA_ID_TAGNAME */
++    0x8e,                       /* size: 14 */
++    /* GSTREAMER_TAG\0 */
++    0x47, 0x53, 0x54, 0x52, 0x45, 0x41, 0x4d, 0x45, 0x52, 0x5f, 0x54, 0x41,
++    0x47, 0x00,
++    0x44, 0x87,                 /* GST_MATROSKA_ID_TAGSTRING */
++    0x9d,                       /* size: 29 */
++    /* title-sortname@"Cool\ Title"\0 */
++    0x74, 0x69, 0x74, 0x6c, 0x65, 0x2d, 0x73, 0x6f, 0x72, 0x74, 0x6e, 0x61,
++    0x6d, 0x65, 0x40, 0x22, 0x43, 0x6f, 0x6f, 0x6c, 0x5c, 0x20, 0x54, 0x69,
++    0x74, 0x6c, 0x65, 0x22, 0x00,
++  };
++  GstTagList *tags =
++      gst_tag_list_new (GST_TAG_TITLE_SORTNAME, "Cool Title", NULL);
++  test_tags (tags, data, sizeof (data));
++}
++
++GST_END_TEST;
++
++
+ static Suite *
+ matroskamux_suite (void)
+ {
+@@ -1014,6 +1092,8 @@ matroskamux_suite (void)
+ 
+   tcase_add_test (tc_chain, test_toc_with_edition);
+   tcase_add_test (tc_chain, test_toc_without_edition);
++  tcase_add_test (tc_chain, test_tags_title);
++  tcase_add_test (tc_chain, test_tags_title_sortname);
+   return s;
+ }
+ 

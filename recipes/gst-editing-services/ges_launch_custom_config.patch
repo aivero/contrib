@@ -1,0 +1,35 @@
+diff --git a/subprojects/gst-editing-services/tools/ges-launcher.c b/subprojects/gst-editing-services/tools/ges-launcher.c
+index aa0b711b..fcd40af2 100644
+--- a/subprojects/gst-editing-services/tools/ges-launcher.c
++++ b/subprojects/gst-editing-services/tools/ges-launcher.c
+@@ -1593,6 +1593,30 @@ _startup (GApplication * application)
+     goto done;
+   }
+ 
++  gst_tag_register (
++      "camera_meta_tag",
++      GST_TAG_FLAG_DECODED,
++      G_TYPE_STRING,
++      "camera_meta_tag",
++      "Camera Metadata",
++       gst_tag_merge_use_first);
++
++  gst_tag_register (
++      "3dq_encoder_tag",
++      GST_TAG_FLAG_DECODED,
++      G_TYPE_STRING,
++      "3dq_encoder_tag",
++      "3DQ Encoder",
++       gst_tag_merge_use_first);
++
++  gst_tag_register (
++      "3dq_config_tag",
++      GST_TAG_FLAG_DECODED,
++      G_TYPE_STRING,
++      "3dq_config_tag",
++      "Configuration related to 3DQ streaming",
++       gst_tag_merge_use_first);
++
+   if (opts->interactive && !opts->outputuri) {
+     if (gst_play_kb_set_key_handler (keyboard_cb, self)) {
+       gst_print ("Press 'k' to see a list of keyboard shortcuts.\n");

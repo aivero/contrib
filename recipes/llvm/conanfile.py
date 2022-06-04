@@ -1,10 +1,11 @@
 from build import *
 import multiprocessing
 
+
 class Llvm(Recipe):
     description = "Collection of modular and reusable compiler and toolchain technologies"
     license = "custom"
-    exports = ("disable-system-libs.patch",)
+    exports = ("*-disable-system-libs.patch",)
     build_requires = (
         "cmake-bootstrap/[^3.18.4]",
         "ninja-bootstrap/[^1.10.0]",
@@ -13,15 +14,18 @@ class Llvm(Recipe):
     requires = "file/[^5.39]"
 
     def source(self):
-        prefix = "https://github.com/llvm/llvm-project/releases/download/llvmorg-"
-        self.get(f"{prefix}{self.version}/llvm-{self.version}.src.tar.xz", os.path.join(self.src, "llvm"))
-        self.get(f"{prefix}{self.version}/clang-{self.version}.src.tar.xz", os.path.join(self.src, "clang"))
-        self.get(f"{prefix}{self.version}/lld-{self.version}.src.tar.xz", os.path.join(self.src, "lld"))
-        self.get(f"{prefix}{self.version}/compiler-rt-{self.version}.src.tar.xz", os.path.join(self.src, "compiler-rt"))
-        self.get(f"{prefix}{self.version}/libcxx-{self.version}.src.tar.xz", os.path.join(self.src, "libcxx"))
-        self.get(f"{prefix}{self.version}/libcxxabi-{self.version}.src.tar.xz", os.path.join(self.src, "libcxxabi"))
-        self.get(f"{prefix}{self.version}/libunwind-{self.version}.src.tar.xz", os.path.join(self.src, "libunwind"))
-        self.patch("disable-system-libs.patch")
+        version = self.version
+        prefix = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}"
+        ext = ".src.tar.xz"
+
+        self.get(f"{prefix}/llvm-{version}{ext}", os.path.join(self.src, "llvm"))
+        self.get(f"{prefix}/clang-{version}{ext}", os.path.join(self.src, "clang"))
+        self.get(f"{prefix}/lld-{version}{ext}", os.path.join(self.src, "lld"))
+        self.get(f"{prefix}/compiler-rt-{version}{ext}", os.path.join(self.src, "compiler-rt"))
+        self.get(f"{prefix}/libcxx-{version}{ext}", os.path.join(self.src, "libcxx"))
+        self.get(f"{prefix}/libcxxabi-{version}{ext}", os.path.join(self.src, "libcxxabi"))
+        self.get(f"{prefix}/libunwind-{version}{ext}", os.path.join(self.src, "libunwind"))
+        self.patch(f"{version}-disable-system-libs.patch")
 
     def build(self):
         source_folder = os.path.join(self.src, "llvm")
@@ -44,10 +48,18 @@ class Llvm(Recipe):
 
         defs["LLVM_EXTERNAL_CLANG_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "clang")
         defs["LLVM_EXTERNAL_LLD_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "lld")
-        defs["LLVM_EXTERNAL_COMPILER_RT_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "compiler-rt")
-        defs["LLVM_EXTERNAL_LIBCXX_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "libcxx")
-        defs["LLVM_EXTERNAL_LIBCXXABI_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "libcxxabi")
-        defs["LLVM_EXTERNAL_LIBUNWIND_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "libunwind")
+        defs["LLVM_EXTERNAL_COMPILER_RT_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "compiler-rt"
+        )
+        defs["LLVM_EXTERNAL_LIBCXX_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "libcxx"
+        )
+        defs["LLVM_EXTERNAL_LIBCXXABI_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "libcxxabi"
+        )
+        defs["LLVM_EXTERNAL_LIBUNWIND_SOURCE_DIR"] = os.path.join(
+            self.build_folder, self.src, "libunwind"
+        )
 
         defs["LLVM_HOST_TRIPLE"] = f"{arch}-unknown-linux-{abi}"
 
@@ -190,6 +202,7 @@ class Llvm(Recipe):
 
         # Install stage 2 to package directory
         defs["CMAKE_INSTALL_PREFIX"] = self.package_folder
+        defs["CMAKE_SYSTEM_NAME"] = "Linux"
 
         # Use stage 1 libs and incs
         ldflags = ""
@@ -201,7 +214,9 @@ class Llvm(Recipe):
         clang_inc = os.path.join(stage1_folder, "lib", "clang", self.version, "include")
         clang_lib = os.path.join(stage1_folder, "lib", "clang", self.version, "lib", "linux")
         libc_inc = self.env["LIBC_INCLUDE_PATH"]
-        os.environ["CXXFLAGS"] = f"{cflags} -idirafter {libcxx_inc} -idirafter {clang_inc} -idirafter {libc_inc}"
+        os.environ[
+            "CXXFLAGS"
+        ] = f"{cflags} -idirafter {libcxx_inc} -idirafter {clang_inc} -idirafter {libc_inc}"
         os.environ["LDFLAGS"] = f"{cflags} {ldflags} -L{clang_lib} -L{libcxx_lib}"
         os.environ["LIBRARY_PATH"] = libcxx_lib
 

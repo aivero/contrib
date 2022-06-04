@@ -1,0 +1,16 @@
+diff --git a/clang/lib/Driver/ToolChains/Linux.cpp b/clang/lib/Driver/ToolChains/Linux.cpp
+index 1803504..d87e3c8 100644
+--- a/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -214,6 +214,11 @@ static StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
+ 
+ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+     : Generic_ELF(D, Triple, Args) {
++  if (::getenv("LIBC_LIBRARY_PATH")) {
++    path_list &Paths = getFilePaths();
++    addPathIfExists(D, ::getenv("LIBC_LIBRARY_PATH"), Paths);
++    return;
++  }
+   GCCInstallation.init(Triple, Args);
+   Multilibs = GCCInstallation.getMultilibs();
+   SelectedMultilib = GCCInstallation.getMultilib();

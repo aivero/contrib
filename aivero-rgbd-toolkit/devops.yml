@@ -1,9 +1,0 @@
--
-- 
-  profiles:
-    - linux-armv8-l4t-t186
-    - linux-armv8-l4t-t210
-    - linux-x86_64
-  mode: docker
-  conanInstall:
-    - aivero-rgbd-toolkit

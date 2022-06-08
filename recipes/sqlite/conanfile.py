@@ -12,7 +12,6 @@ class Sqlite(Recipe):
     build_requires = (
         "cc/[^1.0.0]",
         "make/[^4.3]",
-        "tcl/[^8.6.10]",
     )
     requires = (
         "zlib/[^1.2.11]",
@@ -20,9 +19,8 @@ class Sqlite(Recipe):
     )
 
     def source(self):
-        self.get(f"https://www.sqlite.org/2019/sqlite-src-{conv_version(self.version)}.zip")
+        self.get(f"https://www.sqlite.org/2022/sqlite-autoconf-{conv_version(self.version)}.tar.gz")
 
     def build(self):
         self.exe("chmod +x configure")
-
         self.autotools()

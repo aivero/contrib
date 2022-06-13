@@ -17,7 +17,7 @@ class Gnutls(Recipe):
     )
 
     def source(self):
-        self.get(f"https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-{self.version}.tar.xz")
+        self.get(f"https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-{self.version}.tar.xz")
 
     def build(self):
         args = [

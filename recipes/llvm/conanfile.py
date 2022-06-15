@@ -14,18 +14,9 @@ class Llvm(Recipe):
     requires = "file/[^5.39]"
 
     def source(self):
-        version = self.version
-        prefix = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}"
-        ext = ".src.tar.xz"
-
-        self.get(f"{prefix}/llvm-{version}{ext}", os.path.join(self.src, "llvm"))
-        self.get(f"{prefix}/clang-{version}{ext}", os.path.join(self.src, "clang"))
-        self.get(f"{prefix}/lld-{version}{ext}", os.path.join(self.src, "lld"))
-        self.get(f"{prefix}/compiler-rt-{version}{ext}", os.path.join(self.src, "compiler-rt"))
-        self.get(f"{prefix}/libcxx-{version}{ext}", os.path.join(self.src, "libcxx"))
-        self.get(f"{prefix}/libcxxabi-{version}{ext}", os.path.join(self.src, "libcxxabi"))
-        self.get(f"{prefix}/libunwind-{version}{ext}", os.path.join(self.src, "libunwind"))
-        self.patch(f"{version}-disable-system-libs.patch")
+        prefix = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}"
+        self.get(f"{prefix}/llvm-project-{self.version}.src.tar.xz", self.src)
+        self.patch(f"{self.version}-disable-system-libs.patch")
 
     def build(self):
         source_folder = os.path.join(self.src, "llvm")
@@ -48,21 +39,6 @@ class Llvm(Recipe):
             abi = "musl"
         else:
             abi = "gnu"
-
-        defs["LLVM_EXTERNAL_CLANG_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "clang")
-        defs["LLVM_EXTERNAL_LLD_SOURCE_DIR"] = os.path.join(self.build_folder, self.src, "lld")
-        defs["LLVM_EXTERNAL_COMPILER_RT_SOURCE_DIR"] = os.path.join(
-            self.build_folder, self.src, "compiler-rt"
-        )
-        defs["LLVM_EXTERNAL_LIBCXX_SOURCE_DIR"] = os.path.join(
-            self.build_folder, self.src, "libcxx"
-        )
-        defs["LLVM_EXTERNAL_LIBCXXABI_SOURCE_DIR"] = os.path.join(
-            self.build_folder, self.src, "libcxxabi"
-        )
-        defs["LLVM_EXTERNAL_LIBUNWIND_SOURCE_DIR"] = os.path.join(
-            self.build_folder, self.src, "libunwind"
-        )
 
         defs["LLVM_HOST_TRIPLE"] = f"{arch}-unknown-linux-{abi}"
 
@@ -92,6 +68,8 @@ class Llvm(Recipe):
         defs["LLVM_INCLUDE_EXAMPLES"] = False
         defs["LLVM_INSTALL_BINUTILS_SYMLINKS"] = True
         defs["LLVM_INSTALL_UTILS"] = True
+
+        defs["LLVM_ENABLE_RUNTIMES"] = "libcxx;libcxxabi;libunwind"
 
         # clang options
         defs["CLANG_VENDOR"] = "Aivero"

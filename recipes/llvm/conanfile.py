@@ -69,7 +69,7 @@ class Llvm(Recipe):
         defs["LLVM_INSTALL_BINUTILS_SYMLINKS"] = True
         defs["LLVM_INSTALL_UTILS"] = True
 
-        defs["LLVM_ENABLE_RUNTIMES"] = "compiler-rt;libcxx;libcxxabi;libunwind"
+        defs["LLVM_ENABLE_PROJECTS"] = "all"
 
         # clang options
         defs["CLANG_VENDOR"] = "Aivero"

@@ -4,6 +4,7 @@ from build import *
 class Rustc(Recipe):
     description = "Systems programming language focused on safety, speed and concurrency"
     license = "MIT"
+    exports = ("*-boostrap-respect-cxxflags.patch",)
     build_requires = (
         "cmake/[^3.18.4]",
         "curl/[^7.72.0]",
@@ -21,6 +22,7 @@ class Rustc(Recipe):
 
     def source(self):
         self.get(f"https://static.rust-lang.org/dist/rustc-{self.version}-src.tar.gz")
+        self.patch(f"{self.version}-boostrap-respect-cxxflags.patch")
 
     def build(self):
         os.environ["RUSTFLAGS"] = "-g -Clinker-plugin-lto -Copt-level=2"

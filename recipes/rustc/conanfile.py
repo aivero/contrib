@@ -43,6 +43,7 @@ class Rustc(Recipe):
             "--enable-vendor",
             "--disable-docs",
             "--disable-compiler-docs",
+            "--disable-llvm-static-stdcpp",
         ]
         self.exe("./configure", args)
         self.exe("python x.py install")

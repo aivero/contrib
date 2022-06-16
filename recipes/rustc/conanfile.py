@@ -45,6 +45,11 @@ class Rustc(Recipe):
             "--disable-compiler-docs",
             "--disable-llvm-static-stdcpp",
         ]
+
+        # We ship llvm, so if we allow rust to have the llvm-project source code available it will
+        # think it is the one vendoring it. This can have some unexpected side effects, so we
+        # remove it.
+        shutil.rmtree(os.path.join(self.build_folder, self.src, "src", "llvm-project"))
         self.exe("./configure", args)
         self.exe("python x.py install")
 

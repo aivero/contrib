@@ -22,7 +22,6 @@ class Rustc(Recipe):
 
     def source(self):
         self.get(f"https://static.rust-lang.org/dist/rustc-{self.version}-src.tar.gz")
-        self.patch(f"{self.version}-boostrap-respect-cxxflags.patch")
 
     def build(self):
         os.environ["RUSTFLAGS"] = "-g -Clinker-plugin-lto -Copt-level=2"

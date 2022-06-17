@@ -41,6 +41,7 @@ class Rustc(Recipe):
             "--enable-vendor",
             "--disable-docs",
             "--disable-compiler-docs",
+            "--disable-llvm-static-stdcpp",
         ]
 
         self.exe("./configure", args)

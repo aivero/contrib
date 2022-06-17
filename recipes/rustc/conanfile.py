@@ -39,9 +39,11 @@ class Rustc(Recipe):
             "--enable-locked-deps",
             "--enable-extended",
             "--enable-vendor",
+            "--enable-clang",
+            "--enable-lld",
+            "--enable-use-libcxx",
             "--disable-docs",
             "--disable-compiler-docs",
-            "--disable-llvm-static-stdcpp",
         ]
 
         self.exe("./configure", args)

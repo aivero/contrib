@@ -41,6 +41,7 @@ class Llvm(Recipe):
             abi = "gnu"
 
         defs["LLVM_HOST_TRIPLE"] = f"{arch}-unknown-linux-{abi}"
+        defs["LLVM_DEFAULT_TARGET_TRIPLE"] = f"{arch}-unknown-linux-{abi}"
 
         defs["LLVM_ENABLE_PIC"] = True
         defs["LLVM_BUILD_RUNTIME"] = True

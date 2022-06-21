@@ -26,7 +26,7 @@ class CC(Recipe):
         llvm_inc = os.path.join(llvm_rootpath, "include")
         libcxx_inc = os.path.join(llvm_rootpath, "include", "c++", "v1")
         # -Wno-unused-command-line-argument is needed for some sanity tests in cmake
-        cflags = f" -nostdinc -idirafter {libclang_inc} -idirafter {libc_inc} -idirafter {llvm_inc} {static_flags} -Wno-unused-command-line-argument "
+        cflags = f" -nostdinc -idirafter {libclang_inc} -idirafter {libc_inc} -idirafter {llvm_inc} {static_flags} -fPIC -Wno-unused-command-line-argument "
         cxxflags = f" -nostdinc++ -idirafter {libcxx_inc} {cflags} "
 
         self.env_info.CFLAGS = cflags

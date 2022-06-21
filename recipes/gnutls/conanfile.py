@@ -7,13 +7,13 @@ class Gnutls(Recipe):
     build_requires = (
         "cc/[^1.0.0]",
         "make/[^4.3]",
-        "zlib/[^1.2.11]",
         "pkgconf/[^1.7.3]",
     )
     requires = (
         "p11-kit/[^0.23.21]",
         "nettle/[^3.6]",
         "libtasn1/[^4.16.0]",
+        "zlib/[^1.2.11]",
     )
 
     def source(self):

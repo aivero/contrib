@@ -1,6 +1,2 @@
 - version: 14.0.5
   bootstrap: true
-- version: 13.0.1
-  bootstrap: true
-- version: 12.0.1
-  bootstrap: true

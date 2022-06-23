@@ -1,5 +1,5 @@
 - version: b51cdb9de0a85ecd90ea0d91742d0b79637ebdfd
-  profiles: ["linux-x86_64", "linux-x86_64-gst1.20", "linux-x86_64-dev"]
+  profiles: ["linux-x86_64", "linux-x86_64-dev"]
   trigger: [webrtc-signalling]
 
 - name: webrtc-signalling

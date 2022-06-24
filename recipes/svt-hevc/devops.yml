@@ -1,2 +1,3 @@
 - version: 1.4.3
-  profiles: [linux-x86_64]
+  profiles:
+    - linux-x86_64

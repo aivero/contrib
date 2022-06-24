@@ -1,4 +1,7 @@
--
+- profiles:
+    - linux-x86_64
+    - linux-armv8-l4t-t186
+    - linux-armv8-l4t-t210
 - 
   profiles:
     - linux-armv8-l4t-t186

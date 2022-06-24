@@ -1,2 +1,4 @@
 - version: 1.21.0
-  profiles: [linux-x86_64, linux-x86_64-dev]
+  profiles:
+    - linux-x86_64
+    - linux-x86_64-dev

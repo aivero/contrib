@@ -1,2 +1,3 @@
 - version: '21.3.5'
-  profiles: [linux-x86_64]
+  profiles:
+    - linux-x86_64

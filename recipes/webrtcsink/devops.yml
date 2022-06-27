@@ -1,10 +1,11 @@
-- version: b51cdb9de0a85ecd90ea0d91742d0b79637ebdfd
+- version: ec46b706e9defd54fc2d5081303ee1ee547ea73c
   profiles:
     - linux-x86_64
     - linux-x86_64-dev
   trigger: [webrtc-signalling]
 
-- name: webrtc-signalling
+- version: ec46b706e9defd54fc2d5081303ee1ee547ea73c
+  name: webrtc-signalling
   mode: docker
   profiles:
     - linux-x86_64

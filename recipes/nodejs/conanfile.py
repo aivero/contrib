@@ -14,11 +14,9 @@ class Nodejs(Recipe):
         "zlib/[^1.2.11]",
         "libatomic/[^8.4.0]"
     )
-    exports = "fix-args-too-long.patch"
 
     def source(self):
         self.get(f"https://github.com/nodejs/node/archive/v{self.version}.tar.gz")
-        self.patch("fix-args-too-long.patch")
 
     def build(self):
         args = [

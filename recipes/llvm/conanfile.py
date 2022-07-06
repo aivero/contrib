@@ -272,3 +272,7 @@ class Llvm(Recipe):
         self.env_info.LD = os.path.join(self.package_folder, "bin", "ld")
         self.env_info.STRIP = os.path.join(self.package_folder, "bin", "strip")
         self.env_info.OBJCOPY = os.path.join(self.package_folder, "bin", "objcopy")
+
+        self.env_info.CLANG_PATH = os.path.join(self.package_folder, "bin", "clang")
+        self.env_info.LLVM_CONFIG_PATH = os.path.join(self.package_folder, "bin", "llvm-config")
+        self.env_info.LIBCLANG_PATH = os.path.join(self.package_folder, "lib", "libclang.so")

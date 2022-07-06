@@ -2,7 +2,7 @@ stages:
   - build
   - test
 generate-config:
-  image: aivero/conan:focal-x86_64
+  image: registry.gitlab.com/aivero/open-source/contrib/focal-x86_64:master
   tags: [x86_64,aws]
   stage: build
   rules:

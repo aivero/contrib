@@ -34,26 +34,28 @@ impl ProcessingBlock {
     /// # Returns
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
-    pub fn process_frame(&self, frame: &Frame) -> Result<Frame, Error> {
+    pub fn process_frame(&self, mut frame: Frame) -> Result<Frame, Error> {
         let mut error = Error::default();
         unsafe {
             rs2::rs2_process_frame(self.handle, frame.handle, error.inner());
+            // ownership was moved to block object
+            frame.handle = std::ptr::null_mut();
             if error.check() {
                 return Err(error);
             };
         }
 
-        let mut processed_frame: *mut rs2::rs2_frame = std::ptr::null_mut();
+        let mut processed_frame = Frame {
+            handle: std::ptr::null_mut(),
+        };
         let ret = unsafe {
-            rs2::rs2_poll_for_frame(self.frame_queue, &mut processed_frame, error.inner())
+            rs2::rs2_poll_for_frame(self.frame_queue, &mut processed_frame.handle, error.inner())
         };
         if error.check() || ret == 0 {
             return Err(error);
         };
 
-        Ok(Frame {
-            handle: processed_frame,
-        })
+        Ok(processed_frame)
     }
 
     /// Create a frame queue into which results of the processing block can be stored.
@@ -64,7 +66,7 @@ impl ProcessingBlock {
     /// # Returns
     /// * `Ok(rs2_frame_queue)` on success.
     /// * `Err(Error)` on failure.
-    pub fn create_frame_queue(capacity: i32) -> Result<*mut rs2::rs2_frame_queue, Error> {
+    fn create_frame_queue(capacity: i32) -> Result<*mut rs2::rs2_frame_queue, Error> {
         let mut error = Error::default();
         let frame_queue = unsafe { rs2::rs2_create_frame_queue(capacity, error.inner()) };
         if error.check() {

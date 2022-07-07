@@ -711,13 +711,20 @@ impl K4aSrc {
             rgbd::fill_main_buffer_and_tag(output_buffer, buffer, stream.id.get_string())?;
         } else {
             // Attach the secondary buffer and tag it adequately
-            rgbd::attach_aux_buffer_and_tag(output_buffer.get_mut().ok_or(gst::error_msg!(
-                gst::ResourceError::Failed,
-                [
-                    "k4asrc: Cannot get mutable reference to the main buffer while attaching {} stream",
-                    stream.id.get_string()
-                ]
-            ))?, &mut buffer, stream.id.get_string())?;
+            rgbd::attach_aux_buffer_and_tag(
+                output_buffer.get_mut().ok_or_else(|| {
+                    gst::error_msg!(
+                        gst::ResourceError::Failed,
+                        [
+                            "k4asrc: Cannot get mutable reference to the main buffer while \
+                             attaching {} stream",
+                            stream.id.get_string()
+                        ]
+                    )
+                })?,
+                &mut buffer,
+                stream.id.get_string(),
+            )?;
         }
 
         Ok(())
@@ -754,13 +761,15 @@ impl K4aSrc {
         // Form a gst buffer out of the IMU samples
         let mut buffer = Self::gst_buffer_from_imu_samples(imu_samples)?;
         // Get mutable reference to the buffer
-        let buffer_mut_ref = buffer.get_mut().ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-            [
-                "k4asrc: Cannot get mutable reference to {} buffer",
-                STREAM_ID_IMU
-            ]
-        ))?;
+        let buffer_mut_ref = buffer.get_mut().ok_or_else(|| {
+            gst::error_msg!(
+                gst::ResourceError::Failed,
+                [
+                    "k4asrc: Cannot get mutable reference to {} buffer",
+                    STREAM_ID_IMU
+                ]
+            )
+        })?;
 
         // Set timestamps using `RgbdTimestamps` trait
         self.set_rgbd_timestamp(
@@ -772,13 +781,16 @@ impl K4aSrc {
 
         // Attach the IMU buffer and tag it adequately
         rgbd::attach_aux_buffer_and_tag(
-            output_buffer.get_mut().ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-                [
-                    "k4asrc: Cannot get mutable reference to the main buffer while attaching {} stream",
-                    STREAM_ID_IMU
-                ]
-            ))?,
+            output_buffer.get_mut().ok_or_else(|| {
+                gst::error_msg!(
+                    gst::ResourceError::Failed,
+                    [
+                        "k4asrc: Cannot get mutable reference to the main buffer while attaching \
+                         {} stream",
+                        STREAM_ID_IMU
+                    ]
+                )
+            })?,
             &mut buffer,
             STREAM_ID_IMU,
         )?;
@@ -822,13 +834,15 @@ impl K4aSrc {
         // Form a gst buffer out of mutable slice
         let mut buffer = gst::buffer::Buffer::from_mut_slice(camera_meta);
         // Get mutable reference to the buffer
-        let buffer_mut_ref = buffer.get_mut().ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-            [
-                "k4asrc: Cannot get mutable reference to {} buffer",
-                STREAM_ID_CAMERAMETA
-            ]
-        ))?;
+        let buffer_mut_ref = buffer.get_mut().ok_or_else(|| {
+            gst::error_msg!(
+                gst::ResourceError::Failed,
+                [
+                    "k4asrc: Cannot get mutable reference to {} buffer",
+                    STREAM_ID_CAMERAMETA
+                ]
+            )
+        })?;
 
         // Set timestamps using `RgbdTimestamps` trait
         self.set_rgbd_timestamp(
@@ -840,13 +854,16 @@ impl K4aSrc {
 
         // Attach the camera_meta buffer and tag it adequately
         rgbd::attach_aux_buffer_and_tag(
-            output_buffer.get_mut().ok_or(gst::error_msg!(
-                gst::ResourceError::Failed,
-                [
-                    "k4asrc: Cannot get mutable reference to the main buffer while attaching {} stream",
-                    STREAM_ID_CAMERAMETA
-                ]
-            ))?,
+            output_buffer.get_mut().ok_or_else(|| {
+                gst::error_msg!(
+                    gst::ResourceError::Failed,
+                    [
+                        "k4asrc: Cannot get mutable reference to the main buffer while attaching \
+                         {} stream",
+                        STREAM_ID_CAMERAMETA
+                    ]
+                )
+            })?,
             &mut buffer,
             STREAM_ID_CAMERAMETA,
         )?;

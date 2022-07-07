@@ -26,13 +26,15 @@ pub fn fill_main_buffer_and_tag(
 
     // Tag the buffer appropriately
     tag_buffer_with_title(
-        main_buffer.get_mut().ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-            [
-                "Cannot get mutable reference to the buffer for {} stream",
-                tag
-            ]
-        ))?,
+        main_buffer.get_mut().ok_or_else(|| {
+            gst::error_msg!(
+                gst::ResourceError::Failed,
+                [
+                    "Cannot get mutable reference to the buffer for {} stream",
+                    tag
+                ]
+            )
+        })?,
         tag,
     )?;
 
@@ -57,13 +59,15 @@ pub fn attach_aux_buffer_and_tag(
 ) -> Result<(), gst::ErrorMessage> {
     // Tag the buffer appropriately
     tag_buffer_with_title(
-        buffer.get_mut().ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-            [
-                "Cannot get mutable reference to the buffer for {} stream",
-                tag
-            ]
-        ))?,
+        buffer.get_mut().ok_or_else(|| {
+            gst::error_msg!(
+                gst::ResourceError::Failed,
+                [
+                    "Cannot get mutable reference to the buffer for {} stream",
+                    tag
+                ]
+            )
+        })?,
         tag,
     )?;
 
@@ -118,10 +122,12 @@ pub fn tag_buffer_with_title(
     // Create an appropriate tag
     let mut tags = gst::tags::TagList::new();
     tags.get_mut()
-        .ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-            ["Cannot get mutable reference to {} tag", tag]
-        ))?
+        .ok_or_else(|| {
+            gst::error_msg!(
+                gst::ResourceError::Failed,
+                ["Cannot get mutable reference to {} tag", tag]
+            )
+        })?
         .add::<gst::tags::Title>(&tag, gst::TagMergeMode::Append);
 
     // Add the tag to the output buffer
@@ -143,17 +149,21 @@ pub fn get_tag(buffer: &gst::BufferRef) -> Result<String, gst::ErrorMessage> {
     // Get TagList from GstBuffer
     let tag_list = buffer
         .meta::<TagsMeta>()
-        .ok_or(gst::error_msg!(
-            gst::ResourceError::Failed,
-            ["Buffer {:?} has no tags", buffer]
-        ))?
+        .ok_or_else(|| {
+            gst::error_msg!(
+                gst::ResourceError::Failed,
+                ["Buffer {:?} has no tags", buffer]
+            )
+        })?
         .get_tag_list();
 
     // Get the title tag from TagList
-    let tag = tag_list.get::<gst::tags::Title>().ok_or(gst::error_msg!(
-        gst::ResourceError::Failed,
-        ["Buffer {:?} has no title tag", buffer]
-    ))?;
+    let tag = tag_list.get::<gst::tags::Title>().ok_or_else(|| {
+        gst::error_msg!(
+            gst::ResourceError::Failed,
+            ["Buffer {:?} has no title tag", buffer]
+        )
+    })?;
 
     // Return it as string slice
     Ok(String::from(tag.get()))

@@ -313,7 +313,7 @@ impl PushSrcImpl for RealsenseSrc {
         // Align frames, if enabled and configured
         if let Some(align_processing_block) = self.align_processing_block.lock().unwrap().as_ref() {
             frameset = align_processing_block
-                .process_frame(&frameset)
+                .process_frame(frameset)
                 .map_err(|_| gst::FlowError::Error)?;
         }
 
@@ -784,13 +784,16 @@ impl RealsenseSrc {
         } else {
             // Attach the auxiliary buffer and tag it adequately
             rgbd::attach_aux_buffer_and_tag(
-                output_buffer.get_mut().ok_or(gst::error_msg!(
-                    gst::StreamError::Failed,
-                    [
-                        "Cannot get mutable reference to the main buffer while attaching {} stream",
-                        tag
-                    ]
-                ))?,
+                output_buffer.get_mut().ok_or_else(|| {
+                    gst::error_msg!(
+                        gst::StreamError::Failed,
+                        [
+                            "Cannot get mutable reference to the main buffer while attaching {} \
+                             stream",
+                            tag
+                        ]
+                    )
+                })?,
                 &mut buffer,
                 tag,
             )?;
@@ -801,13 +804,16 @@ impl RealsenseSrc {
             // Attempt to read the RealSense per-frame metadata, otherwise set frame_meta to None
             let md = self.get_frame_meta(frame)?;
             self.add_per_frame_metadata(
-                output_buffer.get_mut().ok_or(gst::error_msg!(
-                    gst::StreamError::Failed,
-                    [
-                        "Cannot get mutable reference to the main buffer while attaching {}meta",
-                        tag
-                    ]
-                ))?,
+                output_buffer.get_mut().ok_or_else(|| {
+                    gst::error_msg!(
+                        gst::StreamError::Failed,
+                        [
+                            "Cannot get mutable reference to the main buffer while attaching \
+                             {}meta",
+                            tag
+                        ]
+                    )
+                })?,
                 md,
                 tag,
                 duration,
@@ -1313,25 +1319,29 @@ impl RealsenseSrc {
         // Form a gst buffer out of mutable slice
         let mut buffer = gst::buffer::Buffer::from_mut_slice(camera_meta);
         // Get mutable reference to the buffer
-        let buffer_mut_ref = buffer.get_mut().ok_or(gst::error_msg!(
-            gst::StreamError::Failed,
-            [
-                "Cannot get mutable reference to the buffer for {}",
-                STREAM_ID_CAMERAMETA
-            ]
-        ))?;
+        let buffer_mut_ref = buffer.get_mut().ok_or_else(|| {
+            gst::error_msg!(
+                gst::StreamError::Failed,
+                [
+                    "Cannot get mutable reference to the buffer for {}",
+                    STREAM_ID_CAMERAMETA
+                ]
+            )
+        })?;
 
         buffer_mut_ref.set_duration(duration);
 
         // Attach the camera_meta buffer and tag it adequately
         rgbd::attach_aux_buffer_and_tag(
-            output_buffer.get_mut().ok_or(gst::error_msg!(
-                gst::StreamError::Failed,
-                [
-                    "Cannot get mutable reference to the main buffer while attaching {}",
-                    STREAM_ID_CAMERAMETA
-                ]
-            ))?,
+            output_buffer.get_mut().ok_or_else(|| {
+                gst::error_msg!(
+                    gst::StreamError::Failed,
+                    [
+                        "Cannot get mutable reference to the main buffer while attaching {}",
+                        STREAM_ID_CAMERAMETA
+                    ]
+                )
+            })?,
             &mut buffer,
             STREAM_ID_CAMERAMETA,
         )?;

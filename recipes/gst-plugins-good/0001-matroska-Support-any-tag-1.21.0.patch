@@ -1,18 +1,54 @@
+diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
+index 01d754c3eb..b587279860 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
++++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
+@@ -42,6 +42,12 @@
+  * gst-launch-1.0 -v filesrc location=/path/to/mkv ! matroskademux ! vorbisdec ! audioconvert ! audioresample ! autoaudiosink
+  * ]| This pipeline demuxes a Matroska file and outputs the contained Vorbis audio.
+  *
++ * Some official Matroska tags can be mapped to GStreamer tags. The TITLE Matroska tag can be
++ * mapped to GST_TAG_TITLE for example. `matroskamux` also outputs an unofficial GSTREAMER_TAG
++ * Matroska tag for all Gstreamer tags it could not map to official tags. These tags are
++ * understood by `matroskademux` and can be mapped back into the original Gstreamer tag if that
++ * gstreamer tag is registered.
++ *
+  */
+ 
+ 
+@@ -2798,12 +2804,12 @@ gst_matroska_demux_handle_seek_event (GstMatroskaDemux * demux,
+ 
+   GST_DEBUG_OBJECT (demux, "configuring seek");
+ 
+-  flush = ! !(flags & GST_SEEK_FLAG_FLUSH);
+-  keyunit = ! !(flags & GST_SEEK_FLAG_KEY_UNIT);
+-  after = ! !(flags & GST_SEEK_FLAG_SNAP_AFTER);
+-  before = ! !(flags & GST_SEEK_FLAG_SNAP_BEFORE);
+-  accurate = ! !(flags & GST_SEEK_FLAG_ACCURATE);
+-  instant_rate_change = ! !(flags & GST_SEEK_FLAG_INSTANT_RATE_CHANGE);
++  flush = !!(flags & GST_SEEK_FLAG_FLUSH);
++  keyunit = !!(flags & GST_SEEK_FLAG_KEY_UNIT);
++  after = !!(flags & GST_SEEK_FLAG_SNAP_AFTER);
++  before = !!(flags & GST_SEEK_FLAG_SNAP_BEFORE);
++  accurate = !!(flags & GST_SEEK_FLAG_ACCURATE);
++  instant_rate_change = !!(flags & GST_SEEK_FLAG_INSTANT_RATE_CHANGE);
+ 
+   /* Directly send the instant-rate-change event here before taking the
+    * stream-lock so that it can be applied as soon as possible */
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
-index c4fc73caad..acfae58877 100644
+index c4fc73caad..3e65addd55 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-ids.h
-@@ -467,7 +467,7 @@
+@@ -467,6 +467,8 @@
  #define GST_MATROSKA_TAG_ID_RECORDING_LOCATION "RECORDING_LOCATION"
  #define GST_MATROSKA_TAG_ID_PRODUCTION_COPYRIGHT "PRODUCTION_COPYRIGHT"
  #define GST_MATROSKA_TAG_ID_LICENSE "LICENSE"
--
-+#define GST_MATROSKA_TAG_ID_GST_TAG  "GSTREAMER_TAG"
++#define GST_MATROSKA_TAG_ID_GST_TAG "GSTREAMER_TAG"
++
+ 
  /*
   * TODO: add this tag & mappings
-  * "REPLAYGAIN_GAIN" -> GST_TAG_*_GAIN   see http://replaygain.hydrogenaudio.org/rg_data_format.html
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
-index 0147de216a..25c0162689 100644
+index 0147de216a..5e2ca68c6d 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 @@ -40,6 +40,11 @@
@@ -27,6 +63,43 @@ index 0147de216a..25c0162689 100644
   */
  
  #ifdef HAVE_CONFIG_H
+@@ -3443,21 +3448,21 @@ static const struct
+ }
+ gst_matroska_tag_conv[] = {
+   {
+-  GST_MATROSKA_TAG_ID_TITLE, GST_TAG_TITLE}, {
+-  GST_MATROSKA_TAG_ID_ARTIST, GST_TAG_ARTIST}, {
+-  GST_MATROSKA_TAG_ID_ALBUM, GST_TAG_ALBUM}, {
+-  GST_MATROSKA_TAG_ID_COMMENTS, GST_TAG_COMMENT}, {
+-  GST_MATROSKA_TAG_ID_BITSPS, GST_TAG_BITRATE}, {
+-  GST_MATROSKA_TAG_ID_BPS, GST_TAG_BITRATE}, {
+-  GST_MATROSKA_TAG_ID_ENCODER, GST_TAG_ENCODER}, {
+-  GST_MATROSKA_TAG_ID_DATE, GST_TAG_DATE}, {
+-  GST_MATROSKA_TAG_ID_ISRC, GST_TAG_ISRC}, {
+-  GST_MATROSKA_TAG_ID_COPYRIGHT, GST_TAG_COPYRIGHT}, {
+-  GST_MATROSKA_TAG_ID_BPM, GST_TAG_BEATS_PER_MINUTE}, {
+-  GST_MATROSKA_TAG_ID_TERMS_OF_USE, GST_TAG_LICENSE}, {
+-  GST_MATROSKA_TAG_ID_COMPOSER, GST_TAG_COMPOSER}, {
+-  GST_MATROSKA_TAG_ID_LEAD_PERFORMER, GST_TAG_PERFORMER}, {
+-  GST_MATROSKA_TAG_ID_GENRE, GST_TAG_GENRE}
++      GST_MATROSKA_TAG_ID_TITLE, GST_TAG_TITLE}, {
++      GST_MATROSKA_TAG_ID_ARTIST, GST_TAG_ARTIST}, {
++      GST_MATROSKA_TAG_ID_ALBUM, GST_TAG_ALBUM}, {
++      GST_MATROSKA_TAG_ID_COMMENTS, GST_TAG_COMMENT}, {
++      GST_MATROSKA_TAG_ID_BITSPS, GST_TAG_BITRATE}, {
++      GST_MATROSKA_TAG_ID_BPS, GST_TAG_BITRATE}, {
++      GST_MATROSKA_TAG_ID_ENCODER, GST_TAG_ENCODER}, {
++      GST_MATROSKA_TAG_ID_DATE, GST_TAG_DATE}, {
++      GST_MATROSKA_TAG_ID_ISRC, GST_TAG_ISRC}, {
++      GST_MATROSKA_TAG_ID_COPYRIGHT, GST_TAG_COPYRIGHT}, {
++      GST_MATROSKA_TAG_ID_BPM, GST_TAG_BEATS_PER_MINUTE}, {
++      GST_MATROSKA_TAG_ID_TERMS_OF_USE, GST_TAG_LICENSE}, {
++      GST_MATROSKA_TAG_ID_COMPOSER, GST_TAG_COMPOSER}, {
++      GST_MATROSKA_TAG_ID_LEAD_PERFORMER, GST_TAG_PERFORMER}, {
++      GST_MATROSKA_TAG_ID_GENRE, GST_TAG_GENRE}
+ };
+ 
+ /* Every stagefright implementation on android up to and including 6.0.1 is using
 @@ -3470,23 +3475,16 @@ gst_matroska_mux_tag_list_is_empty (const GstTagList * list)
    int i;
    for (i = 0; i < gst_tag_list_n_tags (list); i++) {
@@ -60,21 +133,22 @@ index 0147de216a..25c0162689 100644
      }
    }
    return TRUE;
-@@ -3499,32 +3497,45 @@ gst_matroska_mux_write_simple_tag (const GstTagList * list, const gchar * tag,
+@@ -3499,32 +3497,48 @@ gst_matroska_mux_write_simple_tag (const GstTagList * list, const gchar * tag,
    GstEbmlWrite *ebml = (GstEbmlWrite *) data;
    guint i;
    guint64 simpletag_master;
 +  GValue src = { 0, };
 +  gchar *dest, *formatted;
 +
- 
 +  if (!gst_tag_list_copy_value (&src, list, tag))
-+   return;
++    return;
++
 +  if (!(dest = gst_value_serialize (&src))) {
 +    GST_WARNING ("Can't transform tag '%s' to string", tag);
 +    g_value_unset (&src);
 +    return;
 +  }
+ 
    for (i = 0; i < G_N_ELEMENTS (gst_matroska_tag_conv); i++) {
      const gchar *tagname_gst = gst_matroska_tag_conv[i].gstreamer_tagname;
      const gchar *tagname_mkv = gst_matroska_tag_conv[i].matroska_tagname;
@@ -82,7 +156,7 @@ index 0147de216a..25c0162689 100644
      if (strcmp (tagname_gst, tag) == 0) {
 -      GValue src = { 0, };
 -      gchar *dest;
- 
+-
 -      if (!gst_tag_list_copy_value (&src, list, tag))
 -        break;
 -      if ((dest = gst_value_serialize (&src))) {
@@ -107,38 +181,51 @@ index 0147de216a..25c0162689 100644
 +      return;
      }
    }
++
 +  /* This Gstreamer tag did not have an official Matroska tag to map to.
 +     Instead map it to the unofficial GSTREAMER_TAG Matroska tag. */
 +  simpletag_master = gst_ebml_write_master_start (ebml,
 +      GST_MATROSKA_ID_SIMPLETAG);
 +  gst_ebml_write_ascii (ebml, GST_MATROSKA_ID_TAGNAME,
 +      GST_MATROSKA_TAG_ID_GST_TAG);
++
 +  formatted = g_strdup_printf ("%s@%s", tag, dest);
 +  gst_ebml_write_utf8 (ebml, GST_MATROSKA_ID_TAGSTRING, formatted);
 +  gst_ebml_write_master_finish (ebml, simpletag_master);
++
 +  g_free (formatted);
 +  g_free (dest);
-+  g_value_unset (&src);  
++  g_value_unset (&src);
  }
  
  static void
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
-index eb317644cc..2804b1710a 100644
+index 6fadbba956..59fd325a03 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
-@@ -2337,6 +2337,37 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
+@@ -2351,7 +2351,6 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
+ 
+     for (i = 0; !matched && i < G_N_ELEMENTS (tag_conv); i++) {
+       const gchar *tagname_gst = tag_conv[i].gstreamer_tagname;
+-
+       const gchar *tagname_mkv = tag_conv[i].matroska_tagname;
+ 
+       if (strcmp (tagname_mkv, tag) == 0) {
+@@ -2383,6 +2382,39 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
          matched = TRUE;
        }
      }
-+    if (!matched && strcmp (GST_MATROSKA_TAG_ID_GST_TAG, tag) == 0 ) {
-+      gchar **tokenized = g_strsplit(value, "@", 2);
++
++    if (!matched && strcmp (GST_MATROSKA_TAG_ID_GST_TAG, tag) == 0) {
++      gchar **tokenized = g_strsplit (value, "@", 2);
 +      gchar *tagname_gst, *value_gst;
++
 +      /* The format of the GSTREAMER_TAG Matroska should be
 +       * `<tag_name>@<tag_value>. We ensure that `tag_name` actually exists
 +       * otherwise we cannot deserialize the tags value. */
 +      if ((tagname_gst = tokenized[0]) && (value_gst = tokenized[1]) &&
-+          gst_tag_exists(tagname_gst))
-+      {
++          gst_tag_exists (tagname_gst)) {
++
 +        GValue dest = { 0, };
 +        GType dest_type = gst_tag_get_type (tagname_gst);
 +        g_value_init (&dest, dest_type);
@@ -158,21 +245,20 @@ index eb317644cc..2804b1710a 100644
 +            value);
 +      }
 +
-+      g_strfreev(tokenized);
++      g_strfreev (tokenized);
 +    }
 +
      if (!matched) {
        gchar *key_val;
        /* TODO: read LANGUAGE sub-tag, and use "key[lc]=val" form */
 diff --git a/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c b/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c
-index 5081c8494a..5e512516eb 100644
+index 5081c8494a..ee9373c807 100644
 --- a/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c
 +++ b/subprojects/gst-plugins-good/tests/check/elements/matroskademux.c
-@@ -305,8 +305,106 @@ GST_START_TEST (test_toc_demux)
-   gst_harness_teardown (h);
- }
+@@ -307,6 +307,104 @@ GST_START_TEST (test_toc_demux)
  
-+ 
+ GST_END_TEST;
+ 
 +static void
 +test_tags (const gchar * input, const GstTagList * expected_tags)
 +{
@@ -268,25 +354,23 @@ index 5081c8494a..5e512516eb 100644
 +  test_tags (mkv_with_gstreamer_tag, tags);
 +}
 +
- GST_END_TEST;
- 
++GST_END_TEST;
 +
 +
  static Suite *
  matroskademux_suite (void)
  {
-@@ -316,7 +414,8 @@ matroskademux_suite (void)
+@@ -316,6 +414,8 @@ matroskademux_suite (void)
    suite_add_tcase (s, tc_chain);
    tcase_add_test (tc_chain, test_sub_terminator);
    tcase_add_test (tc_chain, test_toc_demux);
--
 +  tcase_add_test (tc_chain, test_tags_artist);
 +  tcase_add_test (tc_chain, test_tags_gstreamer);
+ 
    return s;
  }
- 
 diff --git a/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c b/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c
-index fa53c7ad68..f74c48bdca 100644
+index fa53c7ad68..2a45826441 100644
 --- a/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c
 +++ b/subprojects/gst-plugins-good/tests/check/elements/matroskamux.c
 @@ -63,6 +63,13 @@ fail_unless_equals_int (data_size, gst_buffer_get_size (buffer));   \
@@ -303,7 +387,7 @@ index fa53c7ad68..f74c48bdca 100644
  static void
  test_ebml_header_with_version (gint version,
      gconstpointer data, gsize data_size)
-@@ -994,6 +1001,77 @@ GST_START_TEST (test_toc_without_edition)
+@@ -994,6 +1001,76 @@ GST_START_TEST (test_toc_without_edition)
  
  GST_END_TEST;
  
@@ -377,11 +461,10 @@ index fa53c7ad68..f74c48bdca 100644
 +
 +GST_END_TEST;
 +
-+
  static Suite *
  matroskamux_suite (void)
  {
-@@ -1014,6 +1092,8 @@ matroskamux_suite (void)
+@@ -1014,6 +1091,8 @@ matroskamux_suite (void)
  
    tcase_add_test (tc_chain, test_toc_with_edition);
    tcase_add_test (tc_chain, test_toc_without_edition);

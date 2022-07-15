@@ -47,11 +47,8 @@ impl Pipeline {
         let pipeline = Pipeline {
             handle: unsafe { rs2::rs2_create_pipeline(ctx.handle, error.inner()) },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(pipeline)
-        }
+        error.check()?;
+        Ok(pipeline)
     }
 
     /// Start the [`Pipeline`](../pipeline/struct.Pipeline.html) streaming with its default
@@ -74,11 +71,8 @@ impl Pipeline {
         let profile = PipelineProfile {
             handle: unsafe { rs2::rs2_pipeline_start(self.handle, error.inner()) },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(profile)
-        }
+        error.check()?;
+        Ok(profile)
     }
 
     /// Start the [`Pipeline`](../pipeline/struct.Pipeline.html) streaming according to the
@@ -119,11 +113,8 @@ impl Pipeline {
                 rs2::rs2_pipeline_start_with_config(self.handle, rs2_config.handle, error.inner())
             },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(profile)
-        }
+        error.check()?;
+        Ok(profile)
     }
 
     /// Stop the [`Pipeline`](../pipeline/struct.Pipeline.html) streaming. The
@@ -142,11 +133,8 @@ impl Pipeline {
         unsafe {
             rs2::rs2_pipeline_stop(self.handle, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Wait until a new set of [`Frame`](../frame/struct.Frame.html)s becomes available. The
@@ -178,9 +166,7 @@ impl Pipeline {
                 rs2::rs2_pipeline_wait_for_frames(self.handle, timeout, error.inner())
             },
         };
-        if error.check() {
-            return Err(error);
-        };
+        error.check()?;
 
         frameset.extract_frames()
     }
@@ -203,9 +189,7 @@ impl Pipeline {
                 rs2::rs2_pipeline_wait_for_frames(self.handle, timeout, error.inner())
             },
         };
-        if error.check() {
-            return Err(error);
-        };
+        error.check()?;
 
         Ok(frameset)
     }
@@ -254,29 +238,31 @@ impl Pipeline {
     /// * `Err(Error)` on failure.
     pub fn poll_for_frames(&self) -> Result<Option<Vec<Frame>>, Error> {
         let mut error = Error::default();
-        let mut frames: *mut rs2::rs2_frame = std::ptr::null_mut();
-        let ret =
-            unsafe { rs2::rs2_pipeline_poll_for_frames(self.handle, &mut frames, error.inner()) };
-        if error.check() {
-            return Err(error);
+        let mut frames = Frame {
+            handle: std::ptr::null_mut(),
         };
+        let ret = unsafe {
+            rs2::rs2_pipeline_poll_for_frames(self.handle, &mut frames.handle, error.inner())
+        };
+        error.check()?;
         if ret == 0 {
             return Ok(None);
         }
-        let count = unsafe { rs2::rs2_embedded_frames_count(frames, error.inner()) };
-        if error.check() {
-            return Err(error);
-        };
+
+        let mut error = Error::default();
+        let count = unsafe { rs2::rs2_embedded_frames_count(frames.handle, error.inner()) };
+        error.check()?;
+
         let mut res: Vec<Frame> = Vec::new();
+        res.reserve_exact(count as usize);
+
         for i in 0..count {
+            let mut error = Error::default();
             res.push(Frame {
-                handle: unsafe { rs2::rs2_extract_frame(frames, i, error.inner()) },
+                handle: unsafe { rs2::rs2_extract_frame(frames.handle, i, error.inner()) },
             });
-            if error.check() {
-                return Err(error);
-            };
+            error.check()?;
         }
-        unsafe { rs2::rs2_release_frame(frames) };
         Ok(Some(res))
     }
 
@@ -305,10 +291,7 @@ impl Pipeline {
         let profile = PipelineProfile {
             handle: unsafe { rs2::rs2_pipeline_get_active_profile(self.handle, error.inner()) },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(profile)
-        }
+        error.check()?;
+        Ok(profile)
     }
 }

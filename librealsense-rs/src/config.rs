@@ -51,11 +51,8 @@ impl Config {
         let config = Config {
             handle: unsafe { rs2::rs2_create_config(error.inner()) },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(config)
-        }
+        error.check()?;
+        Ok(config)
     }
 
     /// Enable a [`Device`](../device/struct.Device.html) stream explicitly, with
@@ -112,11 +109,8 @@ impl Config {
                 error.inner(),
             );
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Enable all [`Device`](../device/struct.Device.html) streams explicitly. The
@@ -137,11 +131,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_enable_all_stream(self.handle, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Select a specific [`Device`](../device/struct.Device.html) explicitly by its
@@ -169,12 +160,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_enable_device(self.handle, s.as_ptr(), error.inner());
         }
-        std::mem::forget(s);
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Select a recorded [`Device`](../device/struct.Device.html) from a `file`, to be
@@ -201,12 +188,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_enable_device_from_file(self.handle, s.as_ptr(), error.inner());
         }
-        std::mem::forget(s);
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Select a recorded [`Device`](../device/struct.Device.html) from a `file`, to be
@@ -244,12 +227,8 @@ impl Config {
                 error.inner(),
             );
         }
-        std::mem::forget(s);
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Requires that the resolved [`Device`](../device/struct.Device.html) would be
@@ -270,12 +249,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_enable_record_to_file(self.handle, s.as_ptr(), error.inner());
         }
-        std::mem::forget(s);
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Disable a [`Device`](../device/struct.Device.html) stream explicitly, to remove
@@ -294,11 +269,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_disable_stream(self.handle, stream, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Disable a [`Device`](../device/struct.Device.html) indexed stream explicitly,
@@ -318,11 +290,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_disable_indexed_stream(self.handle, stream, index, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Disable all [`Device`](../device/struct.Device.html) streams explicitly, to
@@ -338,11 +307,8 @@ impl Config {
         unsafe {
             rs2::rs2_config_disable_all_streams(self.handle, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Resolve the configuration filters, to find a matching
@@ -385,12 +351,8 @@ impl Config {
         let pipe_profile = PipelineProfile {
             handle: unsafe { rs2::rs2_config_resolve(self.handle, pipe.handle, error.inner()) },
         };
-
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(pipe_profile)
-        }
+        error.check()?;
+        Ok(pipe_profile)
     }
 
     /// Check if the [`Config`](../config/struct.Config.html) can resolve the
@@ -410,12 +372,7 @@ impl Config {
     pub fn can_resolve(&self, pipe: &Pipeline) -> Result<bool, Error> {
         let mut error = Error::default();
         let ret = unsafe { rs2::rs2_config_can_resolve(self.handle, pipe.handle, error.inner()) };
-        if error.check() {
-            Err(error)
-        } else if ret == 0 {
-            Ok(false)
-        } else {
-            Ok(true)
-        }
+        error.check()?;
+        Ok(ret != 0)
     }
 }

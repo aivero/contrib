@@ -51,6 +51,7 @@ lazy_static! {
 }
 
 /// A struct representation of the `realsensesrc` element.
+#[derive(Default)]
 pub struct RealsenseSrc {
     /// Reconfigurable properties of the element that are protected under RwLock.
     settings: RwLock<Settings>,
@@ -101,16 +102,6 @@ impl ObjectSubclass for RealsenseSrc {
     const NAME: &'static str = "realsensesrc";
     type Type = RealsenseSrcObject;
     type ParentType = gst_base::PushSrc;
-
-    fn new() -> Self {
-        Self {
-            settings: RwLock::new(Settings::default()),
-            internals: Mutex::new(RealsenseSrcInternals::default()),
-            align_processing_block: Mutex::new(None),
-            unlock: AtomicBool::new(false),
-            tags_sent: AtomicBool::new(false),
-        }
-    }
 }
 
 impl BaseSrcImpl for RealsenseSrc {
@@ -771,10 +762,11 @@ impl RealsenseSrc {
         let frame_data = frame
             .get_data()
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e.get_message()]))?;
-        let mut buffer = gst::buffer::Buffer::from_mut_slice(frame_data);
+        let mut buffer = gst::buffer::Buffer::with_size(frame_data.len()).unwrap();
 
         // Newly allocated buffer is mutable, no need for error handling
         let buffer_mut_ref = buffer.get_mut().unwrap();
+        buffer_mut_ref.copy_from_slice(0, frame_data).unwrap();
         buffer_mut_ref.set_duration(duration);
 
         // Where the buffer is placed depends whether this is the first stream that is enabled
@@ -870,9 +862,9 @@ impl RealsenseSrc {
         )?;
 
         // Set real-time playback based on property
-        let playback =
-            rs2::record_playback::Playback::create_from_pipeline_profile(pipeline_profile)
-                .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
+        let playback = pipeline_profile
+            .get_device()
+            .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
         playback
             .set_real_time(settings.real_time_rosbag_playback)
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
@@ -1440,7 +1432,10 @@ impl RealsenseSrc {
             }
         }
 
-        *internals = RealsenseSrcInternals::default();
+        *internals = Default::default();
+
+        let mut block = self.align_processing_block.lock().unwrap();
+        *block = Default::default();
 
         Ok(())
     }

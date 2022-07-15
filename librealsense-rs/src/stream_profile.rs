@@ -15,12 +15,15 @@ pub struct StreamProfile {
     pub(crate) handle: *mut rs2::rs2_stream_profile,
 }
 
-/// Safe releasing of the `rs2_stream_profile` handle is required only if it is cloned.
-impl Drop for StreamProfile {
+pub struct StreamProfileList {
+    pub(crate) handle: *mut rs2::rs2_stream_profile_list,
+}
+
+impl Drop for StreamProfileList {
     fn drop(&mut self) {
-        // unsafe {
-        //     rs2::rs2_delete_stream_profile(self.handle);
-        // }
+        unsafe {
+            rs2::rs2_delete_stream_profiles_list(self.handle);
+        }
     }
 }
 
@@ -98,11 +101,8 @@ impl StreamProfile {
                 error.inner(),
             );
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(data)
-        }
+        error.check()?;
+        Ok(data)
     }
 
     /// Extract resolution of the stream described by
@@ -122,11 +122,8 @@ impl StreamProfile {
                 error.inner(),
             );
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(resolution)
-        }
+        error.check()?;
+        Ok(resolution)
     }
 
     /// Obtain intrinsics of a [`StreamProfile`](../stream_profile/struct.Pipeline.html).
@@ -144,11 +141,8 @@ impl StreamProfile {
                 error.inner(),
             );
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(Intrinsics::new(intrinsics._handle))
-        }
+        error.check()?;
+        Ok(Intrinsics::new(intrinsics._handle))
     }
 
     /// Obtain extrinsics between two [`StreamProfile`](../stream_profile/struct.Pipeline.html)s.
@@ -171,11 +165,8 @@ impl StreamProfile {
                 error.inner(),
             );
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(Extrinsics::new(extrinsics._handle))
-        }
+        error.check()?;
+        Ok(Extrinsics::new(extrinsics._handle))
     }
 
     /// Obtain extrinsics to another [`StreamProfile`](../stream_profile/struct.Pipeline.html).

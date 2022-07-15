@@ -110,12 +110,13 @@ impl Error {
     /// Check the value of [`Error`](../error/struct.Error.html).
     ///
     /// # Returns
-    /// * `bool` that returs `true` if the struct [`Error`](../error/struct.Error.html)
-    /// contains an error
-    /// that occured and
-    /// false if everything went fine.
-    pub fn check(&self) -> bool {
-        !self.handle.is_null()
+    /// * A Result that can be bubbled up if the error is not null.
+    pub fn check(self) -> Result<(), Error> {
+        if self.handle.is_null() {
+            Ok(())
+        } else {
+            Err(self)
+        }
     }
 
     /// Return the message of the error.

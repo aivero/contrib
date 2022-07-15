@@ -3,7 +3,7 @@
 
 use crate::device::Device;
 use crate::error::Error;
-use crate::stream_profile::StreamProfile;
+use crate::stream_profile::*;
 
 /// Struct representation of [`PipelineProfile`](../pipeline_profile/struct.PipelineProfile.html)
 /// that wraps around `rs2_pipeline_profile` handle.
@@ -46,11 +46,8 @@ impl PipelineProfile {
         let device = Device {
             handle: unsafe { rs2::rs2_pipeline_profile_get_device(self.handle, error.inner()) },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(device)
-        }
+        error.check()?;
+        Ok(device)
     }
 
     /// Retrieve the selected [`StreamProfile`](../stream_profile/struct.StreamProfile.html)s,
@@ -62,27 +59,30 @@ impl PipelineProfile {
     /// * `Err(Error)` on failure.
     pub fn get_streams(&self) -> Result<Vec<StreamProfile>, Error> {
         let mut error = Error::default();
-        unsafe {
-            let stream_profiles = rs2::rs2_pipeline_profile_get_streams(self.handle, error.inner());
-            if error.check() {
-                return Err(error);
-            };
-            let stream_count = rs2::rs2_get_stream_profiles_count(stream_profiles, error.inner());
-            if error.check() {
-                return Err(error);
-            };
-            let mut streams: Vec<StreamProfile> = Vec::new();
-            for i in 0..stream_count {
-                streams.push(StreamProfile {
-                    handle: rs2::rs2_get_stream_profile(stream_profiles, i, error.inner())
-                        as *mut rs2::rs2_stream_profile,
-                });
-                if error.check() {
-                    return Err(error);
-                };
-            }
-            Ok(streams)
+        let stream_profiles = StreamProfileList {
+            handle: unsafe { rs2::rs2_pipeline_profile_get_streams(self.handle, error.inner()) },
+        };
+        error.check()?;
+
+        let mut error = Error::default();
+        let stream_count =
+            unsafe { rs2::rs2_get_stream_profiles_count(stream_profiles.handle, error.inner()) };
+        error.check()?;
+
+        let mut streams: Vec<StreamProfile> = Vec::new();
+        streams.reserve_exact(stream_count as usize);
+
+        for i in 0..stream_count {
+            let mut error = Error::default();
+            streams.push(StreamProfile {
+                handle: unsafe {
+                    rs2::rs2_get_stream_profile(stream_profiles.handle, i, error.inner())
+                        as *mut rs2::rs2_stream_profile
+                },
+            });
+            error.check()?;
         }
+        Ok(streams)
     }
 
     /// Retrieve the [`StreamProfile`](../stream_profile/struct.StreamProfile.html) that is enabled

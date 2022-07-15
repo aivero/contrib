@@ -2,8 +2,6 @@
 // Copyright(c) 2019 Aivero. All Rights Reserved.
 use crate::device::{Device, DeviceList};
 use crate::error::Error;
-use crate::record_playback::Playback;
-use crate::sensor::Sensor;
 
 /// Struct representation of [`Context`](../context/struct.Context.html) that wraps
 /// around `rs2_context` handle. The [`Context`](../context/struct.Context.html) is
@@ -35,11 +33,8 @@ impl Context {
         let context = Context {
             handle: unsafe { rs2::rs2_create_context(rs2::RS2_API_VERSION as i32, error.inner()) },
         };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(context)
-        }
+        error.check()?;
+        Ok(context)
     }
 
     /// Creates `RealSense` [`Context`](../context/struct.Context.html) that is
@@ -53,19 +48,19 @@ impl Context {
         let device_list = DeviceList {
             handle: unsafe { rs2::rs2_query_devices(self.handle, error.inner()) },
         };
-        if error.check() {
-            return Err(error);
-        };
+        error.check()?;
 
+        let mut error = Error::default();
         let count = unsafe { rs2::rs2_get_device_count(device_list.handle, error.inner()) };
+        error.check()?;
+
         let mut res: Vec<Device> = Vec::new();
         for i in 0..count {
+            let mut error = Error::default();
             res.push(Device {
                 handle: unsafe { rs2::rs2_create_device(device_list.handle, i, error.inner()) },
             });
-            if error.check() {
-                return Err(error);
-            };
+            error.check()?;
         }
         Ok(res)
     }
@@ -76,29 +71,5 @@ impl Context {
     )]
     pub fn get_devices(&self) -> Result<Vec<Device>, Error> {
         self.query_devices()
-    }
-
-    pub fn query_all_sensors(&self) -> Result<Vec<Sensor>, Error> {
-        unimplemented!()
-    }
-
-    pub fn get_sensor_parent(&self, _sensor: &Sensor) -> Result<Device, Error> {
-        unimplemented!()
-    }
-
-    pub fn set_devices_changed_callback(&self) -> Result<(), Error> {
-        unimplemented!()
-    }
-
-    pub fn load_device(&self, _file: &str) -> Result<Playback, Error> {
-        unimplemented!()
-    }
-
-    pub fn unload_device(&self, _file: &str) -> Result<(), Error> {
-        unimplemented!()
-    }
-
-    pub fn unload_tracking_module(&self) -> Result<(), Error> {
-        unimplemented!()
     }
 }

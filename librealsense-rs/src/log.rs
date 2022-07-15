@@ -15,11 +15,7 @@ pub fn log_to_console(min_severity: rs2_log_severity) -> Result<(), Error> {
     unsafe {
         rs2::rs2_log_to_console(min_severity, error.inner());
     }
-    if error.check() {
-        Err(error)
-    } else {
-        Ok(())
-    }
+    error.check()?;Ok(())
 }
 
 /// Select a file for logging and determine the level of severity to be logged inside such file.
@@ -33,11 +29,7 @@ pub fn log_to_file(min_severity: rs2_log_severity, file_path: &str) -> Result<()
     unsafe {
         rs2::rs2_log_to_file(min_severity, file_path.as_ptr() as *const i8, error.inner());
     }
-    if error.check() {
-        Err(error)
-    } else {
-        Ok(())
-    }
+    error.check()?;Ok(())
 }
 
 /// Select a file for logging and determine the level of severity to be logged inside such file.
@@ -51,9 +43,5 @@ pub fn log_to_file(min_severity: rs2_log_severity, file_path: &str) -> Result<()
     unsafe {
         rs2::rs2_log_to_file(min_severity, file_path.as_ptr() as *const u8, error.inner());
     }
-    if error.check() {
-        Err(error)
-    } else {
-        Ok(())
-    }
+    error.check()?;Ok(())
 }

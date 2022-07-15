@@ -8,16 +8,30 @@ use rs2::rs2_stream;
 /// Struct representation of [`ProcessingBlock`](../processing/struct.ProcessingBlock.html) that wraps around
 /// `rs2_processing_block` handle.
 pub struct ProcessingBlock {
-    pub(crate) handle: *mut rs2::rs2_processing_block,
-    pub(crate) frame_queue: *mut rs2::rs2_frame_queue,
+    block: ProcessingBlockInner,
+    queue: FrameQueue,
 }
 
-/// Safe releasing of the `rs2_processing_block` handle.
-impl Drop for ProcessingBlock {
+struct ProcessingBlockInner {
+    handle: *mut rs2::rs2_processing_block,
+}
+
+impl Drop for ProcessingBlockInner {
     fn drop(&mut self) {
         unsafe {
             rs2::rs2_delete_processing_block(self.handle);
-            rs2::rs2_delete_frame_queue(self.frame_queue);
+        }
+    }
+}
+
+struct FrameQueue {
+    handle: *mut rs2::rs2_frame_queue,
+}
+
+impl Drop for FrameQueue {
+    fn drop(&mut self) {
+        unsafe {
+            rs2::rs2_delete_frame_queue(self.handle);
         }
     }
 }
@@ -34,26 +48,29 @@ impl ProcessingBlock {
     /// # Returns
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
-    pub fn process_frame(&self, mut frame: Frame) -> Result<Frame, Error> {
+    pub fn process_frame(&self, frame: Frame) -> Result<Frame, Error> {
         let mut error = Error::default();
         unsafe {
-            rs2::rs2_process_frame(self.handle, frame.handle, error.inner());
-            // ownership was moved to block object
-            frame.handle = std::ptr::null_mut();
-            if error.check() {
-                return Err(error);
-            };
+            rs2::rs2_process_frame(self.block.handle, frame.handle, error.inner());
         }
+        std::mem::forget(frame);
+        error.check()?;
 
+        let mut error = Error::default();
         let mut processed_frame = Frame {
             handle: std::ptr::null_mut(),
         };
         let ret = unsafe {
-            rs2::rs2_poll_for_frame(self.frame_queue, &mut processed_frame.handle, error.inner())
+            rs2::rs2_poll_for_frame(
+                self.queue.handle,
+                &mut processed_frame.handle,
+                error.inner(),
+            )
         };
-        if error.check() || ret == 0 {
-            return Err(error);
-        };
+        error.check()?;
+        if ret == 0 {
+            return Err(Error::default());
+        }
 
         Ok(processed_frame)
     }
@@ -66,12 +83,12 @@ impl ProcessingBlock {
     /// # Returns
     /// * `Ok(rs2_frame_queue)` on success.
     /// * `Err(Error)` on failure.
-    fn create_frame_queue(capacity: i32) -> Result<*mut rs2::rs2_frame_queue, Error> {
+    fn create_frame_queue(capacity: i32) -> Result<FrameQueue, Error> {
         let mut error = Error::default();
-        let frame_queue = unsafe { rs2::rs2_create_frame_queue(capacity, error.inner()) };
-        if error.check() {
-            return Err(error);
+        let frame_queue = FrameQueue {
+            handle: unsafe { rs2::rs2_create_frame_queue(capacity, error.inner()) },
         };
+        error.check()?;
         Ok(frame_queue)
     }
 
@@ -83,11 +100,9 @@ impl ProcessingBlock {
     fn start(&self) -> Result<(), Error> {
         let mut error = Error::default();
         unsafe {
-            rs2::rs2_start_processing_queue(self.handle, self.frame_queue, error.inner());
+            rs2::rs2_start_processing_queue(self.block.handle, self.queue.handle, error.inner());
         };
-        if error.check() {
-            return Err(error);
-        };
+        error.check()?;
         Ok(())
     }
 
@@ -102,15 +117,14 @@ impl ProcessingBlock {
     pub fn create_align(align_to: rs2_stream) -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_align(align_to, error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_align(align_to, error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth-Colorizer processing block that can be used to quickly visualize the depth data.
@@ -124,15 +138,14 @@ impl ProcessingBlock {
     pub fn create_colorizer() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_colorizer(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_colorizer(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth post-processing filter block. This block accepts depth frames, applies decimation
@@ -145,15 +158,14 @@ impl ProcessingBlock {
     pub fn create_decimation_filter() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_decimation_filter_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_decimation_filter_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates a post processing block that provides for depth<->disparity domain transformation
@@ -168,20 +180,19 @@ impl ProcessingBlock {
     pub fn create_disparity_transform(transform_to_disparity: bool) -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe {
-                rs2::rs2_create_disparity_transform_block(
-                    transform_to_disparity as u8,
-                    error.inner(),
-                )
+            block: ProcessingBlockInner {
+                handle: unsafe {
+                    rs2::rs2_create_disparity_transform_block(
+                        transform_to_disparity as u8,
+                        error.inner(),
+                    )
+                },
             },
-            frame_queue: Self::create_frame_queue(1)?,
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth post-processing hole filling block. The filter replaces empty pixels with
@@ -193,15 +204,14 @@ impl ProcessingBlock {
     pub fn create_hole_filling_filter() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_hole_filling_filter_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_hole_filling_filter_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth frame decompression module. Decoded frames compressed and transmitted with Z16H
@@ -214,15 +224,14 @@ impl ProcessingBlock {
     pub fn create_huffman_depth_decompress() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_huffman_depth_decompress_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_huffman_depth_decompress_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Point-Cloud processing block. This block accepts depth frames and outputs Points frames.
@@ -234,15 +243,14 @@ impl ProcessingBlock {
     pub fn create_pointcloud() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_pointcloud(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_pointcloud(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates a rates printer block. The printer prints the actual FPS of the invoked frame stream.
@@ -255,15 +263,14 @@ impl ProcessingBlock {
     pub fn create_rates_printer() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_rates_printer_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_rates_printer_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth post-processing spatial filter block. This block accepts depth frames, applies spatial
@@ -275,15 +282,14 @@ impl ProcessingBlock {
     pub fn create_spatial_filter() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_spatial_filter_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_spatial_filter_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Sync processing block. This block accepts arbitrary frames and output composite frames
@@ -296,15 +302,14 @@ impl ProcessingBlock {
     pub fn create_sync_processing() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_sync_processing_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_sync_processing_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth post-processing filter block. This block accepts depth frames, applies temporal filter
@@ -315,15 +320,14 @@ impl ProcessingBlock {
     pub fn create_temporal_filter() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_temporal_filter_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_temporal_filter_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates depth thresholding processing block By controlling min and max options on the block, one could
@@ -335,15 +339,14 @@ impl ProcessingBlock {
     pub fn create_threshold() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_threshold(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_threshold(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates depth units transformation processing block All of the pixels are transformed from depth
@@ -355,15 +358,14 @@ impl ProcessingBlock {
     pub fn create_units_transform() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_units_transform(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_units_transform(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates YUY decoder processing block. This block accepts raw YUY frames and outputs frames of other
@@ -379,15 +381,14 @@ impl ProcessingBlock {
     pub fn create_yuy_decoder() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_yuy_decoder(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_yuy_decoder(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 
     /// Creates Depth post-processing zero order fix block. The filter invalidates pixels that
@@ -399,14 +400,13 @@ impl ProcessingBlock {
     pub fn create_zero_order_invalidation() -> Result<Self, Error> {
         let mut error = Error::default();
         let processing_block = ProcessingBlock {
-            handle: unsafe { rs2::rs2_create_zero_order_invalidation_block(error.inner()) },
-            frame_queue: Self::create_frame_queue(1)?,
+            block: ProcessingBlockInner {
+                handle: unsafe { rs2::rs2_create_zero_order_invalidation_block(error.inner()) },
+            },
+            queue: Self::create_frame_queue(1)?,
         };
-        if error.check() {
-            Err(error)
-        } else {
-            processing_block.start()?;
-            Ok(processing_block)
-        }
+        error.check()?;
+        processing_block.start()?;
+        Ok(processing_block)
     }
 }

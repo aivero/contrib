@@ -2,7 +2,7 @@
 // Copyright(c) 2019 Aivero. All Rights Reserved.
 use crate::error::Error;
 use crate::low_level_utils::cstring_to_string;
-use crate::sensor::Sensor;
+use crate::sensor::{Sensor, SensorList};
 
 // Expose `rs2_camera_info` for external use.
 pub use rs2::rs2_camera_info;
@@ -47,19 +47,26 @@ impl Device {
     /// * `Err(Error)` on failure.
     pub fn query_sensors(&self) -> Result<Vec<Sensor>, Error> {
         let mut error = Error::default();
-        let sensor_list = unsafe { rs2::rs2_query_sensors(self.handle, error.inner()) };
-        if error.check() {
-            return Err(error);
+        let sensor_list = SensorList {
+            handle: unsafe { rs2::rs2_query_sensors(self.handle, error.inner()) },
         };
-        let sensor_count = unsafe { rs2::rs2_get_sensors_count(sensor_list, error.inner()) };
+        error.check()?;
+
+        let mut error = Error::default();
+        let sensor_count = unsafe { rs2::rs2_get_sensors_count(sensor_list.handle, error.inner()) };
+        error.check()?;
+
         let mut sensors: Vec<Sensor> = Vec::new();
+        sensors.reserve_exact(sensor_count as usize);
+
         for sensor_index in 0..sensor_count {
+            let mut error = Error::default();
             sensors.push(Sensor {
-                handle: unsafe { rs2::rs2_create_sensor(sensor_list, sensor_index, error.inner()) },
+                handle: unsafe {
+                    rs2::rs2_create_sensor(sensor_list.handle, sensor_index, error.inner())
+                },
             });
-            if error.check() {
-                return Err(error);
-            };
+            error.check()?;
         }
         Ok(sensors)
     }
@@ -97,11 +104,8 @@ impl Device {
     pub fn get_info(&self, info: rs2_camera_info) -> Result<String, Error> {
         let mut error = Error::default();
         let ret = unsafe { rs2::rs2_get_device_info(self.handle, info, error.inner()) };
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(cstring_to_string(ret))
-        }
+        error.check()?;
+        Ok(cstring_to_string(ret))
     }
 
     /// Send hardware reset request to the [`Device`](../device/struct.Device.html).
@@ -114,11 +118,8 @@ impl Device {
         unsafe {
             rs2::rs2_hardware_reset(self.handle, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Update [`Device`](../device/struct.Device.html) to the provided firmware, the
@@ -151,13 +152,8 @@ impl Device {
         unsafe {
             rs2::rs2_is_enabled(self.handle, is_enabled as *mut i32, error.inner());
         }
-        if error.check() {
-            Err(error)
-        } else if *is_enabled == 1 {
-            Ok(true)
-        } else {
-            Ok(false)
-        }
+        error.check()?;
+        Ok(*is_enabled == 1)
     }
 
     /// Enable or disable advanced mode for a [`Device`](../device/struct.Device.html).
@@ -170,21 +166,11 @@ impl Device {
     /// * `Err(Error)` on failure.
     pub fn set_advanced_mode(&self, enable: bool) -> Result<(), Error> {
         let mut error = Error::default();
-        if enable {
-            unsafe {
-                rs2::rs2_toggle_advanced_mode(self.handle, 1, error.inner());
-            };
-        } else {
-            unsafe {
-                rs2::rs2_toggle_advanced_mode(self.handle, 0, error.inner());
-            };
+        unsafe {
+            rs2::rs2_toggle_advanced_mode(self.handle, enable as i32, error.inner());
         }
-
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Configure device with JSON.
@@ -198,21 +184,18 @@ impl Device {
     pub fn load_json(&self, json_content: &str) -> Result<(), Error> {
         let mut error = Error::default();
 
+        let s = std::ffi::CString::new(json_content).expect("Failed to create CString");
         unsafe {
             rs2::rs2_load_json(
                 self.handle,
-                Box::into_raw(json_content.to_owned().into_boxed_str().into_boxed_bytes())
-                    as *const std::os::raw::c_void,
+                s.as_ptr() as *const std::os::raw::c_void,
                 json_content.len() as u32,
                 error.inner(),
             );
         };
 
-        if error.check() {
-            Err(error)
-        } else {
-            Ok(())
-        }
+        error.check()?;
+        Ok(())
     }
 
     /// Configure [`Device`](../device/struct.Device.html) with JSON file specified by
@@ -241,5 +224,42 @@ impl Device {
         })?;
         self.load_json(&json_content)?;
         Ok(())
+    }
+
+    /// Set the [`Playback`](../record_playback/struct.Playback.html) to work in real time or non
+    /// real time. In real time mode, [`Playback`](../record_playback/struct.Playback.html) will
+    /// play the same way the file was recorded. In real time mode if the application takes too
+    /// long to handle the callback, frames may be dropped. In non real time mode,
+    /// [`Playback`](../record_playback/struct.Playback.html) will wait for each callback to finish
+    /// handling the data before reading the next frame. In this mode no frames will be dropped,
+    /// and the application controls the frame rate of the
+    /// [`Playback`](../record_playback/struct.Playback.html) (according to the callback handler
+    /// duration).
+    ///
+    /// # Arguments
+    /// * `enable` - Set `true` for real time mode and `false` for non real time mode.
+    ///
+    /// connected device.
+    /// # Returns
+    /// * `Ok()` on success.
+    /// * `Err(Error)` on failure.
+    pub fn set_real_time(&self, enable: bool) -> Result<(), Error> {
+        let mut error = Error::default();
+        unsafe { rs2::rs2_playback_device_set_real_time(self.handle, enable as i32, error.inner()) }
+        error.check()?;
+        Ok(())
+    }
+
+    /// Indicates if playback is in real time mode or non real time.
+    ///
+    /// connected device.
+    /// # Returns
+    /// * `Ok(bool)` on success, `true` for real time mode and `false` for non real time mode.
+    /// * `Err(Error)` on failure.
+    pub fn is_real_time(&self) -> Result<bool, Error> {
+        let mut error = Error::default();
+        let ret = unsafe { rs2::rs2_playback_device_is_real_time(self.handle, error.inner()) };
+        error.check()?;
+        Ok(ret != 0)
     }
 }

@@ -13,16 +13,13 @@ pub mod error;
 pub mod extrinsics;
 pub mod frame;
 pub mod high_level_utils;
-pub mod internal;
 pub mod intrinsics;
 pub mod log;
 mod low_level_utils;
 pub mod metadata;
-pub mod option;
 pub mod pipeline;
 pub mod pipeline_profile;
 pub mod processing;
-pub mod record_playback;
 pub mod sensor;
 pub mod stream_profile;
 

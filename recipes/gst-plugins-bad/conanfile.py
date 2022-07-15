@@ -21,6 +21,7 @@ class GstPluginsBad(GstRecipe):
         "pnm": [True, False],
         "rtmp2": [True, False],
         "srtp": [True, False],
+        "sctp": [True, False],
         "videoparsers": [True, False],
         "webp": [True, False],
         "webrtc": [True, False],
@@ -41,6 +42,7 @@ class GstPluginsBad(GstRecipe):
         "pnm=True",
         "rtmp2=True",
         "srtp=True",
+        "sctp=True",
         "videoparsers=True",
         "webp=True",
         "webrtc=True",
@@ -94,9 +96,13 @@ class GstPluginsBad(GstRecipe):
     def source(self):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 and https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2432 are tagged we need to use a commit of the main branch
-            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/ab459f0528d8eba17589c8a8582b69a166616384.tar.gz")
-        else:           
-            self.get(f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz")
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/ab459f0528d8eba17589c8a8582b69a166616384.tar.gz"
+            )
+        else:
+            self.get(
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"
+            )
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gst-plugins-bad")
@@ -112,6 +118,7 @@ class GstPluginsBad(GstRecipe):
             "pnm": self.options.pnm,
             "rtmp2": self.options.rtmp2,
             "srtp": self.options.srtp,
+            "sctp": self.options.sctp,
             "videoparsers": self.options.videoparsers,
             "webp": self.options.webp,
             "webrtc": self.options.webrtc,

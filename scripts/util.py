@@ -92,11 +92,9 @@ def find_parent_branch():
             return [99999, "00000000000", branch]
 
         print(f"Merge base output: {output}")
-        merge_base = output[:-1]
+        merge_base = output[:-1].splitlines()[-1]
 
-        output = call(
-            ["git", "rev-list", "--count", f"{cur_branch}...{merge_base}"]
-        )
+        output = call(["git", "rev-list", "--count", f"{cur_branch}...{merge_base}"])
         commits_to_merge_base = output[:-1]
 
         return [int(commits_to_merge_base), merge_base, branch]

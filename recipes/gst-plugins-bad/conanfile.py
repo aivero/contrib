@@ -26,6 +26,7 @@ class GstPluginsBad(GstRecipe):
         "webp": [True, False],
         "webrtc": [True, False],
         "x265": [True, False],
+        "onvif": [True, False],
     }
     default_options = (
         "closedcaption=False",
@@ -47,6 +48,7 @@ class GstPluginsBad(GstRecipe):
         "webp=True",
         "webrtc=True",
         "x265=False",
+        "onvif=True",
     )
 
     build_requires = (
@@ -123,6 +125,7 @@ class GstPluginsBad(GstRecipe):
             "webp": self.options.webp,
             "webrtc": self.options.webrtc,
             "x265": self.options.x265,
+            "onvif": self.options.onvif,
         }
         if self.settings.arch == "x86_64":
             opts["msdk"] = self.options.msdk

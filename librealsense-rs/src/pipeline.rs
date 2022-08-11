@@ -23,9 +23,13 @@ pub struct Pipeline {
 /// Safe releasing of the `rs2_pipeline` handle.
 impl Drop for Pipeline {
     fn drop(&mut self) {
-        unsafe {
-            rs2::rs2_delete_pipeline(self.handle);
-        }
+        unsafe { rs2::rs2_delete_pipeline(self.handle) }
+    }
+}
+
+impl From<*mut rs2::rs2_pipeline> for Pipeline {
+    fn from(p: *mut rs2::rs2_pipeline) -> Self {
+        Pipeline { handle: p }
     }
 }
 
@@ -42,13 +46,8 @@ impl Pipeline {
     /// # Returns
     /// * `Ok(Pipeline)` on success.
     /// * `Err(Error)` on failure.
-    pub fn new(ctx: &Context) -> Result<Pipeline, Error> {
-        let mut error = Error::default();
-        let pipeline = Pipeline {
-            handle: unsafe { rs2::rs2_create_pipeline(ctx.handle, error.inner()) },
-        };
-        error.check()?;
-        Ok(pipeline)
+    pub fn create(ctx: &Context) -> Result<Pipeline, Error> {
+        Error::call1(rs2::rs2_create_pipeline, ctx.0)
     }
 
     /// Start the [`Pipeline`](../pipeline/struct.Pipeline.html) streaming with its default
@@ -67,12 +66,7 @@ impl Pipeline {
     /// * `Ok(PipelineProfile)` on success.
     /// * `Err(Error)` on failure.
     pub fn start(&self) -> Result<PipelineProfile, Error> {
-        let mut error = Error::default();
-        let profile = PipelineProfile {
-            handle: unsafe { rs2::rs2_pipeline_start(self.handle, error.inner()) },
-        };
-        error.check()?;
-        Ok(profile)
+        Error::call1(rs2::rs2_pipeline_start, self.handle)
     }
 
     /// Start the [`Pipeline`](../pipeline/struct.Pipeline.html) streaming according to the
@@ -107,14 +101,11 @@ impl Pipeline {
     /// * `Ok(PipelineProfile)` on success.
     /// * `Err(Error)` on failure.
     pub fn start_with_config(&self, rs2_config: &Config) -> Result<PipelineProfile, Error> {
-        let mut error = Error::default();
-        let profile = PipelineProfile {
-            handle: unsafe {
-                rs2::rs2_pipeline_start_with_config(self.handle, rs2_config.handle, error.inner())
-            },
-        };
-        error.check()?;
-        Ok(profile)
+        Error::call2(
+            rs2::rs2_pipeline_start_with_config,
+            self.handle,
+            rs2_config.0,
+        )
     }
 
     /// Stop the [`Pipeline`](../pipeline/struct.Pipeline.html) streaming. The
@@ -129,12 +120,7 @@ impl Pipeline {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn stop(&self) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_pipeline_stop(self.handle, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call1(rs2::rs2_pipeline_stop, self.handle)
     }
 
     /// Wait until a new set of [`Frame`](../frame/struct.Frame.html)s becomes available. The
@@ -157,65 +143,10 @@ impl Pipeline {
     /// is returned.
     ///
     /// # Returns
-    /// * `Ok(Vec<Frame>)` on success.
+    /// * `Ok(Frame)` on success.
     /// * `Err(Error)` on failure.
-    pub fn wait_for_frames(&self, timeout: u32) -> Result<Vec<Frame>, Error> {
-        let mut error = Error::default();
-        let frameset = Frame {
-            handle: unsafe {
-                rs2::rs2_pipeline_wait_for_frames(self.handle, timeout, error.inner())
-            },
-        };
-        error.check()?;
-
-        frameset.extract_frames()
-    }
-
-    /// Wait until a new frameset becomes available. See
-    /// [`Pipeline::wait_for_frames()`](../pipeline/struct.Pipeline.html#method.wait_for_frames)
-    /// for more info.
-    ///
-    /// # Arguments
-    /// * `timeout` - Max time in milliseconds to wait until [`Error`](../error/struct.Error.html)
-    /// is returned.
-    ///
-    /// # Returns
-    /// * `Ok(Frame)` containing the entire frameset on success.
-    /// * `Err(Error)` on failure.
-    pub fn wait_for_frameset(&self, timeout: u32) -> Result<Frame, Error> {
-        let mut error = Error::default();
-        let frameset = Frame {
-            handle: unsafe {
-                rs2::rs2_pipeline_wait_for_frames(self.handle, timeout, error.inner())
-            },
-        };
-        error.check()?;
-
-        Ok(frameset)
-    }
-
-    /// Wait until a new set of [`Frame`](../frame/struct.Frame.html)s becomes available. The
-    /// [`Frame`](../frame/struct.Frame.html)s set includes time-synchronized
-    /// [`Frame`](../frame/struct.Frame.html)s of each enabled stream in the pipeline. The method
-    /// blocks the calling thread, and fetches the latest unread
-    /// [`Frame`](../frame/struct.Frame.html)s set. Device [`Frame`](../frame/struct.Frame.html)s,
-    /// which were produced while the function wasn't called, are dropped. To avoid
-    /// [`Frame`](../frame/struct.Frame.html) drops, this method should be called as fast as the
-    /// device [`Frame`](../frame/struct.Frame.html) rate. The application can maintain the
-    /// [`Frame`](../frame/struct.Frame.html)s handles to defer processing. However, if the
-    /// application maintains too long history, the device may lack memory resources to produce new
-    /// [`Frame`](../frame/struct.Frame.html)s, and the following call to this method shall fail to
-    /// retrieve new [`Frame`](../frame/struct.Frame.html)s, until resources are retained.
-    ///
-    /// # Arguments
-    /// * `timeout` - Max time in milliseconds to wait until [`Error`](../error/struct.Error.html)
-    /// is returned.
-    ///
-    /// # Returns
-    /// * `Ok(Vec<Frame>)` on success.
-    /// * `Err(Error)` on failure.
-    pub fn try_wait_for_frames(&self, _timeout: u32) -> Result<Vec<Frame>, Error> {
-        unimplemented!();
+    pub fn wait_for_frames(&self, timeout_ms: u32) -> Result<Frame, Error> {
+        Error::call2(rs2::rs2_pipeline_wait_for_frames, self.handle, timeout_ms)
     }
 
     /// Check if a new set of [`Frame`](../frame/struct.Frame.html)s is available and retrieve the
@@ -234,36 +165,16 @@ impl Pipeline {
     /// resources become available.
     ///
     /// # Returns
-    /// * `Ok(Vec<Frame>)` on success.
+    /// * `Ok(Frame)` on success.
     /// * `Err(Error)` on failure.
-    pub fn poll_for_frames(&self) -> Result<Option<Vec<Frame>>, Error> {
-        let mut error = Error::default();
-        let mut frames = Frame {
-            handle: std::ptr::null_mut(),
-        };
-        let ret = unsafe {
-            rs2::rs2_pipeline_poll_for_frames(self.handle, &mut frames.handle, error.inner())
-        };
-        error.check()?;
+    pub fn poll_for_frames(&self) -> Result<Option<Frame>, Error> {
+        let mut res = Frame(std::ptr::null_mut());
+        let ret: i32 = Error::call2(rs2::rs2_pipeline_poll_for_frames, self.handle, &mut res.0)?;
         if ret == 0 {
-            return Ok(None);
+            Ok(None)
+        } else {
+            Ok(Some(res))
         }
-
-        let mut error = Error::default();
-        let count = unsafe { rs2::rs2_embedded_frames_count(frames.handle, error.inner()) };
-        error.check()?;
-
-        let mut res: Vec<Frame> = Vec::new();
-        res.reserve_exact(count as usize);
-
-        for i in 0..count {
-            let mut error = Error::default();
-            res.push(Frame {
-                handle: unsafe { rs2::rs2_extract_frame(frames.handle, i, error.inner()) },
-            });
-            error.check()?;
-        }
-        Ok(Some(res))
     }
 
     /// Return the active [`Device`](../device/struct.Device.html) and streams profiles, used by the
@@ -287,11 +198,6 @@ impl Pipeline {
     /// * `Ok(PipelineProfile)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_active_profile(&self) -> Result<PipelineProfile, Error> {
-        let mut error = Error::default();
-        let profile = PipelineProfile {
-            handle: unsafe { rs2::rs2_pipeline_get_active_profile(self.handle, error.inner()) },
-        };
-        error.check()?;
-        Ok(profile)
+        Error::call1(rs2::rs2_pipeline_get_active_profile, self.handle)
     }
 }

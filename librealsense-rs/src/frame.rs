@@ -2,62 +2,47 @@
 // Copyright(c) 2019 Aivero. All Rights Reserved.
 use crate::error::Error;
 use crate::metadata::{Metadata, MetadataAttribute};
-use crate::sensor::Sensor;
 use crate::stream_profile::StreamProfile;
 use std::collections::HashMap;
 
 /// Struct representation of [`Frame`](../frame/struct.Frame.html) that wraps around
 /// `rs2_frame` handle.
-pub struct Frame {
-    pub(crate) handle: *mut rs2::rs2_frame,
-}
+pub struct Frame(pub(crate) *mut rs2::rs2_frame);
 
 /// Safe releasing of the `rs2_frame` handle.
 impl Drop for Frame {
     fn drop(&mut self) {
         unsafe {
-            if !self.handle.is_null() {
-                rs2::rs2_release_frame(self.handle);
+            if !self.0.is_null() {
+                rs2::rs2_release_frame(self.0);
             }
         }
     }
 }
 
-impl Frame {
-    #[deprecated(since = "0.6.0", note = "Proper Rust dropping is utilised")]
-    pub fn release(&self) {
-        // unsafe { rs2::rs2_release_frame(self.handle) };
+impl From<*mut rs2::rs2_frame> for Frame {
+    fn from(f: *mut rs2::rs2_frame) -> Self {
+        Frame(f)
     }
+}
 
+impl Frame {
     /// Extract individual frames from a frameset.
     ///
     /// # Returns
-    /// * `Ok(Vec<Frame>)` on success.
+    /// * `Ok(Frame)` on success.
     /// * `Err(Error)` on failure.
-    pub fn extract_frames(&self) -> Result<Vec<Frame>, Error> {
-        let mut error = Error::default();
-        let count = unsafe { rs2::rs2_embedded_frames_count(self.handle, error.inner()) };
-        error.check()?;
-
-        let mut res: Vec<Frame> = Vec::new();
-        for i in 0..count {
-            let mut error = Error::default();
-            res.push(Frame {
-                handle: unsafe { rs2::rs2_extract_frame(self.handle, i, error.inner()) },
-            });
-            error.check()?;
-        }
-        Ok(res)
+    pub fn extract_frame(&self, i: i32) -> Result<Frame, Error> {
+        Error::call2(rs2::rs2_extract_frame, self.0, i)
     }
 
-    /// Retrieve [`Frame`](../frame/struct.Frame.html)'s parent
-    /// [`Sensor`](../sensor/struct.Sensor.html).
+    /// Get number of frames embedded within a composite frame
     ///
     /// # Returns
-    /// * `Ok(Sensor)` on success.
+    /// * `Ok(i32)` on success.
     /// * `Err(Error)` on failure.
-    pub fn get_sensor(&self) -> Result<Sensor, Error> {
-        unimplemented!();
+    pub fn embedded_frames_count(&self) -> Result<i32, Error> {
+        Error::call1(rs2::rs2_embedded_frames_count, self.0)
     }
 
     /// Retrieve timestamp from [`Frame`](../frame/struct.Frame.html) in milliseconds.
@@ -66,10 +51,7 @@ impl Frame {
     /// * `Ok(f64)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_timestamp(&self) -> Result<f64, Error> {
-        let mut error = Error::default();
-        let timestamp = unsafe { rs2::rs2_get_frame_timestamp(self.handle, error.inner()) };
-        error.check()?;
-        Ok(timestamp)
+        Error::call1(rs2::rs2_get_frame_timestamp, self.0)
     }
 
     /// Retrieve timestamp domain from [`Frame`](../frame/struct.Frame.html).
@@ -82,11 +64,7 @@ impl Frame {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn get_timestamp_domain(&self) -> Result<rs2::rs2_timestamp_domain, Error> {
-        let mut error = Error::default();
-        let timestamp_domain =
-            unsafe { rs2::rs2_get_frame_timestamp_domain(self.handle, error.inner()) };
-        error.check()?;
-        Ok(timestamp_domain)
+        Error::call1(rs2::rs2_get_frame_timestamp_domain, self.0)
     }
 
     /// Read the given metadata attribute from the
@@ -109,26 +87,22 @@ impl Frame {
     /// use librealsense2::pipeline::Pipeline;
     /// use librealsense2::context::Context;
     /// use librealsense2::metadata::MetadataAttribute;
-    /// let pipeline = Pipeline::new(&Context::new().unwrap()).unwrap();
+    /// let pipeline = Pipeline::create(&Context::create().unwrap()).unwrap();
     ///
     /// let frames = pipeline.wait_for_frames(2500).unwrap();
-    /// let contrast =
-    ///     if frames[0].supports_frame_metadata(MetadataAttribute::Contrast).unwrap() {
-    ///         Some(frames[0].get_frame_metadata(MetadataAttribute::Contrast).unwrap())
-    ///     }
-    ///     else { None };
+    /// let frame = frames.extract_frame(0).unwrap();
+    /// let contrast = if frame.supports_frame_metadata(MetadataAttribute::Contrast).unwrap() {
+    ///     Some(frame.get_frame_metadata(MetadataAttribute::Contrast).unwrap())
+    /// } else {
+    ///     None
+    /// };
     /// ```
     pub fn get_frame_metadata(&self, attribute: MetadataAttribute) -> Result<i64, Error> {
-        let mut error = Error::default();
-        let value = unsafe {
-            rs2::rs2_get_frame_metadata(
-                self.handle,
-                attribute as rs2::rs2_frame_metadata_value,
-                error.inner(),
-            )
-        };
-        error.check()?;
-        Ok(value)
+        Error::call2(
+            rs2::rs2_get_frame_metadata,
+            self.0,
+            attribute as rs2::rs2_frame_metadata_value,
+        )
     }
 
     /// Check if the [`Frame`](../frame/struct.Frame.html)'s metadata supports the
@@ -148,25 +122,21 @@ impl Frame {
     /// use librealsense2::pipeline::Pipeline;
     /// use librealsense2::context::Context;
     /// use librealsense2::metadata::MetadataAttribute;
-    /// let pipeline = Pipeline::new(&Context::new().unwrap()).unwrap();
+    /// let pipeline = Pipeline::create(&Context::create().unwrap()).unwrap();
     ///
     /// let frames = pipeline.wait_for_frames(2500).unwrap();
-    /// if frames[0].supports_frame_metadata(MetadataAttribute::Contrast).unwrap() {
+    /// if frames.extract_frame(0).unwrap().supports_frame_metadata(MetadataAttribute::Contrast).unwrap() {
     ///     println!("frames[0] supports the 'Contrast' metadata.")
     /// }
     /// else { println!("frames[0] does not support the 'Contrast' metadata.") };
     /// ```
     pub fn supports_frame_metadata(&self, attribute: MetadataAttribute) -> Result<bool, Error> {
-        let mut error = Error::default();
-        let meta_supported = unsafe {
-            rs2::rs2_supports_frame_metadata(
-                self.handle,
-                attribute as rs2::rs2_frame_metadata_value,
-                error.inner(),
-            )
-        };
-        error.check()?;
-        Ok(meta_supported == 1)
+        Error::call2(
+            rs2::rs2_supports_frame_metadata,
+            self.0,
+            attribute as rs2::rs2_frame_metadata_value,
+        )
+        .map(|m: i32| m == 1)
     }
 
     /// Get all the frame's supported metadata field represented as a `Metadata` struct. Please
@@ -183,10 +153,10 @@ impl Frame {
     /// ```no_run
     /// use librealsense2::pipeline::Pipeline;
     /// use librealsense2::context::Context;
-    /// let pipeline = Pipeline::new(&Context::new().unwrap()).unwrap();
+    /// let pipeline = Pipeline::create(&Context::create().unwrap()).unwrap();
     ///
     /// let frames = pipeline.wait_for_frames(2500).unwrap();
-    /// let metadata = frames[0].get_metadata().unwrap();
+    /// let metadata = frames.extract_frame(0).unwrap().get_metadata().unwrap();
     /// println!("frames[0]'s contrast is {}", metadata.contrast.unwrap());
     /// ```
     pub fn get_metadata(&self) -> Result<Metadata, Error> {
@@ -196,19 +166,13 @@ impl Frame {
             // Cast the integer to a rs2_frame_metadata_value, which realsense uses to identify metadata fields
             let metadata_value: rs2::rs2_frame_metadata_value = i;
             // Check if the given index is supported, ignore it if not
-            let mut error = Error::default();
-            let meta_supported = unsafe {
-                rs2::rs2_supports_frame_metadata(self.handle, metadata_value, error.inner())
-            };
-            if meta_supported == 0 || error.check().is_err() {
+            let meta_supported: Result<i32, Error> =
+                Error::call2(rs2::rs2_supports_frame_metadata, self.0, metadata_value);
+            if meta_supported.map(|m| m == 0).unwrap_or(true) {
                 continue;
             }
             // Attempt to get the meta's name and value
-            let mut error = Error::default();
-            let mete_val =
-                unsafe { rs2::rs2_get_frame_metadata(self.handle, metadata_value, error.inner()) };
-            error.check()?;
-
+            let mete_val = Error::call2(rs2::rs2_get_frame_metadata, self.0, metadata_value)?;
             // Append that to the dictionary
             meta_values.insert(metadata_value, mete_val);
         }
@@ -221,10 +185,7 @@ impl Frame {
     /// * `Ok(u64)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_frame_number(&self) -> Result<u64, Error> {
-        let mut error = Error::default();
-        let frame_number = unsafe { rs2::rs2_get_frame_number(self.handle, error.inner()) };
-        error.check()?;
-        Ok(frame_number)
+        Error::call1(rs2::rs2_get_frame_number, self.0)
     }
 
     /// Retrieve the height of a [`Frame`](../frame/struct.Frame.html) in pixels.
@@ -233,10 +194,7 @@ impl Frame {
     /// * `Ok(i32)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_height(&self) -> Result<i32, Error> {
-        let mut error = Error::default();
-        let height = unsafe { rs2::rs2_get_frame_height(self.handle, error.inner()) };
-        error.check()?;
-        Ok(height)
+        Error::call1(rs2::rs2_get_frame_height, self.0)
     }
 
     /// Retrieve the width of a [`Frame`](../frame/struct.Frame.html) in pixels.
@@ -245,10 +203,7 @@ impl Frame {
     /// * `Ok(i32)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_width(&self) -> Result<i32, Error> {
-        let mut error = Error::default();
-        let width = unsafe { rs2::rs2_get_frame_width(self.handle, error.inner()) };
-        error.check()?;
-        Ok(width)
+        Error::call1(rs2::rs2_get_frame_width, self.0)
     }
 
     /// Retrieve bits per pixels in the [`Frame`](../frame/struct.Frame.html) image
@@ -258,10 +213,7 @@ impl Frame {
     /// * `Ok(i32)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_bits_per_pixel(&self) -> Result<i32, Error> {
-        let mut error = Error::default();
-        let bpp = unsafe { rs2::rs2_get_frame_bits_per_pixel(self.handle, error.inner()) };
-        error.check()?;
-        Ok(bpp)
+        Error::call1(rs2::rs2_get_frame_bits_per_pixel, self.0)
     }
 
     /// Retrieve [`Frame`](../frame/struct.Frame.html) stride in bytes (number of bytes
@@ -271,10 +223,7 @@ impl Frame {
     /// * `Ok(i32)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_stride(&self) -> Result<i32, Error> {
-        let mut error = Error::default();
-        let stride = unsafe { rs2::rs2_get_frame_stride_in_bytes(self.handle, error.inner()) };
-        error.check()?;
-        Ok(stride)
+        Error::call1(rs2::rs2_get_frame_stride_in_bytes, self.0)
     }
 
     /// Retrieve the data size of a [`Frame`](../frame/struct.Frame.html) in bytes.
@@ -295,10 +244,7 @@ impl Frame {
     /// * `Ok(i32)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_data_size(&self) -> Result<i32, Error> {
-        let mut error = Error::default();
-        let size = unsafe { rs2::rs2_get_frame_data_size(self.handle, error.inner()) };
-        error.check()?;
-        Ok(size)
+        Error::call1(rs2::rs2_get_frame_data_size, self.0)
     }
 
     /// Retrieve the data from [`Frame`](../frame/struct.Frame.html).
@@ -307,10 +253,8 @@ impl Frame {
     /// * `Ok(&[u8])` on success.
     /// * `Err(Error)` on failure.
     pub fn get_data(&self) -> Result<&[u8], Error> {
-        let mut error = Error::default();
         let data = {
-            let data_ptr = unsafe { rs2::rs2_get_frame_data(self.handle, error.inner()) };
-            error.check()?;
+            let data_ptr: *const std::ffi::c_void = Error::call1(rs2::rs2_get_frame_data, self.0)?;
             let size = self.get_data_size()? as usize;
             unsafe { std::slice::from_raw_parts(data_ptr as *const u8, size) }
         };
@@ -324,14 +268,6 @@ impl Frame {
     /// * `Ok(StreamProfile)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_stream_profile(&self) -> Result<StreamProfile, Error> {
-        let mut error = Error::default();
-        let profile = StreamProfile {
-            handle: unsafe {
-                rs2::rs2_get_frame_stream_profile(self.handle, error.inner())
-                    as *mut rs2::rs2_stream_profile
-            },
-        };
-        error.check()?;
-        Ok(profile)
+        Error::call1(rs2::rs2_get_frame_stream_profile, self.0)
     }
 }

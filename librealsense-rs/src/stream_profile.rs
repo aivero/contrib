@@ -7,23 +7,52 @@ use crate::error::Error;
 use crate::extrinsics::*;
 use crate::intrinsics::*;
 
+pub struct StreamProfileList(pub(crate) *mut rs2::rs2_stream_profile_list);
+
+impl Drop for StreamProfileList {
+    fn drop(&mut self) {
+        unsafe { rs2::rs2_delete_stream_profiles_list(self.0) }
+    }
+}
+
+impl From<*mut rs2::rs2_stream_profile_list> for StreamProfileList {
+    fn from(l: *mut rs2::rs2_stream_profile_list) -> Self {
+        StreamProfileList(l)
+    }
+}
+
+impl StreamProfileList {
+    /// Get the number of supported stream profiles
+    ///
+    /// # Returns
+    /// * `Ok(i32)` on success.
+    /// * `Err(Error)` on failure.
+    pub fn count(&self) -> Result<i32, Error> {
+        Error::call1(rs2::rs2_get_stream_profiles_count, self.0)
+    }
+
+    /// Get pointer to specific stream profile
+    ///
+    /// # Arguments
+    /// * `index` - the zero based index of the streaming mode
+    ///
+    /// # Returns
+    /// * `Ok(StreamProfile)` on success.
+    /// * `Err(Error)` on failure.
+    pub fn get(&self, i: i32) -> Result<StreamProfile, Error> {
+        Error::call2(rs2::rs2_get_stream_profile, self.0, i)
+    }
+}
+
 /// Struct representation of [`StreamProfile`](../stream_profile/struct.Pipeline.html) that wraps
 /// around `rs2_stream_profile` handle. The
 /// [`StreamProfile`](../stream_profile/struct.Pipeline.html) contains information about a specific
 /// stream.
-pub struct StreamProfile {
-    pub(crate) handle: *mut rs2::rs2_stream_profile,
-}
+pub struct StreamProfile(pub(crate) *const rs2::rs2_stream_profile);
 
-pub struct StreamProfileList {
-    pub(crate) handle: *mut rs2::rs2_stream_profile_list,
-}
-
-impl Drop for StreamProfileList {
-    fn drop(&mut self) {
-        unsafe {
-            rs2::rs2_delete_stream_profiles_list(self.handle);
-        }
+impl From<*const rs2::rs2_stream_profile> for StreamProfile {
+    fn from(p: *const rs2::rs2_stream_profile) -> Self {
+        StreamProfile(p)
     }
 }
 
@@ -88,20 +117,16 @@ impl StreamProfile {
     /// * `Ok(StreamData)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_data(&self) -> Result<StreamData, Error> {
-        let mut error = Error::default();
         let mut data = StreamData::default();
-        unsafe {
-            rs2::rs2_get_stream_profile_data(
-                self.handle,
-                &mut data.stream as *mut rs2::rs2_stream,
-                &mut data.format as *mut rs2::rs2_format,
-                &mut data.index as *mut i32,
-                &mut data.id as *mut i32,
-                &mut data.framerate as *mut i32,
-                error.inner(),
-            );
-        }
-        error.check()?;
+        Error::call6(
+            rs2::rs2_get_stream_profile_data,
+            self.0,
+            &mut data.stream as *mut rs2::rs2_stream,
+            &mut data.format as *mut rs2::rs2_format,
+            &mut data.index as *mut i32,
+            &mut data.id as *mut i32,
+            &mut data.framerate as *mut i32,
+        )?;
         Ok(data)
     }
 
@@ -112,17 +137,13 @@ impl StreamProfile {
     /// * `Ok(StreamResolution)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_resolution(&self) -> Result<StreamResolution, Error> {
-        let mut error = Error::default();
         let mut resolution = StreamResolution::default();
-        unsafe {
-            rs2::rs2_get_video_stream_resolution(
-                self.handle,
-                &mut resolution.width as *mut i32,
-                &mut resolution.height as *mut i32,
-                error.inner(),
-            );
-        }
-        error.check()?;
+        Error::call3(
+            rs2::rs2_get_video_stream_resolution,
+            self.0,
+            &mut resolution.width as *mut i32,
+            &mut resolution.height as *mut i32,
+        )?;
         Ok(resolution)
     }
 
@@ -132,16 +153,12 @@ impl StreamProfile {
     /// * `Ok(Intrinsics)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_intrinsics(&self) -> Result<Intrinsics, Error> {
-        let mut error = Error::default();
         let mut intrinsics = RsIntrinsicsWrapper::default();
-        unsafe {
-            rs2::rs2_get_video_stream_intrinsics(
-                self.handle,
-                &mut intrinsics._handle,
-                error.inner(),
-            );
-        }
-        error.check()?;
+        Error::call2(
+            rs2::rs2_get_video_stream_intrinsics,
+            self.0,
+            &mut intrinsics._handle,
+        )?;
         Ok(Intrinsics::new(intrinsics._handle))
     }
 
@@ -155,17 +172,13 @@ impl StreamProfile {
     /// * `Ok(Extrinsics)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_extrinsics(from: &Self, to: &Self) -> Result<Extrinsics, Error> {
-        let mut error = Error::default();
         let mut extrinsics = RsExtrinsicsWrapper::default();
-        unsafe {
-            rs2::rs2_get_extrinsics(
-                from.handle,
-                to.handle,
-                &mut extrinsics._handle,
-                error.inner(),
-            );
-        }
-        error.check()?;
+        Error::call3(
+            rs2::rs2_get_extrinsics,
+            from.0,
+            to.0,
+            &mut extrinsics._handle,
+        )?;
         Ok(Extrinsics::new(extrinsics._handle))
     }
 

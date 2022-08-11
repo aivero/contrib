@@ -13,16 +13,18 @@ pub use rs2::rs2_stream;
 /// allows, in combination with [`Pipeline`](../pipeline/struct.Pipeline.html), to
 /// request filters for the streams and [`Device`](../device/struct.Device.html)
 /// selection and configuration.
-pub struct Config {
-    pub(crate) handle: *mut rs2::rs2_config,
-}
+pub struct Config(pub(crate) *mut rs2::rs2_config);
 
 /// Safe releasing of the `rs2_config` handle.
 impl Drop for Config {
     fn drop(&mut self) {
-        unsafe {
-            rs2::rs2_delete_config(self.handle);
-        }
+        unsafe { rs2::rs2_delete_config(self.0) }
+    }
+}
+
+impl From<*mut rs2::rs2_config> for Config {
+    fn from(c: *mut rs2::rs2_config) -> Self {
+        Config(c)
     }
 }
 
@@ -46,13 +48,8 @@ impl Config {
     /// # Returns
     /// * `Ok(Config)` on success.
     /// * `Err(Error)` on failure.
-    pub fn new() -> Result<Config, Error> {
-        let mut error = Error::default();
-        let config = Config {
-            handle: unsafe { rs2::rs2_create_config(error.inner()) },
-        };
-        error.check()?;
-        Ok(config)
+    pub fn create() -> Result<Config, Error> {
+        Error::call0(rs2::rs2_create_config)
     }
 
     /// Enable a [`Device`](../device/struct.Device.html) stream explicitly, with
@@ -96,21 +93,16 @@ impl Config {
         format: rs2_format,
         framerate: i32,
     ) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_config_enable_stream(
-                self.handle,
-                stream,
-                index,
-                width,
-                height,
-                format,
-                framerate,
-                error.inner(),
-            );
-        }
-        error.check()?;
-        Ok(())
+        Error::call7(
+            rs2::rs2_config_enable_stream,
+            self.0,
+            stream,
+            index,
+            width,
+            height,
+            format,
+            framerate,
+        )
     }
 
     /// Enable all [`Device`](../device/struct.Device.html) streams explicitly. The
@@ -127,12 +119,7 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn enable_all_streams(&self) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_config_enable_all_stream(self.handle, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call1(rs2::rs2_config_enable_all_stream, self.0)
     }
 
     /// Select a specific [`Device`](../device/struct.Device.html) explicitly by its
@@ -155,13 +142,8 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn enable_device(&self, serial: &str) -> Result<(), Error> {
-        let mut error = Error::default();
         let s = std::ffi::CString::new(serial).expect("Failed to create CString");
-        unsafe {
-            rs2::rs2_config_enable_device(self.handle, s.as_ptr(), error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call2(rs2::rs2_config_enable_device, self.0, s.as_ptr())
     }
 
     /// Select a recorded [`Device`](../device/struct.Device.html) from a `file`, to be
@@ -183,13 +165,8 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn enable_device_from_file(&self, file: &str) -> Result<(), Error> {
-        let mut error = Error::default();
         let s = std::ffi::CString::new(file).expect("Failed to create CString");
-        unsafe {
-            rs2::rs2_config_enable_device_from_file(self.handle, s.as_ptr(), error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call2(rs2::rs2_config_enable_device_from_file, self.0, s.as_ptr())
     }
 
     /// Select a recorded [`Device`](../device/struct.Device.html) from a `file`, to be
@@ -217,18 +194,13 @@ impl Config {
         file: &str,
         repeat: bool,
     ) -> Result<(), Error> {
-        let mut error = Error::default();
         let s = std::ffi::CString::new(file).expect("Failed to create CString");
-        unsafe {
-            rs2::rs2_config_enable_device_from_file_repeat_option(
-                self.handle,
-                s.as_ptr(),
-                repeat as i32,
-                error.inner(),
-            );
-        }
-        error.check()?;
-        Ok(())
+        Error::call3(
+            rs2::rs2_config_enable_device_from_file_repeat_option,
+            self.0,
+            s.as_ptr(),
+            repeat as i32,
+        )
     }
 
     /// Requires that the resolved [`Device`](../device/struct.Device.html) would be
@@ -244,13 +216,8 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn enable_record_to_file(&self, file: &str) -> Result<(), Error> {
-        let mut error = Error::default();
         let s = std::ffi::CString::new(file).expect("Failed to create CString");
-        unsafe {
-            rs2::rs2_config_enable_record_to_file(self.handle, s.as_ptr(), error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call2(rs2::rs2_config_enable_record_to_file, self.0, s.as_ptr())
     }
 
     /// Disable a [`Device`](../device/struct.Device.html) stream explicitly, to remove
@@ -265,12 +232,7 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn disable_stream(&self, stream: rs2_stream) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_config_disable_stream(self.handle, stream, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call2(rs2::rs2_config_disable_stream, self.0, stream)
     }
 
     /// Disable a [`Device`](../device/struct.Device.html) indexed stream explicitly,
@@ -286,12 +248,12 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn disable_indexed_stream(&self, stream: rs2_stream, index: i32) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_config_disable_indexed_stream(self.handle, stream, index, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call3(
+            rs2::rs2_config_disable_indexed_stream,
+            self.0,
+            stream,
+            index,
+        )
     }
 
     /// Disable all [`Device`](../device/struct.Device.html) streams explicitly, to
@@ -303,12 +265,7 @@ impl Config {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn disable_all_streams(&self) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_config_disable_all_streams(self.handle, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call1(rs2::rs2_config_disable_all_streams, self.0)
     }
 
     /// Resolve the configuration filters, to find a matching
@@ -347,12 +304,7 @@ impl Config {
     /// * `Ok(PipelineProfile)` on success.
     /// * `Err(Error)` on failure.
     pub fn resolve(&self, pipe: &Pipeline) -> Result<PipelineProfile, Error> {
-        let mut error = Error::default();
-        let pipe_profile = PipelineProfile {
-            handle: unsafe { rs2::rs2_config_resolve(self.handle, pipe.handle, error.inner()) },
-        };
-        error.check()?;
-        Ok(pipe_profile)
+        Error::call2(rs2::rs2_config_resolve, self.0, pipe.handle)
     }
 
     /// Check if the [`Config`](../config/struct.Config.html) can resolve the
@@ -370,9 +322,6 @@ impl Config {
     /// [`Config`](../config/struct.Config.html) is valid.
     /// * `Err(Error)` on failure.
     pub fn can_resolve(&self, pipe: &Pipeline) -> Result<bool, Error> {
-        let mut error = Error::default();
-        let ret = unsafe { rs2::rs2_config_can_resolve(self.handle, pipe.handle, error.inner()) };
-        error.check()?;
-        Ok(ret != 0)
+        Error::call2(rs2::rs2_config_can_resolve, self.0, pipe.handle).map(|ret: i32| ret != 0)
     }
 }

@@ -7,16 +7,18 @@ use crate::stream_profile::*;
 
 /// Struct representation of [`PipelineProfile`](../pipeline_profile/struct.PipelineProfile.html)
 /// that wraps around `rs2_pipeline_profile` handle.
-pub struct PipelineProfile {
-    pub(crate) handle: *mut rs2::rs2_pipeline_profile,
-}
+pub struct PipelineProfile(pub(crate) *mut rs2::rs2_pipeline_profile);
 
 /// Safe releasing of the `rs2_pipeline_profile` handle.
 impl Drop for PipelineProfile {
     fn drop(&mut self) {
-        unsafe {
-            rs2::rs2_delete_pipeline_profile(self.handle);
-        }
+        unsafe { rs2::rs2_delete_pipeline_profile(self.0) }
+    }
+}
+
+impl From<*mut rs2::rs2_pipeline_profile> for PipelineProfile {
+    fn from(p: *mut rs2::rs2_pipeline_profile) -> Self {
+        PipelineProfile(p)
     }
 }
 
@@ -42,12 +44,7 @@ impl PipelineProfile {
     /// * `Ok(Device)` on success.
     /// * `Err(Error)` on failure.
     pub fn get_device(&self) -> Result<Device, Error> {
-        let mut error = Error::default();
-        let device = Device {
-            handle: unsafe { rs2::rs2_pipeline_profile_get_device(self.handle, error.inner()) },
-        };
-        error.check()?;
-        Ok(device)
+        Error::call1(rs2::rs2_pipeline_profile_get_device, self.0)
     }
 
     /// Retrieve the selected [`StreamProfile`](../stream_profile/struct.StreamProfile.html)s,
@@ -55,62 +52,9 @@ impl PipelineProfile {
     /// [`PipelineProfile`](../pipeline_profile/struct.PipelineProfile.html).
     ///
     /// # Returns
-    /// * `Ok(Vec<StreamProfile>)` on success.
+    /// * `Ok(StreamProfileList)` on success.
     /// * `Err(Error)` on failure.
-    pub fn get_streams(&self) -> Result<Vec<StreamProfile>, Error> {
-        let mut error = Error::default();
-        let stream_profiles = StreamProfileList {
-            handle: unsafe { rs2::rs2_pipeline_profile_get_streams(self.handle, error.inner()) },
-        };
-        error.check()?;
-
-        let mut error = Error::default();
-        let stream_count =
-            unsafe { rs2::rs2_get_stream_profiles_count(stream_profiles.handle, error.inner()) };
-        error.check()?;
-
-        let mut streams: Vec<StreamProfile> = Vec::new();
-        streams.reserve_exact(stream_count as usize);
-
-        for i in 0..stream_count {
-            let mut error = Error::default();
-            streams.push(StreamProfile {
-                handle: unsafe {
-                    rs2::rs2_get_stream_profile(stream_profiles.handle, i, error.inner())
-                        as *mut rs2::rs2_stream_profile
-                },
-            });
-            error.check()?;
-        }
-        Ok(streams)
-    }
-
-    /// Retrieve the [`StreamProfile`](../stream_profile/struct.StreamProfile.html) that is enabled
-    /// for the specified stream in this
-    /// [`PipelineProfile`](../pipeline_profile/struct.PipelineProfile.html).
-    ///
-    /// # Arguments
-    /// * `stream_type` - Stream type of the desired profile.
-    /// * `stream_index` - Stream index of the desired profile, with -1 for any matching.
-    ///
-    /// # Returns
-    /// * `Ok(StreamProfile)` on success if such stream exist.
-    /// * `Ok(None)` on success if no such stream exists.
-    /// * `Err(Error)` on failure.
-    pub fn get_stream(
-        &self,
-        stream_type: rs2::rs2_stream,
-        stream_index: i32,
-    ) -> Result<Option<StreamProfile>, Error> {
-        for stream in self.get_streams()? {
-            let stream_data = stream.get_data()?;
-            if stream_data.stream == stream_type
-                && stream_index != -1
-                && stream_data.index == stream_index
-            {
-                return Ok(Some(stream));
-            }
-        }
-        Ok(None)
+    pub fn get_streams(&self) -> Result<StreamProfileList, Error> {
+        Error::call1(rs2::rs2_pipeline_profile_get_streams, self.0)
     }
 }

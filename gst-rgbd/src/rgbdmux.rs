@@ -486,7 +486,7 @@ impl RgbdMux {
         while let Some(buffer) = sink_pad.peek_buffer() {
             let segment = sink_pad.segment().downcast::<gst::ClockTime>().unwrap();
             let pts = buffer.pts().ok_or(gst::FlowError::Error)?;
-
+            let buffer_duration = buffer.duration().unwrap_or_default();
             let latency = aggregator.latency().unwrap_or_default();
             let buffer_running_time =
                 segment.to_running_time(pts).unwrap_or(gst::ClockTime::ZERO) + latency;
@@ -498,14 +498,15 @@ impl RgbdMux {
             //     valid_buffer
             // }
 
-            if buffer_running_time < position_running_time {
+            if buffer_running_time + buffer_duration  < position_running_time {
                 sink_pad.drop_buffer();
                 gst_info!(
                     CAT,
-                    "Dropped buffer: {} {} {}",
+                    "Dropped buffer: {} {} {} {}",
                     sink_pad.name(),
                     buffer_running_time,
-                    position_running_time
+                    position_running_time,
+                    latency,
                 );
             } else if first || buffer_running_time < position_running_time + duration {
                 return Ok(true);

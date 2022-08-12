@@ -27,9 +27,8 @@ use gst_base::subclass::prelude::*;
 use camera_meta::Distortion;
 use gst::{ErrorMessage, LibraryError};
 use gst_depth_meta::{camera_meta, camera_meta::*, rgbd};
-use rs2::{
-    device::Device, frame::Frame, high_level_utils::StreamInfo, processing::ProcessingBlock,
-};
+use librealsense2::processing::FrameQueue;
+use rs2::{frame::Frame, high_level_utils::StreamInfo, processing::ProcessingBlock};
 
 use super::d400_limits::*;
 use super::rs_meta::rs_meta_serialization::*;
@@ -57,39 +56,22 @@ pub struct RealsenseSrc {
     settings: RwLock<Settings>,
     /// Mutex-protected internals of the element containing stream-relevant data.
     internals: Mutex<RealsenseSrcInternals>,
-    /// Align processing block that either aligns `depth -> color` or `all streams -> depth`.
-    align_processing_block: Mutex<Option<ProcessingBlock>>,
     // Flag signifying that the GstBaseSrc::unlock() method has been called and the create() method should terminate ASAP
     unlock: AtomicBool,
     tags_sent: AtomicBool,
 }
 
 /// Internals of the element that are under Mutex.
+#[derive(Default)]
 struct RealsenseSrcInternals {
-    /// Current state of the RealSense pipeline.
-    state: State,
+    context: Option<rs2::context::Context>,
+    pipeline: Option<rs2::pipeline::Pipeline>,
     camera_meta: Option<CameraMeta>,
     /// Contains CameraMeta serialised with Cap'n Proto. Valid only if `attach-camera-meta=true`, otherwise empty.
     camera_meta_serialised: Vec<u8>,
-    /// Handle to the device. Valid only if `serial` is specified.
-    device: Option<Device>,
-}
-
-impl Default for RealsenseSrcInternals {
-    fn default() -> Self {
-        Self {
-            state: State::Stopped,
-            camera_meta: None,
-            camera_meta_serialised: Vec::default(),
-            device: None,
-        }
-    }
-}
-
-/// An enum containing the current state of the RealSense pipeline
-enum State {
-    Stopped,
-    Started { pipeline: rs2::pipeline::Pipeline },
+    /// Align processing block that either aligns `depth -> color` or `all streams -> depth`.
+    align_processing_block: Option<ProcessingBlock>,
+    frame_queue: Option<FrameQueue>,
 }
 
 glib::wrapper! {
@@ -300,17 +282,28 @@ impl PushSrcImpl for RealsenseSrc {
         // Embed the frames in output_buffer
         let settings = &self.settings.read().unwrap();
         let streams: Streams = (&settings.streams.enabled_streams).into();
-
-        // Align frames, if enabled and configured
-        if let Some(align_processing_block) = self.align_processing_block.lock().unwrap().as_ref() {
-            frameset = align_processing_block
-                .process_frame(frameset)
-                .map_err(|_| gst::FlowError::Error)?;
+        {
+            let internals = self.internals.lock().unwrap();
+            // Align frames, if enabled and configured
+            if let (Some(align_processing_block), Some(frame_queue)) =
+                (&internals.align_processing_block, &internals.frame_queue)
+            {
+                align_processing_block
+                    .process_frame(frameset)
+                    .map_err(|_| gst::FlowError::Error)?;
+                frameset = frame_queue
+                    .poll_for_frame()
+                    .map_err(|_| gst::FlowError::Error)?;
+            }
         }
 
         // Extract individual frames from the frameset
-        let frames = frameset
-            .extract_frames()
+        let number_of_frames = frameset
+            .embedded_frames_count()
+            .map_err(|_| gst::FlowError::Error)?;
+        let frames = (0..number_of_frames)
+            .map(|i| frameset.extract_frame(i))
+            .collect::<Result<Vec<rs2::frame::Frame>, rs2::error::Error>>()
             .map_err(|_| gst::FlowError::Error)?;
 
         for (i, (stream_id, stream_descriptor)) in streams.iter().enumerate() {
@@ -369,13 +362,8 @@ impl RealsenseSrc {
     ///   * No streams are enabled
     fn configure(&self) -> Result<rs2::config::Config, gst::ErrorMessage> {
         // Create new RealSense config
-        let config = rs2::config::Config::new()
+        let config = rs2::config::Config::create()
             .map_err(|e| gst::error_msg!(gst::LibraryError::Settings, ["{}", e]))?;
-
-        // Make sure the pipeline has not started yet
-        if let State::Started { .. } = self.internals.lock().unwrap().state {
-            unreachable!("Element has already started");
-        }
 
         let settings = self.settings.read().unwrap();
 
@@ -467,41 +455,19 @@ impl RealsenseSrc {
         base_src: &gst_base::BaseSrc,
         config: rs2::config::Config,
     ) -> Result<(), ErrorMessage> {
-        let mut settings = self.settings.write().unwrap();
-
         // Get realsense context
-        let context = rs2::context::Context::new()
+        let context = rs2::context::Context::create()
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
 
-        if let Some(serial) = &settings.serial {
-            let devices = context
-                .query_devices()
-                .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
-
-            // Make sure a device with the selected serial is connected
-            // Find the device with the given serial, ignoring all errors
-            let device = devices
-                .into_iter()
-                .find(
-                    |d| match d.get_info(rs2::rs2_camera_info::RS2_CAMERA_INFO_SERIAL_NUMBER) {
-                        Ok(device_serial) => *serial == device_serial,
-                        _ => false,
-                    },
-                )
-                .ok_or_else(|| gst::error_msg!(gst::StreamError::Failed, [""]))?;
-
+        let mut settings = self.settings.write().unwrap();
+        if let (Some(serial), Some(config)) = (&settings.serial, &settings.config) {
             // Load JSON if `config` is defined
-            if let Some(config) = &settings.config {
-                Self::load_json(&device, config)?;
-            }
-
-            // Store in internals, so that the device can be hardware reset after stream is over
-            let mut internals = self.internals.lock().unwrap();
-            internals.device = Some(device);
+            let device = Self::find_device(&context, serial)?;
+            Self::load_json(&device, config)?;
         }
 
         // Crate new RealSense pipeline
-        let pipeline = rs2::pipeline::Pipeline::new(&context)
+        let pipeline = rs2::pipeline::Pipeline::create(&context)
             .map_err(|e| gst::error_msg!(gst::CoreError::Failed, ["{}", e]))?;
 
         // Make sure that the config can be resolved
@@ -549,23 +515,21 @@ impl RealsenseSrc {
             "RealSense stream source has the following calibration:\n{:?}",
             camera_meta
         );
-        {
-            let mut internals = self.internals.lock().unwrap();
 
-            // Update state and get access to pipeline
-            internals.state = State::Started { pipeline };
+        let mut internals = self.internals.lock().unwrap();
+        internals.context = Some(context);
+        internals.pipeline = Some(pipeline);
 
-            // Setup camera meta for transport, if enabled
-            internals.camera_meta = Some(camera_meta.clone());
-            if settings.attach_camera_meta {
-                // Serialise the CameraMeta
-                internals.camera_meta_serialised = camera_meta.serialise().map_err(|e| {
-                    gst::error_msg!(
-                        gst::LibraryError::Settings,
-                        ["Cannot serialise camera meta{}", e]
-                    )
-                })?
-            }
+        // Setup camera meta for transport, if enabled
+        internals.camera_meta = Some(camera_meta.clone());
+        if settings.attach_camera_meta {
+            // Serialise the CameraMeta
+            internals.camera_meta_serialised = camera_meta.serialise().map_err(|e| {
+                gst::error_msg!(
+                    gst::LibraryError::Settings,
+                    ["Cannot serialise camera meta{}", e]
+                )
+            })?
         }
 
         // Create align processing block if enabled
@@ -591,12 +555,22 @@ impl RealsenseSrc {
             // We prefer it warns and then operates as if no alignment was requested.
             let enabled_streams: Streams = (&settings.streams.enabled_streams).into();
             if enabled_streams.len() > 1 {
-                *self.align_processing_block.lock().unwrap() = Some(
+                internals.align_processing_block = Some(
                     ProcessingBlock::create_align(
                         Into::<RsStreamDescriptor>::into(settings.align_to).rs2_stream,
                     )
                     .map_err(|e| gst::error_msg!(gst::LibraryError::Settings, ["{}", e]))?,
-                )
+                );
+                internals.frame_queue = Some(
+                    FrameQueue::create(1)
+                        .map_err(|e| gst::error_msg!(gst::LibraryError::Settings, ["{}", e]))?,
+                );
+                internals
+                    .align_processing_block
+                    .as_ref()
+                    .unwrap()
+                    .start(internals.frame_queue.as_ref().unwrap())
+                    .map_err(|e| gst::error_msg!(gst::LibraryError::Settings, ["{}", e]))?;
             } else {
                 gst_info!(
                     CAT,
@@ -606,6 +580,38 @@ impl RealsenseSrc {
         }
 
         Ok(())
+    }
+
+    fn find_device(
+        context: &rs2::context::Context,
+        serial: &str,
+    ) -> Result<rs2::device::Device, gst::ErrorMessage> {
+        let devices = context.query_devices().map_err(|e| {
+            gst::error_msg!(gst::StreamError::Failed, ["Unable to query devices: {}", e])
+        })?;
+
+        // Make sure a device with the selected serial is connected
+        // Find the device with the given serial, ignoring all errors
+        let number_of_devices = devices.count().map_err(|e| {
+            gst::error_msg!(
+                gst::StreamError::Failed,
+                ["Unable to get device count {}", e]
+            )
+        })?;
+        (0..number_of_devices)
+            .filter_map(|i| devices.create_device(i).ok())
+            .find(
+                |d| match d.get_info(rs2::rs2_camera_info::RS2_CAMERA_INFO_SERIAL_NUMBER) {
+                    Ok(device_serial) => *serial == device_serial,
+                    _ => false,
+                },
+            )
+            .ok_or_else(|| {
+                gst::error_msg!(
+                    gst::StreamError::Failed,
+                    ["Could not find device for serial {}", serial]
+                )
+            })
     }
 
     /// Send the metadata as tags on the pipeline in order to be read by downstream elements.
@@ -638,7 +644,7 @@ impl RealsenseSrc {
     ///     * Json config is invalid
     fn load_json(device: &rs2::device::Device, config: &str) -> Result<(), ErrorMessage> {
         if !device
-            .is_advanced_mode_enabled()
+            .is_enabled()
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?
         {
             device
@@ -662,12 +668,7 @@ impl RealsenseSrc {
         let internals = self.internals.lock().unwrap();
 
         // Get RealSense pipeline
-        let pipeline = match internals.state {
-            State::Started { ref pipeline } => pipeline,
-            State::Stopped => {
-                unreachable!("RealSense pipeline is not yet initialised");
-            }
-        };
+        let pipeline = internals.pipeline.as_ref().unwrap();
         let mut waited = gst::ClockTime::from_nseconds(0);
 
         // Wait for frameset, i.e. rs2::Frame with multiple Frames attached to it
@@ -677,7 +678,7 @@ impl RealsenseSrc {
             if self.unlock.load(Ordering::Relaxed) {
                 return Err(gst::FlowError::Flushing);
             }
-            match pipeline.wait_for_frameset(10) {
+            match pipeline.wait_for_frames(10) {
                 Ok(frameset) => return Ok(frameset),
                 Err(err) => {
                     gst::gst_info!(CAT, "wait_for_frameset returned {}", err);
@@ -1121,12 +1122,13 @@ impl RealsenseSrc {
     /// * `HashMap<String, camera_meta::Intrinsics>` containing Intrinsics corresponding to a stream.
     fn extract_intrinsics(
         desired_streams: &EnabledStreams,
-        stream_profiles: &[rs2::stream_profile::StreamProfile],
+        stream_profiles: &rs2::stream_profile::StreamProfileList,
     ) -> Result<HashMap<String, camera_meta::Intrinsics>, ErrorMessage> {
         let mut intrinsics: HashMap<String, camera_meta::Intrinsics> = HashMap::new();
 
         // Iterate over all stream profile, extract intrinsics and assign them to the appropriate stream
-        for stream_profile in stream_profiles.iter() {
+        for i in 0..stream_profiles.count().unwrap() {
+            let stream_profile = stream_profiles.get(i).unwrap();
             let stream_data = stream_profile
                 .get_data()
                 .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
@@ -1204,15 +1206,15 @@ impl RealsenseSrc {
     /// in a hashmap of <(from, to), Transformation>.
     fn extract_extrinsics(
         desired_streams: &EnabledStreams,
-        stream_profiles: &[rs2::stream_profile::StreamProfile],
+        stream_profiles: &rs2::stream_profile::StreamProfileList,
     ) -> Result<HashMap<(String, String), camera_meta::Transformation>, ErrorMessage> {
         // Determine the main stream from which all transformations are taken
         let main_stream_id = Self::determine_main_stream(desired_streams);
         let main_stream_rs_descriptor: RsStreamDescriptor = main_stream_id.into();
 
         // Get the stream profile for the main stream
-        let main_stream_profile = stream_profiles
-            .iter()
+        let main_stream_profile = (0..stream_profiles.count().unwrap())
+            .filter_map(|i| stream_profiles.get(i).ok())
             .find(|stream_profile| match stream_profile.get_data() {
                 Ok(stream) => {
                     stream.stream == main_stream_rs_descriptor.rs2_stream
@@ -1228,7 +1230,8 @@ impl RealsenseSrc {
 
         // Iterate over all stream profiles and find extrinsics to the other enabled streams
         let mut extrinsics: HashMap<(String, String), camera_meta::Transformation> = HashMap::new();
-        for stream_profile in stream_profiles.iter() {
+        for i in 0..stream_profiles.count().unwrap() {
+            let stream_profile = stream_profiles.get(i).unwrap();
             let stream_data = stream_profile
                 .get_data()
                 .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
@@ -1247,7 +1250,7 @@ impl RealsenseSrc {
                     (main_stream_id.to_string(), stream_id.to_string()),
                     Self::rs2_extrinsics_to_camera_meta_transformation(
                         main_stream_profile
-                            .get_extrinsics_to(stream_profile)
+                            .get_extrinsics_to(&stream_profile)
                             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?,
                     ),
                 );
@@ -1280,8 +1283,9 @@ impl RealsenseSrc {
     ///
     /// # Returns
     /// * `f32` containing the depth scale, in metres. Default value of 0.001 is returned if depth sensor is not active.
-    fn get_depth_scale(sensors: Vec<rs2::sensor::Sensor>) -> f32 {
-        for sensor in sensors.iter() {
+    fn get_depth_scale(sensors: rs2::sensor::SensorList) -> f32 {
+        for i in 0..sensors.count().unwrap() {
+            let sensor = sensors.create_sensor(i).unwrap();
             let depth_scale = sensor.get_depth_scale();
             if let Ok(depth_scale) = depth_scale {
                 // Return the depth scale as soon as it is found in sensors.
@@ -1411,32 +1415,23 @@ impl RealsenseSrc {
     fn stop_rs_and_reset(&self) -> Result<(), gst::ErrorMessage> {
         let mut internals = self.internals.lock().unwrap();
 
-        match internals.state {
-            State::Started { ref pipeline } => {
-                pipeline.stop().map_err(|e| {
-                    gst::error_msg!(
-                        gst::StreamError::Failed,
-                        ["RealSense pipeline could not be stopped: {:?}", e]
-                    )
-                })?;
-            }
-            State::Stopped => {
-                unreachable!("Stop is requested even though the element has not yet started");
-            }
-        }
+        internals.pipeline.as_ref().unwrap().stop().map_err(|e| {
+            gst::error_msg!(
+                gst::StreamError::Failed,
+                ["RealSense pipeline could not be stopped: {:?}", e]
+            )
+        })?;
 
-        // Hardware reset the device if it was used during streaming
-        if let Some(device) = &internals.device {
+        let settings = self.settings.read().unwrap();
+        if let Some(serial) = &settings.serial {
+            // Hardware reset the device if it was used during streaming
+            let device = Self::find_device(internals.context.as_ref().unwrap(), serial)?;
             if let Err(err) = device.hardware_reset() {
                 gst_warning!(CAT, "Could not perform a hardware reset: {}", err);
             }
         }
 
         *internals = Default::default();
-
-        let mut block = self.align_processing_block.lock().unwrap();
-        *block = Default::default();
-
         Ok(())
     }
 }

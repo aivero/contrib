@@ -7,8 +7,8 @@ use crate::pipeline::Pipeline;
 use crate::pipeline_profile::PipelineProfile;
 use crate::sensor::Sensor;
 use crate::stream_profile::{StreamData, StreamResolution};
-use rs2::rs2_camera_info::*;
 
+use rs2::rs2_camera_info::*;
 use rs2::rs2_l500_visual_preset::*;
 use rs2::rs2_option::*;
 use rs2::rs2_rs400_visual_preset::*;
@@ -20,9 +20,9 @@ use rs2::rs2_sr300_visual_preset::*;
 /// * `Ok()` on success.
 /// * `Err(Error)` on failure.
 pub fn list_connected_devices() -> Result<(), Error> {
-    let context = Context::new()?;
+    let context = Context::create()?;
     let devices = context.query_devices()?;
-    let device_count = devices.len();
+    let device_count = devices.count()?;
     println!("-------------------------");
     if device_count == 0 {
         println!("No RealSense device is connected.");
@@ -31,7 +31,8 @@ pub fn list_connected_devices() -> Result<(), Error> {
             "The following {} RealSense devices are connected:",
             device_count
         );
-        for device in devices.iter() {
+        for i in 0..device_count {
+            let device = devices.create_device(i)?;
             let name = device.get_info(RS2_CAMERA_INFO_NAME)?;
             let serial = device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)?;
             let version = device.get_info(RS2_CAMERA_INFO_FIRMWARE_VERSION)?;
@@ -58,16 +59,17 @@ pub fn list_connected_devices() -> Result<(), Error> {
 /// # Returns
 /// * `Ok(Pipeline)` on success.
 /// * `Err(Error)` on failure.
-pub fn start_device_with_index(config: &mut Config, index: usize) -> Result<Pipeline, Error> {
-    let context = Context::new()?;
+pub fn start_device_with_index(config: &mut Config, index: i32) -> Result<Pipeline, Error> {
+    let context = Context::create()?;
     let devices = context.query_devices()?;
-    let device_count = devices.len();
-    if index + 1 > device_count {
+    let device_count = devices.count()?;
+    if index >= device_count {
         Err(Error::default())
     } else {
-        let serial = devices[index].get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)?;
+        let device = devices.create_device(index)?;
+        let serial = device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)?;
         config.enable_device(&serial)?;
-        let pipeline = Pipeline::new(&context)?;
+        let pipeline = Pipeline::create(&context)?;
         pipeline.start_with_config(config)?;
         Ok(pipeline)
     }
@@ -90,10 +92,9 @@ pub struct StreamInfo {
 /// * `Err(Error)` on failure.
 pub fn get_info_all_streams(pipeline_profile: &PipelineProfile) -> Result<Vec<StreamInfo>, Error> {
     let mut info_all_streams: Vec<StreamInfo> = Vec::new();
-
     let streams = pipeline_profile.get_streams()?;
-
-    for stream_profile in streams.iter() {
+    for i in 0..streams.count()? {
+        let stream_profile = streams.get(i)?;
         let stream_data = stream_profile.get_data()?;
         let stream_resolution = stream_profile.get_resolution()?;
         info_all_streams.push(StreamInfo {
@@ -101,7 +102,6 @@ pub fn get_info_all_streams(pipeline_profile: &PipelineProfile) -> Result<Vec<St
             resolution: stream_resolution,
         })
     }
-
     Ok(info_all_streams)
 }
 

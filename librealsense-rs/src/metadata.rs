@@ -40,6 +40,13 @@ pub enum MetadataAttribute {
         rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_POWER_LINE_FREQUENCY as isize,
     LowLightCompensation =
         rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_LOW_LIGHT_COMPENSATION as isize,
+    FrameEmitterMode = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_FRAME_EMITTER_MODE as isize,
+    FrameLedPower = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_FRAME_LED_POWER as isize,
+    RawFrameSize = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_RAW_FRAME_SIZE as isize,
+    GpioInputData = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_GPIO_INPUT_DATA as isize,
+    SequenceName = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_SEQUENCE_NAME as isize,
+    SequenceId = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_SEQUENCE_ID as isize,
+    SequenceSize = rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_SEQUENCE_SIZE as isize,
 }
 
 #[derive(Debug, Default)]
@@ -73,6 +80,13 @@ pub struct Metadata {
     pub manual_white_balance: Option<i64>,
     pub power_line_frequency: Option<i64>,
     pub low_light_compensation: Option<i64>,
+    pub frame_emitter_mode: Option<i64>,
+    pub frame_led_power: Option<i64>,
+    pub raw_frame_size: Option<i64>,
+    pub gpio_input_data: Option<i64>,
+    pub sequence_name: Option<i64>,
+    pub sequence_id: Option<i64>,
+    pub sequence_size: Option<i64>,
 }
 
 impl Metadata {
@@ -168,7 +182,28 @@ impl Metadata {
                 rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_LOW_LIGHT_COMPENSATION => {
                     md.low_light_compensation = Some(*value);
                 }
-                _ => unreachable!("An invalid RealSense metadata_value was found!"),
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_FRAME_EMITTER_MODE => {
+                    md.frame_emitter_mode = Some(*value);
+                }
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_FRAME_LED_POWER => {
+                    md.frame_led_power = Some(*value);
+                }
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_RAW_FRAME_SIZE => {
+                    md.raw_frame_size = Some(*value);
+                }
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_GPIO_INPUT_DATA => {
+                    md.gpio_input_data = Some(*value);
+                }
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_SEQUENCE_NAME => {
+                    md.sequence_name = Some(*value);
+                }
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_SEQUENCE_ID => {
+                    md.sequence_id = Some(*value);
+                }
+                rs2::rs2_frame_metadata_value_RS2_FRAME_METADATA_SEQUENCE_SIZE => {
+                    md.sequence_size = Some(*value);
+                }
+                _ => {}
             }
         }
         md

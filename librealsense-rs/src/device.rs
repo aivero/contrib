@@ -2,35 +2,63 @@
 // Copyright(c) 2019 Aivero. All Rights Reserved.
 use crate::error::Error;
 use crate::low_level_utils::cstring_to_string;
-use crate::sensor::{Sensor, SensorList};
+use crate::sensor::SensorList;
 
 // Expose `rs2_camera_info` for external use.
 pub use rs2::rs2_camera_info;
 
-pub struct DeviceList {
-    pub(crate) handle: *mut rs2::rs2_device_list,
-}
+pub struct DeviceList(pub(crate) *mut rs2::rs2_device_list);
 
 impl Drop for DeviceList {
     fn drop(&mut self) {
-        unsafe {
-            rs2::rs2_delete_device_list(self.handle);
-        }
+        unsafe { rs2::rs2_delete_device_list(self.0) }
+    }
+}
+
+impl From<*mut rs2::rs2_device_list> for DeviceList {
+    fn from(d: *mut rs2::rs2_device_list) -> Self {
+        DeviceList(d)
+    }
+}
+
+impl DeviceList {
+    /// Determines number of devices in a list.
+    ///
+    /// # Returns
+    /// * `Ok(i32)` on success.
+    /// * `Err(Error)` on failure.
+    pub fn count(&self) -> Result<i32, Error> {
+        Error::call1(rs2::rs2_get_device_count, self.0)
+    }
+
+    /// Creates a device by index. The device object represents a physical camera and provides
+    /// the means to manipulate it.
+    ///
+    /// # Arguments
+    /// * `index` - The zero based index of device to retrieve.
+    ///
+    /// # Returns
+    /// * `Ok(Device)` on success.
+    /// * `Err(Error)` on failure.
+    pub fn create_device(&self, index: i32) -> Result<Device, Error> {
+        Error::call2(rs2::rs2_create_device, self.0, index)
     }
 }
 
 /// Struct representation of a [`Device`](../device/struct.Device.html) that wraps
 /// around `rs2_device` handle, which exposes the functionality of RealSense devices.
-pub struct Device {
-    pub(crate) handle: *mut rs2::rs2_device,
-}
+pub struct Device(pub(crate) *mut rs2::rs2_device);
 
 /// Safe releasing of the `rs2_device` handle.
 impl Drop for Device {
     fn drop(&mut self) {
-        unsafe {
-            rs2::rs2_delete_device(self.handle);
-        }
+        unsafe { rs2::rs2_delete_device(self.0) }
+    }
+}
+
+impl From<*mut rs2::rs2_device> for Device {
+    fn from(d: *mut rs2::rs2_device) -> Self {
+        Device(d)
     }
 }
 
@@ -43,53 +71,10 @@ impl Device {
     /// [`Device`](../device/struct.Device.html).
     ///
     /// # Returns
-    /// * `Ok(Vec<Sensor>)` on success.
+    /// * `Ok(SensorList)` on success.
     /// * `Err(Error)` on failure.
-    pub fn query_sensors(&self) -> Result<Vec<Sensor>, Error> {
-        let mut error = Error::default();
-        let sensor_list = SensorList {
-            handle: unsafe { rs2::rs2_query_sensors(self.handle, error.inner()) },
-        };
-        error.check()?;
-
-        let mut error = Error::default();
-        let sensor_count = unsafe { rs2::rs2_get_sensors_count(sensor_list.handle, error.inner()) };
-        error.check()?;
-
-        let mut sensors: Vec<Sensor> = Vec::new();
-        sensors.reserve_exact(sensor_count as usize);
-
-        for sensor_index in 0..sensor_count {
-            let mut error = Error::default();
-            sensors.push(Sensor {
-                handle: unsafe {
-                    rs2::rs2_create_sensor(sensor_list.handle, sensor_index, error.inner())
-                },
-            });
-            error.check()?;
-        }
-        Ok(sensors)
-    }
-
-    #[deprecated(
-        since = "0.6.0",
-        note = "Use `query_sensors()` to be consistent with C/C++ API"
-    )]
-    pub fn get_sensors(&self) -> Result<Vec<Sensor>, Error> {
-        self.query_sensors()
-    }
-
-    /// Check if a specific camera `info` is supported by the
-    /// [`Device`](../device/struct.Device.html).
-    ///
-    /// # Arguments
-    /// * `info` - The parameter to check for support.
-    ///
-    /// # Returns
-    /// * `Ok(bool)` on success.
-    /// * `Err(Error)` on failure.
-    pub fn supports_info(&self, _info: rs2_camera_info) -> Result<bool, Error> {
-        unimplemented!()
+    pub fn query_sensors(&self) -> Result<SensorList, Error> {
+        Error::call1(rs2::rs2_query_sensors, self.0)
     }
 
     /// Retrieve camera specific information, like versions of various internal components.
@@ -102,9 +87,7 @@ impl Device {
     /// * `Ok(String)` on success, containing the value under the info field.
     /// * `Err(Error)` on failure.
     pub fn get_info(&self, info: rs2_camera_info) -> Result<String, Error> {
-        let mut error = Error::default();
-        let ret = unsafe { rs2::rs2_get_device_info(self.handle, info, error.inner()) };
-        error.check()?;
+        let ret = Error::call2(rs2::rs2_get_device_info, self.0, info)?;
         Ok(cstring_to_string(ret))
     }
 
@@ -114,46 +97,18 @@ impl Device {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn hardware_reset(&self) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_hardware_reset(self.handle, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call1(rs2::rs2_hardware_reset, self.0)
     }
 
-    /// Update [`Device`](../device/struct.Device.html) to the provided firmware, the
-    /// device must be extendable to `RS2_EXTENSION_UPDATABLE`. This call is executed on the
-    /// caller's thread and it supports progress notifications via the optional callback.
-    ///
-    /// # Arguments
-    /// * `info` - The parameter to check for support.
-    /// * `fw_image` - Firmware image buffer.
-    /// * `fw_image_size` - Firmware image buffer size.
-    /// * `callback` - Optional callback for update progress notifications, the progress value is
-    /// normailzed to 1.
-    /// * `client_data` - Optional client data for the callback.
+    /// Check if Advanced-Mode is enabled
     ///
     /// # Returns
-    /// * `Ok()` on success.
+    /// * `Ok(bool)` on success.
     /// * `Err(Error)` on failure.
-    pub fn update_firmware(&self) -> Result<(), Error> {
-        unimplemented!();
-    }
-
-    /// Send hardware reset request to the [`Device`](../device/struct.Device.html).
-    ///
-    /// # Returns
-    /// * `Ok()` on success.
-    /// * `Err(Error)` on failure.
-    pub fn is_advanced_mode_enabled(&self) -> Result<bool, Error> {
-        let mut error = Error::default();
-        let is_enabled: &mut i32 = &mut (-1);
-        unsafe {
-            rs2::rs2_is_enabled(self.handle, is_enabled as *mut i32, error.inner());
-        }
-        error.check()?;
-        Ok(*is_enabled == 1)
+    pub fn is_enabled(&self) -> Result<bool, Error> {
+        let mut is_enabled: i32 = -1;
+        Error::call2(rs2::rs2_is_enabled, self.0, &mut is_enabled as *mut i32)?;
+        Ok(is_enabled == 1)
     }
 
     /// Enable or disable advanced mode for a [`Device`](../device/struct.Device.html).
@@ -165,12 +120,7 @@ impl Device {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn set_advanced_mode(&self, enable: bool) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe {
-            rs2::rs2_toggle_advanced_mode(self.handle, enable as i32, error.inner());
-        }
-        error.check()?;
-        Ok(())
+        Error::call2(rs2::rs2_toggle_advanced_mode, self.0, enable as i32)
     }
 
     /// Configure device with JSON.
@@ -182,48 +132,12 @@ impl Device {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn load_json(&self, json_content: &str) -> Result<(), Error> {
-        let mut error = Error::default();
-
-        let s = std::ffi::CString::new(json_content).expect("Failed to create CString");
-        unsafe {
-            rs2::rs2_load_json(
-                self.handle,
-                s.as_ptr() as *const std::os::raw::c_void,
-                json_content.len() as u32,
-                error.inner(),
-            );
-        };
-
-        error.check()?;
-        Ok(())
-    }
-
-    /// Configure [`Device`](../device/struct.Device.html) with JSON file specified by
-    /// `json_path`.
-    ///
-    /// # Arguments
-    /// * `json_path` - The absolute path to JSON file.
-    ///
-    /// # Returns
-    /// * `Ok()` on success.
-    /// * `Err(Error)` on failure.
-    pub fn load_json_file_path(&self, json_path: &str) -> Result<(), Error> {
-        if !self.is_advanced_mode_enabled()? {
-            self.set_advanced_mode(true)?;
-        }
-        let json_content = std::fs::read_to_string(json_path).map_err(|err| {
-            Error::new(
-                &format!(
-                    "Cannot read RealSense JSON configuration from file \"{}\" - {}",
-                    json_path, err
-                ),
-                "Device::load_json_file_path()",
-                "json_path",
-                0,
-            )
-        })?;
-        self.load_json(&json_content)?;
-        Ok(())
+        Error::call3(
+            rs2::rs2_load_json,
+            self.0,
+            json_content.as_ptr() as *const std::os::raw::c_void,
+            json_content.len() as u32,
+        )
     }
 
     /// Set the [`Playback`](../record_playback/struct.Playback.html) to work in real time or non
@@ -244,10 +158,11 @@ impl Device {
     /// * `Ok()` on success.
     /// * `Err(Error)` on failure.
     pub fn set_real_time(&self, enable: bool) -> Result<(), Error> {
-        let mut error = Error::default();
-        unsafe { rs2::rs2_playback_device_set_real_time(self.handle, enable as i32, error.inner()) }
-        error.check()?;
-        Ok(())
+        Error::call2(
+            rs2::rs2_playback_device_set_real_time,
+            self.0,
+            enable as i32,
+        )
     }
 
     /// Indicates if playback is in real time mode or non real time.
@@ -257,9 +172,6 @@ impl Device {
     /// * `Ok(bool)` on success, `true` for real time mode and `false` for non real time mode.
     /// * `Err(Error)` on failure.
     pub fn is_real_time(&self) -> Result<bool, Error> {
-        let mut error = Error::default();
-        let ret = unsafe { rs2::rs2_playback_device_is_real_time(self.handle, error.inner()) };
-        error.check()?;
-        Ok(ret != 0)
+        Error::call1(rs2::rs2_playback_device_is_real_time, self.0).map(|r: i32| r != 0)
     }
 }

@@ -135,7 +135,7 @@ pub trait BinExtension {
 
 impl<T> BinExtension for T
 where
-    T: IsA<Bin> + IsA<Element> + IsA<gst::Object> + std::marker::Send,
+    T: IsA<Bin> + IsA<Element> + IsA<gst::Object> + std::marker::Send + std::marker::Sync,
 {
     fn add_iter<Elems, ElemRef>(&self, opt: Add, elements: Elems) -> Result<(), BoolError>
     where
@@ -194,8 +194,13 @@ where
     fn dump_dot_on_important_messages(&self) {
         let _ = self.bus().map(|bus| {
             bus.add_watch({
-                let this = self.clone();
+                let this = self.downgrade();
                 move |_, msg| {
+                    let this = match this.upgrade() {
+                        Some(t) => t,
+                        None => return glib::Continue(false),
+                    };
+
                     msg.dump_dot_if_important(this.upcast_ref());
                     glib::Continue(true)
                 }

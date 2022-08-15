@@ -12,8 +12,12 @@
   before_script:
     - apk add py3-pip  && pip install conan
     - conan config install $CONAN_CONFIG_URL -sf $CONAN_CONFIG_DIR
+    - conan remote remove dev-all
+    - conan remote remove dev-public
+    - conan remote remove dev-internal
     - conan user $CONAN_LOGIN_USERNAME -p $CONAN_LOGIN_PASSWORD -r $CONAN_REPO_ALL
-    - conan user $CONAN_LOGIN_USERNAME -p $CONAN_LOGIN_PASSWORD -r $CONAN_REPO_DEV_ALL
+    - conan user $CONAN_LOGIN_USERNAME -p $CONAN_LOGIN_PASSWORD -r $CONAN_REPO_INTERNAL
+    - conan user $CONAN_LOGIN_USERNAME -p $CONAN_LOGIN_PASSWORD -r $CONAN_REPO_PUBLIC
     - conan config set general.default_profile=linux-x86_64
     - conan install webrtcsink/${CI_COMMIT_REF_NAME}@ -if webrtcsink
   docker:

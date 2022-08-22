@@ -38,3 +38,14 @@ resource_rules:
             - "workflow::unknown-missing"
           comment: |
             {{author}} This issue is missing a workflow label. It needs attention. Please take care of this before the end of #{2.days.from_now.strftime('%Y-%m-%d')}
+      - name: Force a client label
+        conditions:
+          state: opened
+          forbidden_labels:
+            - "client::aivero"
+            - "client::unknown"
+        actions:
+          labels:
+            - "client::unknown"
+          comment: |
+            {{author}} This issue is missing a client label. It needs attention. Please take care of this before the end of #{2.days.from_now.strftime('%Y-%m-%d')}

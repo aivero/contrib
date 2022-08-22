@@ -1,0 +1,40 @@
+resource_rules:
+  issues:
+    rules:
+      - name: Notify creator of all unlabelled issues
+        conditions:
+          date:
+            attribute: updated_at
+            condition: older_than
+            interval_type: days
+            interval: 5
+          state: opened
+          labels:
+            - None
+        actions:
+          labels:
+            - "workflow::unknown-missing"
+          comment: |
+            {{author}} This issue is unlabelled after 5 days. It needs attention. Please take care of this before the end of #{2.days.from_now.strftime('%Y-%m-%d')}
+      - name: Force a workflow label
+        conditions:
+          state: opened
+          forbidden_labels:
+            - "workflow::blocked"
+            - "workflow::design"
+            - "workflow::in dev"
+            - "workflow::in review"
+            - "workflow::on ice❄"
+            - "workflow::planning breakdown"
+            - "workflow::problem validation"
+            - "workflow::ready for development"
+            - "workflow::refinement"
+            - "workflow::solution validation"
+            - "workflow::validation backlog"
+            - "workflow::verification"
+            - "workflow::unknown-missing"
+        actions:
+          labels:
+            - "workflow::unknown-missing"
+          comment: |
+            {{author}} This issue is missing a workflow label. It needs attention. Please take care of this before the end of #{2.days.from_now.strftime('%Y-%m-%d')}

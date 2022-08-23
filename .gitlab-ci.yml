@@ -39,7 +39,7 @@ dry-run:triage:
   script:
     - gem install gitlab-triage
     - gitlab-triage --help
-    - gitlab-triage --dry-run --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
+    - gitlab-triage --dry-run --token $API_TOKEN --source groups --source-id aivero/open-source
   when: manual
   except:
     - schedules
@@ -49,7 +49,7 @@ policy:run:
   stage: build
   script:
     - gem install gitlab-triage
-    - gitlab-triage --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
+    - gitlab-triage --token $API_TOKEN --source groups --source-id aivero/open-source
   when: manual
   except:
     - schedules
@@ -59,6 +59,6 @@ schedule:policyrun:
   stage: build
   script:
     - gem install gitlab-triage
-    - gitlab-triage --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
+    - gitlab-triage --token $API_TOKEN --source groups --source-id aivero/open-source
   only:
     - schedules

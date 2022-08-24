@@ -161,14 +161,14 @@ impl AggregatorImpl for RgbdMux {
         let (duration, first) = {
             let state = self.state.lock().unwrap();
             (
-                RgbdMux::get_duration_from_fps(state.framerate.unwrap()).unwrap(),
+                Self::get_duration_from_fps(state.framerate.unwrap()).unwrap(),
                 state.first,
             )
         };
 
         gst_debug!(
             CAT,
-            "segment position: {:?}, start: {:?}, end: {:?}",
+            "Segment position: {:?}, start: {:?}, end: {:?}",
             segment.position(),
             segment.start(),
             segment.stop()
@@ -222,7 +222,7 @@ impl AggregatorImpl for RgbdMux {
         }
 
         if has_all_buffers_in_range {
-            gst_debug!(CAT, "all buffers in range, muxing");
+            gst_debug!(CAT, "All buffers in range, muxing");
 
             self.advance_segment_position(aggregator);
 
@@ -245,7 +245,7 @@ impl AggregatorImpl for RgbdMux {
 
             Ok(gst::FlowSuccess::Ok)
         } else {
-            gst_debug!(CAT, "need more data");
+            gst_debug!(CAT, "Need more data");
             Err(gst_base::AGGREGATOR_FLOW_NEED_DATA)
         }
     }
@@ -444,16 +444,21 @@ impl RgbdMux {
         let mut segment: gst::FormattedSegment<gst::ClockTime> =
             agg_pad.segment().downcast().unwrap();
 
-        let pts: gst::ClockTime = segment
-            .position()
-            .unwrap_or_else(|| segment.start().unwrap());
+        let start: gst::ClockTime = segment.start().unwrap_or(gst::ClockTime::ZERO);
+        let end: gst::ClockTime = segment.stop().unwrap_or(gst::ClockTime::MAX);
+        let pts: gst::ClockTime = segment.position().unwrap_or(start);
 
-        //todo: Consider bubbling up some error if we fail to get the framerate
         let framerate = self.state.lock().unwrap().framerate.unwrap();
-        let duration = RgbdMux::get_duration_from_fps(framerate);
-        let new_position = pts + duration.unwrap();
-        gst_debug!(CAT, "Advancing Segment to {}", new_position.display());
+        let duration = Self::get_duration_from_fps(framerate);
+        let new_position = if segment.rate() > 0.0 {
+            pts + duration.unwrap()
+        } else {
+            pts - duration.unwrap()
+        };
+
+        let new_position = new_position.clamp(start, end);
         segment.set_position(new_position);
+        gst_debug!(CAT, "Advanced segment to {}", new_position.display());
 
         // https://gstreamer.freedesktop.org/documentation/base/gstaggregator.html?gi-language=c#gst_aggregator_update_segment
         aggregator.update_segment(&segment);
@@ -498,7 +503,7 @@ impl RgbdMux {
             //     valid_buffer
             // }
 
-            if buffer_running_time + buffer_duration  < position_running_time {
+            if buffer_running_time + buffer_duration < position_running_time {
                 sink_pad.drop_buffer();
                 gst_info!(
                     CAT,

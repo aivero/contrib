@@ -40,7 +40,7 @@ class GstVaapi(GstRecipe):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 and https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2432 are tagged we need to use a commit of the main branch
             self.get(
-                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/ab459f0528d8eba17589c8a8582b69a166616384.tar.gz"
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/11e4eb5490de11d3680d4ca875bbec6b0d751017.tar.gz"
             )
         else:
             self.get(

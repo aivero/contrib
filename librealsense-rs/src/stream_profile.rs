@@ -81,7 +81,7 @@ impl Default for StreamData {
 
 /// Helper struct that contains resolution from
 /// [`StreamResolution`](../stream_profile/struct.StreamResolution.html).
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub struct StreamResolution {
     pub width: i32,
     pub height: i32,

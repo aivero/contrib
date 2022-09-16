@@ -18,7 +18,7 @@
 use serde::{Deserialize, Serialize};
 
 /// List of all intrinsics and extrinsics for a calibrated camera setup.
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
 pub struct DDDQRoiMeta {
     pub x: u16,
     pub y: u16,

@@ -4,7 +4,7 @@ use std::borrow::Cow;
 /// RvlError represents all possible errors that may occur during RVL encoding in GStreamer.
 /// It can convert into a multitude of GStreamer errors, in the attempt of making it convenient
 /// to use, while requiring as little boilerplate as possible.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RgbdError {
     /// No video info is available et, but an operation that required video info have been attempted.
     NoVideoInfo,

@@ -602,12 +602,10 @@ impl RgbdMux {
                 BufferMeta::add(main_buffer, &mut buffer);
                 Ok(())
             }
-            None => {
-                return Err(gst::error_msg!(
-                    gst::CoreError::Pad,
-                    ["No buffer is queued on auxiliary `{}` pad.", stream_name]
-                ))
-            }
+            None => Err(gst::error_msg!(
+                gst::CoreError::Pad,
+                ["No buffer is queued on auxiliary `{}` pad.", stream_name]
+            )),
         }
     }
 

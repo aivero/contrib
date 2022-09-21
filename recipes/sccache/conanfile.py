@@ -4,7 +4,7 @@ from build import *
 class SccacheRecipe(RustRecipe):
     description = "Development and debugging tools for GStreamer"
     license = "Apache"
-    build_requires = ("pkgconf/[^1.7.3]", )
+    build_requires = ("pkgconf/[^1.7.3]",)
     requires = ()
 
     def requirements(self):
@@ -12,9 +12,10 @@ class SccacheRecipe(RustRecipe):
         self.requires(f"rustc/[~{self.settings.rust}]")
 
     def source(self):
-        self.get(
-            f"https://github.com/mozilla/sccache/archive/{self.version}.tar.gz"
-        )
+        self.get(f"https://github.com/mozilla/sccache/archive/{self.version}.tar.gz")
 
     def package_info(self):
         self.env_info.RUSTC_WRAPPER = "sccache"
+
+    def build(self):
+        self.cargo(test=False)

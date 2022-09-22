@@ -18,6 +18,7 @@ class LibVpx(Recipe):
             "--disable-examples",
             "--disable-install-docs",
             "--disable-install-srcs",
+            "--enable-vp9-highbitdepth",
         ]
         if self.options.shared:
             args.append("--enable-shared")

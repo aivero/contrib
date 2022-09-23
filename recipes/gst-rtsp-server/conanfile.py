@@ -19,7 +19,7 @@ class GstRtspServer(GstRecipe):
     )
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[>=0.51.2]",
+        "meson/[>=0.62.0]",
         "bison/[^3.3]",
         "flex/[^2.6.4]",
         "gobject-introspection/[^1.59.3]",

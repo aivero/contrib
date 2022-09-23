@@ -33,7 +33,7 @@ class GstEditingServices(GstRecipe):
     )
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[>=0.55.3]",
+        "meson/[>=0.62.0]",
         "flex/[^2.6.4]",
         "m4/[^1.4.18]",
     )

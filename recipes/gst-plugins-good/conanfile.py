@@ -50,7 +50,7 @@ class GstPluginsGood(GstRecipe):
 
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[>=0.57.2]",
+        "meson/[>=0.62.0]",
         "git/[^2.30.0]",
     )
 

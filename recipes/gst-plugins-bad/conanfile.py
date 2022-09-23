@@ -53,7 +53,7 @@ class GstPluginsBad(GstRecipe):
 
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[>=0.55.3]",
+        "meson/[>=0.62.0]",
         "gobject-introspection/[^1.69.0]",
     )
     requires = ("libnice/[^0.1.18]",)

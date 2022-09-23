@@ -26,7 +26,7 @@ class GstVaapi(GstRecipe):
     build_requires = (
         "cc/[^1.0.0]",
         "gobject-introspection/[^1.59.3]",
-        "meson/[>=0.55.3]",
+        "meson/[>=0.62.0]",
     )
     requires = (
         "intel-media-driver/[^22.4.3]",

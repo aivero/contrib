@@ -19,7 +19,7 @@ class GstPluginsBase(GstRecipe):
     )
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[>=0.55.3]",
+        "meson/[>=0.62.0]",
     )
     requires = (
         "opus/[^1.3.1]",

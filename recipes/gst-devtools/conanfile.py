@@ -30,7 +30,7 @@ class GstDevtools(GstRecipe):
         if "1.21" in self.version:
             # until the changes from https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2132 and https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/2432 are tagged we need to use a commit of the main branch
             self.get(
-                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/11e4eb5490de11d3680d4ca875bbec6b0d751017.tar.gz"
+                f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/f8d8d67b8bc61fddd64ff648abd363d893a235a9.tar.gz"
             )
         else:
             self.get(

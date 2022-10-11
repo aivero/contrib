@@ -88,9 +88,12 @@ class GstPluginsGood(GstRecipe):
         )
 
         if "1.21" in self.version:
+            # A commit cherry-picked from gstreamer main. Remove once 1.21.1 is no longer the
+            # latest version
+            self.patch("0001-splitmuxsrc-don-t-queue-data-on-unlinked-pads.patch")
+
             # Add our own custom changes
             self.patch("0001-matroska-Support-any-tag-1.21.0.patch")
-            self.patch("2250.patch")
             self.patch("0001-v4l2deviceprovider-Return-device-even-if-caps-is-EMP.patch")
             if self.options.aivero_rvl_matroska:
                 self.patch("0002-matroska-add-support-for-custom-video-rvl-depth-map-1.21.0.patch")

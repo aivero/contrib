@@ -1,7 +1,7 @@
 FROM lukechannings/deno:v1.14.3 AS deno
 FROM arm64v8/ubuntu:focal AS builder
 RUN apt update && \
-  apt install --no-install-recommends -y python3-pip python3-setuptools && \
+  apt install --no-install-recommends -y python3-pip python3-setuptools curl && \
   pip3 install --upgrade conan
 FROM arm64v8/ubuntu:focal
 COPY --from=builder /usr/local/bin/conan /usr/local/bin/conan

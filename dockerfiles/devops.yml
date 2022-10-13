@@ -1,4 +1,4 @@
-- name: alpine-armv8
+- name: alpine-armv8-bootstrap
   profiles: 
     - linux-armv8-bootstrap
   docker:
@@ -10,7 +10,7 @@
   docker:
     file: alpine-armv8.Dockerfile
 
-- name: alpine-x86_64
+- name: alpine-x86_64-bootstrap
   profiles: 
     - linux-x86_64-bootstrap
   docker:
@@ -29,7 +29,7 @@
   docker:
     file: alpine-x86_64.Dockerfile
 
-- name: focal-armv8
+- name: focal-armv8-bootstrap
   profiles: 
     - linux-armv8-bootstrap
   docker:
@@ -47,7 +47,7 @@
   docker:
     file: focal-x86_64-balena.Dockerfile
 
-- name: focal-x86_64
+- name: focal-x86_64-bootstrap
   profiles: 
     - linux-x86_64-bootstrap
   docker:

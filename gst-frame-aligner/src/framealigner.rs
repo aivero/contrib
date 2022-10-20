@@ -18,6 +18,7 @@
 
 use crate::common::*;
 
+use gst::glib;
 use gst::subclass::prelude::*;
 use gst_base::prelude::*;
 use gst_base::subclass::prelude::*;
@@ -393,7 +394,12 @@ impl ObjectImpl for FrameAligner {
     /// * `id` - Object properties index in PROPERTIES struct
     /// # Returns
     /// *`Value` - Properties of given object.
-    fn property(&self, _obj: &Self::Type, _id: usize, pspec: &glib::ParamSpec) -> glib::Value {
+    fn property(
+        &self,
+        _obj: &Self::Type,
+        _id: usize,
+        pspec: &glib::ParamSpec,
+    ) -> glib::Value {
         let state = &self.state.lock().unwrap();
         match pspec.name() {
             "depth-factor" => state.depth_factor.to_value(),

@@ -13,7 +13,6 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA 02110-1301, USA.
 
-extern crate glib;
 #[macro_use]
 extern crate gst;
 extern crate gst_base;
@@ -34,7 +33,7 @@ mod timestamps;
 
 static TAGS: Once = Once::new();
 
-fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
+fn plugin_init(plugin: &gst::Plugin) -> Result<(), gst::glib::BoolError> {
     #[cfg(feature = "libk4a")]
     k4a::k4asrc::register(plugin)?;
     #[cfg(feature = "librealsense2")]

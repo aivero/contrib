@@ -17,7 +17,7 @@
 use crate::element::*;
 use crate::message::*;
 use crate::orelse;
-use glib::*;
+use gst::glib::*;
 use gst::prelude::*;
 use gst::*;
 

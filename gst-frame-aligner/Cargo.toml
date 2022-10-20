@@ -10,7 +10,6 @@ edition = "2018"
 readme = "README.md"
 
 [dependencies]
-glib = "0.15"
 gst-depth-meta = { path = "../gst-depth-meta-rs" }
 gst = { package = "gstreamer", version = "0.18" }
 gst-base = { package = "gstreamer-base", version = "0.18" }

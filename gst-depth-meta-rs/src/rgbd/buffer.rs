@@ -14,6 +14,7 @@
 // Boston, MA 02110-1301, USA.
 
 use glib::translate::from_glib;
+use gst::glib;
 use gst::meta::*;
 use gst::BufferRef;
 use std::fmt;

@@ -8,7 +8,6 @@ edition = "2018"
 
 [dependencies]
 glib-sys = "0.15.1"
-glib = "0.15"
 gst = { package = "gstreamer", version = "0.18" }
 gst-sys = { package = "gstreamer-sys", version = "0.18" }
 gst-video = { package = "gstreamer-video", version = "0.18" }

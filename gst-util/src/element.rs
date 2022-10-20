@@ -15,9 +15,9 @@
 // Boston, MA 02110-1301, USA.
 
 use crate::orelse;
-use glib::translate::*;
-use glib::value::*;
-use glib::*;
+use gst::glib::translate::*;
+use gst::glib::value::*;
+use gst::glib::*;
 use gst::prelude::*;
 use gst::*;
 use gst_sdp::*;

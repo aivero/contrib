@@ -16,7 +16,6 @@
  * from Aivero AS.
  */
 
-extern crate glib;
 #[macro_use]
 extern crate gst;
 extern crate gst_base;
@@ -28,6 +27,8 @@ extern crate lazy_static;
 
 mod common;
 mod framealigner;
+
+use gst::glib;
 
 fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
     framealigner::register(plugin)?;

@@ -16,6 +16,7 @@
  * from Aivero AS.
  */
 
+use gst::glib;
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};

@@ -27,12 +27,12 @@
 /// * If `value` contains type that is different from `T`.
 pub fn get_property_and_debug<'a, T>(
     cat: gst::DebugCategory,
-    value: &'a glib::Value,
+    value: &'a gst::glib::Value,
     property_name: &str,
     old_value: T,
 ) -> T
 where
-    T: std::fmt::Display + glib::value::FromValue<'a>,
+    T: std::fmt::Display + gst::glib::value::FromValue<'a>,
 {
     let t = value.get::<T>().unwrap();
     gst_info!(

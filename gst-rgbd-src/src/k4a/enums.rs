@@ -16,6 +16,7 @@
 
 use super::error::K4aSrcError;
 use glib::*;
+use gst::glib;
 use libk4a::{DepthMode, ImageFormat};
 use std::convert::TryFrom;
 

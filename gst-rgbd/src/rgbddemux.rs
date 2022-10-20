@@ -15,6 +15,7 @@
 // Boston, MA 02110-1301, USA.
 
 use glib::*;
+use gst::glib;
 use gst::subclass::prelude::*;
 use gst::{prelude::*, TagList};
 use gst_depth_meta::rgbd;

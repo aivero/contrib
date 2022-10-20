@@ -14,6 +14,7 @@
 // Boston, MA 02110-1301, USA.
 
 use glib::*;
+use gst::glib;
 
 /// Timestamp mode, which is used to determine the timestamps of outgoing buffers.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Enum)]

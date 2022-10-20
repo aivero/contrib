@@ -22,7 +22,6 @@ default = [ "libk4a", "librealsense2" ]
 
 [dependencies]
 capnp = "0.14.0"
-glib = "0.15"
 gobject-sys = "0.10"
 gst = { package = "gstreamer", version = "0.18" }
 gst-base = { package = "gstreamer-base", version = "0.18" }

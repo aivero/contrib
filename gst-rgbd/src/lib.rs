@@ -14,7 +14,6 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA 02110-1301, USA.
 
-extern crate glib;
 #[macro_use]
 extern crate gst;
 extern crate gst_base;
@@ -26,7 +25,7 @@ mod common;
 mod rgbddemux;
 mod rgbdmux;
 
-fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
+fn plugin_init(plugin: &gst::Plugin) -> Result<(), gst::glib::BoolError> {
     rgbddemux::register(plugin)?;
     rgbdmux::register(plugin)?;
     Ok(())

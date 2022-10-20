@@ -10,7 +10,6 @@ edition = "2018"
 readme = "README.md"
 
 [dependencies]
-glib = "0.15"
 gst = { package = "gstreamer", version = "0.18" }
 gst_sdp = { package = "gstreamer-sdp", version = "0.18" }
 

@@ -19,6 +19,7 @@ use std::convert::TryInto;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, RwLock};
 
+use gst::glib;
 use gst::subclass::prelude::*;
 use gst_base::prelude::*;
 use gst_base::subclass::base_src::CreateSuccess;

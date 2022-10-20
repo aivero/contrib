@@ -14,6 +14,7 @@
 // Boston, MA 02110-1301, USA.
 
 use glib::*;
+use gst::glib;
 use std::fmt::{Display, Formatter};
 
 use super::settings::EnabledStreams;

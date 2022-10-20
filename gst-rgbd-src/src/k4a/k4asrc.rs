@@ -24,6 +24,7 @@ use super::utilities::*;
 use crate::timestamps::*;
 use camera_meta::Distortion;
 
+use gst::glib;
 use gst::subclass::prelude::*;
 use gst_base::prelude::*;
 use gst_base::subclass::base_src::CreateSuccess;

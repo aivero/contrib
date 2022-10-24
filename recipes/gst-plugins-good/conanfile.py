@@ -97,6 +97,8 @@ class GstPluginsGood(GstRecipe):
             self.patch("0001-v4l2deviceprovider-Return-device-even-if-caps-is-EMP.patch")
             if self.options.aivero_rvl_matroska:
                 self.patch("0002-matroska-add-support-for-custom-video-rvl-depth-map-1.21.0.patch")
+
+            self.patch("0003-v4l2src-video-bitrate-control-1.21.0.patch")
         else:
             # Add our own custom changes
             self.patch("0001-matroska-Support-any-tag-1.20.0.patch")

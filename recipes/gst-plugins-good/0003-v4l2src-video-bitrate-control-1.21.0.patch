@@ -1,0 +1,12 @@
+diff --git a/subprojects/gst-plugins-good/sys/v4l2/v4l2_calls.c b/subprojects/gst-plugins-good/sys/v4l2/v4l2_calls.c
+index cb37ea781b..88b66e5f2b 100644
+--- a/subprojects/gst-plugins-good/sys/v4l2/v4l2_calls.c
++++ b/subprojects/gst-plugins-good/sys/v4l2/v4l2_calls.c
+@@ -361,6 +361,7 @@ gst_v4l2_fill_lists (GstV4l2Object * v4l2object)
+       case V4L2_CID_AUTOGAIN:
+       case V4L2_CID_GAIN:
+       case V4L2_CID_SHARPNESS:
++      case V4L2_CID_MPEG_VIDEO_BITRATE:
+         /* we only handle these for now (why?) */
+         break;
+       case V4L2_CID_HFLIP:

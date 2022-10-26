@@ -16,12 +16,6 @@ gst_sdp = { package = "gstreamer-sdp", version = "0.18" }
 [build-dependencies]
 gst-plugin-version-helper = "0.2.0"
 
-# Run `cargo fmt -- --check` and `cargo clippy -- -D warnings` before commits
-[dev-dependencies.cargo-husky]
-version = "1.5.0"
-default-features = false # Disable features which are enabled by default
-features = ["precommit-hook", "run-cargo-fmt", "run-cargo-clippy"]
-
 [lib]
 crate-type = ["rlib"]
 path = "src/lib.rs"

@@ -26,12 +26,6 @@ capnpc = "0.14.2"
 [dev-dependencies]
 rand = "0.8.2"
 
-# Run `cargo fmt -- --check` and `cargo clippy -- -D warnings` before commits
-[dev-dependencies.cargo-husky]
-version = "1.5.0"
-default-features = false # Disable features which are enabled by default
-features = ["precommit-hook", "run-cargo-fmt", "run-cargo-clippy"]
-
 [lib]
 crate-type = ["rlib"]
 path = "src/lib.rs"

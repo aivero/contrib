@@ -70,7 +70,7 @@ class Llvm(Recipe):
         defs["LLVM_INSTALL_BINUTILS_SYMLINKS"] = True
         defs["LLVM_INSTALL_UTILS"] = True
 
-        defs["LLVM_ENABLE_PROJECTS"] = "llvm;clang;lld;compiler-rt;libcxx;libcxxabi;libunwind"
+        defs["LLVM_ENABLE_PROJECTS"] = "llvm;clang;lld;lldb;compiler-rt;libcxx;libcxxabi;libunwind"
 
         # clang options
         defs["CLANG_VENDOR"] = "Aivero"
@@ -236,6 +236,7 @@ class Llvm(Recipe):
             "install-llvm-libraries",
             "install-llvm-headers",
             "install-llvm-dwp",
+            "install-lldb",
         ]
         # Stage 2 build (lld, clang, libcxx, libcxxabi)
         self.cmake(

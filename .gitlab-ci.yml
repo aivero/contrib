@@ -6,7 +6,7 @@ generate-config:
   tags: [x86_64,aws]
   stage: build
   rules:
-    - if: '$PACKAGE_MANAGER_SET == null && $CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$PACKAGE_MANAGER_SET == null && $CI_PIPELINE_SOURCE != "merge_request_event" && $TRIAGE_BOT_SCHEDULED == null'
   variables:
     CICD_BRANCH: stable
     GIT_DEPTH: 0
@@ -24,7 +24,7 @@ generate-config:
 child-pipeline:
   stage: test
   rules:
-    - if: '$PACKAGE_MANAGER_SET == null && $CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$PACKAGE_MANAGER_SET == null && $CI_PIPELINE_SOURCE != "merge_request_event" && $TRIAGE_BOT_SCHEDULED == null'
   trigger:
     strategy: depend
     include:
@@ -40,9 +40,9 @@ dry-run:triage:
     - gem install gitlab-triage
     - gitlab-triage --help
     - gitlab-triage --dry-run --token $API_TOKEN --source groups --source-id aivero/open-source
-  when: manual
-  except:
-    - schedules
+  rules:
+    - if: '$TRIAGE_BOT_SCHEDULED != null && $CI_PIPELINE_SOURCE != "schedule"'
+      when: manual
 
 policy:run:
   image: ruby
@@ -50,9 +50,9 @@ policy:run:
   script:
     - gem install gitlab-triage
     - gitlab-triage --token $API_TOKEN --source groups --source-id aivero/open-source
-  when: manual
-  except:
-    - schedules
+  rules:
+    - if: '$TRIAGE_BOT_SCHEDULED != null && $CI_PIPELINE_SOURCE != "schedule"'
+      when: manual
 
 schedule:policyrun:
   image: ruby

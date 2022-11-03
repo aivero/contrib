@@ -236,6 +236,7 @@ class Llvm(Recipe):
             "install-llvm-libraries",
             "install-llvm-headers",
             "install-llvm-dwp",
+            "install-liblldb",
             "install-lldb",
         ]
         # Stage 2 build (lld, clang, libcxx, libcxxabi)

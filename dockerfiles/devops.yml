@@ -41,7 +41,7 @@
   docker:
     file: focal-armv8.Dockerfile
 
-- name: focal
+- name: focal-balena
   profiles: 
     - linux-x86_64
   docker:

@@ -22,13 +22,6 @@
   docker:
     file: alpine-x86_64-bootstrap.Dockerfile
 
-- name: alpine-openssl
-  version: "3.15"
-  profiles:
-    - linux-x86_64
-  docker:
-    file: alpine-x86_64-openssl.Dockerfile
-
 - name: alpine-balena-chrony
   version: "3.15-4.1-r0"
   profiles:
@@ -42,6 +35,13 @@
     file: chrony/alpine-x86_64-chrony.Dockerfile
   profiles:
     - linux-x86_64
+
+- name: alpine-openssl
+  version: "3.15"
+  profiles:
+    - linux-x86_64
+  docker:
+    file: alpine-x86_64-openssl.Dockerfile
 
 - name: alpine-vsftpd
   version: "3.8"

@@ -1,14 +1,20 @@
 - name: alpine
   profiles:
+    - linux-armv8
+  docker:
+    file: alpine-armv8.Dockerfile
+
+- name: alpine
+  profiles:
     - linux-armv8-bootstrap
   docker:
     file: alpine-armv8-bootstrap.Dockerfile
 
 - name: alpine
   profiles:
-    - linux-armv8
+    - linux-x86_64
   docker:
-    file: alpine-armv8.Dockerfile
+    file: alpine-x86_64.Dockerfile
 
 - name: alpine
   profiles:
@@ -23,11 +29,26 @@
   docker:
     file: alpine-x86_64-openssl.Dockerfile
 
-- name: alpine
+- name: alpine-balena-chrony
+  version: "3.15-4.1-r0"
+  profiles:
+    - linux-armv8
+  docker:
+    file: chrony/alpine-balena-arm64-chrony.Dockerfile
+
+- name: alpine-chrony
+  version: "3.15-4.1-r0"
+  docker:
+    file: chrony/alpine-x86_64-chrony.Dockerfile
   profiles:
     - linux-x86_64
+
+- name: alpine-vsftpd
+  version: "3.8"
+  profiles:
+    - linux-armv8
   docker:
-    file: alpine-x86_64.Dockerfile
+    file: vsftpd/Dockerfile
 
 - name: focal
   profiles:
@@ -41,12 +62,6 @@
   docker:
     file: focal-armv8.Dockerfile
 
-- name: focal-balena
-  profiles:
-    - linux-x86_64
-  docker:
-    file: focal-x86_64-balena.Dockerfile
-
 - name: focal
   profiles:
     - linux-x86_64-bootstrap
@@ -59,23 +74,8 @@
   docker:
     file: focal-x86_64.Dockerfile
 
-- name: alpine-chrony
-  version: "3.15-4.1-r0"
-  docker:
-    file: chrony/alpine-x86_64-chrony.Dockerfile
+- name: focal-balena
   profiles:
     - linux-x86_64
-
-- name: alpine-balena-chrony
-  version: "3.15-4.1-r0"
-  profiles:
-    - linux-armv8
   docker:
-    file: chrony/alpine-balena-arm64-chrony.Dockerfile
-
-- name: alpine-vsftpd
-  version: "3.8"
-  profiles:
-    - linux-armv8
-  docker:
-    file: vsftpd/Dockerfile
+    file: focal-x86_64-balena.Dockerfile

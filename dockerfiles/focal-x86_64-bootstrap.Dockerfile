@@ -11,7 +11,3 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
   apt install --no-install-recommends -y make clang gcc libc6-dev cmake git gawk bison flex rsync valac python3-minimal python3-pkg-resources python3-distutils && \
   rm -rf /var/lib/apt/lists/*
-RUN deno run --unstable --allow-all --import-map \
-  https://gitlab.com/aivero/open-source/cicd/-/raw/stable/import_map.json \
-  https://gitlab.com/aivero/open-source/cicd/-/raw/stable/lib/es6/src/GenerateConfig.js || true
-

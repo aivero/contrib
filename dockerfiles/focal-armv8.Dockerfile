@@ -10,3 +10,6 @@ COPY --from=deno /bin/deno /usr/bin/deno
 RUN apt update && \
   apt install --no-install-recommends -y libc6-dev libatomic1 python3-minimal python3-pkg-resources ca-certificates git git-lfs curl && \
   rm -rf /var/lib/apt/lists/*
+RUN deno run --unstable --allow-all --import-map \
+  https://gitlab.com/aivero/open-source/cicd/-/raw/stable/import_map.json \
+  https://gitlab.com/aivero/open-source/cicd/-/raw/stable/lib/es6/src/GenerateConfig.js || true

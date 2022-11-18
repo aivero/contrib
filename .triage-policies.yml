@@ -20,9 +20,8 @@ resource_rules:
         conditions:
           state: opened
           forbidden_labels:
-            - "workflow::validation backlog"
-            - "workflow::problem validation"
-            - "workflow::solution validation"
+            - "workflow::discovery backlog"
+            - "workflow::discovery"
             - "workflow::planning breakdown"
             - "workflow::refinement"
             - "workflow::scheduling"

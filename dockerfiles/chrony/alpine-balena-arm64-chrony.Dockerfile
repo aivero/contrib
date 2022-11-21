@@ -8,4 +8,4 @@ EXPOSE 123/udp
 # let docker know how to test container health
 HEALTHCHECK CMD chronyc tracking || exit 1
 # See https://chrony.tuxfamily.org/doc/4.2/chronyd.html
-CMD [ "/usr/sbin/chronyd", "-u", "chrony", "-d"]
+ENTRYPOINT [ "/usr/sbin/chronyd", "-u", "chrony", "-d"]

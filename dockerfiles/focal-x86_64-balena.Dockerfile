@@ -1,5 +1,5 @@
 # docker build -t registry.gitlab.com/aivero/open-source/contrib/focal-x86_64-balena/linux-x86_64 -f focal-x86_64-balena.Dockerfile .
-FROM ubuntu:focal
+FROM gitlab.com:443/aivero/dependency_proxy/containers/ubuntu:focal
 
 RUN apt-get update && apt-get install --no-install-recommends -y wget unzip ca-certificates curl gnupg lsb-release jq && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \

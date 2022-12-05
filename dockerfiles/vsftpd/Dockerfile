@@ -1,7 +1,7 @@
 # docker build --build-arg ALPINE_VERSION=latest --build-arg USER_NAME=deepcore -t registry.gitlab.com/aivero/open-source/contrib/alpine-vsftpd/linux-armv8:3.8 -f vsftpd/Dockerfile .
 
 ARG ALPINE_VERSION=3.8
-FROM gitlab.com:443/aivero/dependency_proxy/containers/arm64v8/alpine:$ALPINE_VERSION
+FROM arm64v8/alpine:$ALPINE_VERSION
 LABEL org.opencontainers.image.source https://registry.gitlab.com/aivero/open-source/contrib/docker-alpine-vsftpd
 RUN apk add --no-cache vsftpd
 

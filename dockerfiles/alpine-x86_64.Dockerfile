@@ -1,3 +1,3 @@
-FROM gitlab.com:443/aivero/dependency_proxy/containers/alpine:latest
+FROM alpine:latest
 RUN apk add --no-cache py3-pip
 RUN pip3 install --ignore-installed conan

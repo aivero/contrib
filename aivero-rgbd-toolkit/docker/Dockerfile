@@ -2,7 +2,7 @@
 
 ARG OS_VERSION=focal
 
-FROM ubuntu:$OS_VERSION
+FROM gitlab.com:443/aivero/dependency_proxy/containers/ubuntu:$OS_VERSION
 
 RUN apt-get update && \
   apt-get install --no-install-recommends -y python3-pip python3-setuptools python3-dev python3-venv python3-wheel git && \

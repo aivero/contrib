@@ -21,9 +21,6 @@ generate-config:
       - build_order.json
       - lock.bundle
       - "*.lock"
-  cache:
-    paths:
-      - deno
 
 child-pipeline:
   stage: test

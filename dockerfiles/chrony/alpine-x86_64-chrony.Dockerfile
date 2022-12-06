@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM --platform=linux/amd64 gitlab.com:443/aivero/dependency_proxy/containers/amd64/alpine:3.15
 RUN apk add --no-cache chrony=4.1-r0
 
 RUN mkdir -p /var/lib/chrony/drift && chown -R chrony:chrony /var/lib/chrony/drift

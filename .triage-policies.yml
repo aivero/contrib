@@ -21,10 +21,8 @@ resource_rules:
           state: opened
           forbidden_labels:
             - "workflow::discovery backlog"
-            - "workflow::discovery"
-            - "workflow::planning breakdown"
-            - "workflow::refinement"
-            - "workflow::scheduling"
+            - "workflow::breakdown"
+            - "workflow::estimation"
             - "workflow::ready"
             - "workflow::in progress"
             - "workflow::in review"

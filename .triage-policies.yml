@@ -31,7 +31,7 @@ resource_rules:
             - "workflow::verification"
             - "workflow::blocked"
             - "workflow::on ice❄"
-
+            - "workflow::needs clarification"
         actions:
           labels:
             - "workflow::unknown-missing"

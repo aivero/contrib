@@ -28,7 +28,13 @@ if branch == util.get_default_branch():
     sys.exit(0)
 commit = util.get_commit()
 print(f"Commit: {commit}")
-parent_branch = util.find_parent_branch()
+
+parent_branch = None
+if "PARENT_BRANCH" in os.environ:
+    parent_branch = os.environ["PARENT_BRANCH"]
+else:
+    parent_branch = util.find_parent_branch()
+
 print(f"Parent Branch: {parent_branch}")
 
 util.create_aliases(

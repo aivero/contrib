@@ -49,9 +49,7 @@ def get_commit():
     if "CI_COMMIT_SHA" in os.environ:
         return os.environ["CI_COMMIT_SHA"]
     branch = get_branch()
-    output = call(
-        ["git", "show-ref", branch, "--heads", "--tag", "-s"]
-    )
+    output = call(["git", "show-ref", branch, "--heads", "--tag", "-s"])
     return output[:-1]
 
 
@@ -59,7 +57,7 @@ def get_branch():
     if "CI_COMMIT_REF_NAME" in os.environ:
         return os.environ["CI_COMMIT_REF_NAME"]
     output = call(["git", "rev-parse", "--abbrev-ref", "HEAD"])[:-1]
-    return output 
+    return output
 
 
 def get_default_branch():
@@ -80,15 +78,17 @@ def find_parent_branch():
     output = call(["git", "branch", "-a"])
     all_branches = output[:-1].split("\n")
     print(f"Raw branches: {all_branches}")
-    all_branches = map(lambda l: l.strip(), all_branches)  
-    branches = list(filter(lambda l: not (l.startswith("*") or l.endswith(cur_branch)), all_branches))
+    all_branches = map(lambda l: l.strip(), all_branches)
+    branches = list(
+        filter(lambda l: not (l.startswith("*") or l.endswith(cur_branch)), all_branches)
+    )
     print(f"Filtered branches: {branches}")
 
     def get_merge_base(branch):
         print(f"Comparing {branch}")
         (exit_code, output) = call(["git", "merge-base", cur_branch, branch], ret_exit_code=True)
         if exit_code != 0 or output.startswith("warning:"):
-            print(f"Failed with output:\n{output}")
+            print(f"`git merge-base {cur_branch} {branch}` Failed with output:\n{output}")
             return [99999, "00000000000", branch]
 
         print(f"Merge base output: {output}")
@@ -204,7 +204,7 @@ def create_alias(
         sha = commit
 
     # Conan has a 50 char limit for versions
-    branch = branch[:50] 
+    branch = branch[:50]
 
     print(f"Creating alias: {name}/{branch} to {name}/{sha}")
     call(["conan", "alias", f"{name}/{branch}", f"{name}/{sha}"])

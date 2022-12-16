@@ -22,8 +22,6 @@ extern crate gst_base;
 extern crate gst_depth_meta;
 extern crate gst_video;
 extern crate nalgebra as na;
-#[macro_use]
-extern crate lazy_static;
 
 mod common;
 mod framealigner;

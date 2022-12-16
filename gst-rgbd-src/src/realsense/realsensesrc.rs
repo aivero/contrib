@@ -42,13 +42,13 @@ use once_cell::sync::Lazy;
 /// The default metric scale for the depth map (1 mm per unit).
 const DEFAULT_DEPTH_SCALE: f32 = 0.001;
 
-lazy_static! {
-    pub static ref CAT: gst::DebugCategory = gst::DebugCategory::new(
+static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
+    gst::DebugCategory::new(
         "realsensesrc",
         gst::DebugColorFlags::empty(),
         Some("Realsense Source"),
-    );
-}
+    )
+});
 
 /// A struct representation of the `realsensesrc` element.
 #[derive(Default)]

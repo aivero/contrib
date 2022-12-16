@@ -14,7 +14,6 @@ gst-depth-meta = { path = "../gst-depth-meta-rs" }
 gst = { package = "gstreamer", version = "0.18" }
 gst-base = { package = "gstreamer-base", version = "0.18" }
 gst-video = { package = "gstreamer-video", version = "0.18" }
-lazy_static = "1.4.0"
 nalgebra = { version = "0.29.0", features = ["serde-serialize"] }
 serde = "1.0.120"
 serde_yaml = "0.8.15"

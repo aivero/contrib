@@ -54,14 +54,9 @@ pub struct K4aSrc {
     timestamp_internals: Arc<Mutex<TimestampInternals>>,
 }
 
-lazy_static! {
-    /// Debug category of `k4asrc` element.
-    static ref CAT: gst::DebugCategory = gst::DebugCategory::new(
-        "k4asrc",
-        gst::DebugColorFlags::empty(),
-        Some("K4A Source"),
-);
-}
+static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
+    gst::DebugCategory::new("k4asrc", gst::DebugColorFlags::empty(), Some("K4A Source"))
+});
 
 /// Internals of the element that are under a mutex.
 struct K4aSrcInternals {

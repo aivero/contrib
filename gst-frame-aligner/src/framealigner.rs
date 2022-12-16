@@ -28,14 +28,13 @@ use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-// Declare debug category
-lazy_static! {
-    static ref CAT: gst::DebugCategory = gst::DebugCategory::new(
+static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
+    gst::DebugCategory::new(
         "framealigner",
         gst::DebugColorFlags::empty(),
-        Some("Frame Aligner")
-    );
-}
+        Some("Frame Aligner"),
+    )
+});
 
 // This element is based on this formula x2 = K2*R*inverse(K1)*x1 + K2*t/x1_z. THe first of the sum we called transform1*x1.
 
@@ -394,12 +393,7 @@ impl ObjectImpl for FrameAligner {
     /// * `id` - Object properties index in PROPERTIES struct
     /// # Returns
     /// *`Value` - Properties of given object.
-    fn property(
-        &self,
-        _obj: &Self::Type,
-        _id: usize,
-        pspec: &glib::ParamSpec,
-    ) -> glib::Value {
+    fn property(&self, _obj: &Self::Type, _id: usize, pspec: &glib::ParamSpec) -> glib::Value {
         let state = &self.state.lock().unwrap();
         match pspec.name() {
             "depth-factor" => state.depth_factor.to_value(),

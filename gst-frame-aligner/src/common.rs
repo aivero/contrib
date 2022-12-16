@@ -17,18 +17,19 @@
  */
 
 use gst::glib;
+use once_cell::sync::Lazy;
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
-// Declare debug category
-lazy_static! {
-    static ref CAT: gst::DebugCategory = gst::DebugCategory::new(
+static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
+    gst::DebugCategory::new(
         "framealigner",
         gst::DebugColorFlags::empty(),
-        Some("Frame Aligner")
-    );
-}
+        Some("Frame Aligner"),
+    )
+});
+
 /// Struct that holds a Error struct for `framealigner`
 #[derive(Debug, Clone)]
 pub struct GstFrameAlignerError(pub String, Option<gst::DebugCategory>);

@@ -24,14 +24,13 @@ use gst_depth_meta::rgbd;
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
-lazy_static! {
-    /// Debug category for 'rgbdmux' element.
-    static ref CAT: gst::DebugCategory = gst::DebugCategory::new(
+static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
+    gst::DebugCategory::new(
         "rgbdmux",
         gst::DebugColorFlags::empty(),
         Some("RGB-D Muxer"),
-    );
-}
+    )
+});
 
 struct State {
     /// The current framerate out the rgbd output

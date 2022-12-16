@@ -18,8 +18,6 @@ extern crate gst;
 extern crate gst_base;
 extern crate gst_depth_meta;
 extern crate gst_video;
-#[macro_use]
-extern crate lazy_static;
 use std::sync::Once;
 
 #[cfg(feature = "librealsense2")]

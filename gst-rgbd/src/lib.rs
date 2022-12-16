@@ -18,8 +18,6 @@
 extern crate gst;
 extern crate gst_base;
 extern crate gst_depth_meta;
-#[macro_use]
-extern crate lazy_static;
 
 mod common;
 mod rgbddemux;

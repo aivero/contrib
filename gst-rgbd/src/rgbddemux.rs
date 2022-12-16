@@ -25,14 +25,13 @@ use std::sync::{Mutex, RwLock};
 
 use crate::common::*;
 
-lazy_static! {
-    /// The debug category for 'rgbddemux' element.
-    static ref CAT: gst::DebugCategory = gst::DebugCategory::new(
+static CAT: Lazy<gst::DebugCategory> = Lazy::new(|| {
+    gst::DebugCategory::new(
         "rgbddemux",
         gst::DebugColorFlags::empty(),
         Some("RGB-D Demuxer"),
-    );
-}
+    )
+});
 
 /// Default value for to `distribute-timestamps` property
 const DEFAULT_DISTRIBUTE_TIMESTAMPS: bool = true;

@@ -6,7 +6,7 @@ class GlibNetworking(Recipe):
     license = "GPL"
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[^0.61.1]",
+        "meson/[>=0.61.1]",
     )
     requires = (
         "glib/[^2.70.3]",

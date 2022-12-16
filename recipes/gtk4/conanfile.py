@@ -16,7 +16,7 @@ class Gtk4(GstRecipe):
     )
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[^0.61.1]",
+        "meson/[>=0.61.1]",
         "gi-docgen/[^2021.8]",
         "shaderc/[>=2021.3]",
         "sassc/[^3.6.2]",

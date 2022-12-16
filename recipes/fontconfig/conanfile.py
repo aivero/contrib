@@ -6,7 +6,7 @@ class Fontconfig(Recipe):
     license = "MIT"
     build_requires = (
         "cc/[^1.0.0]",
-        "meson/[^0.61.1]",
+        "meson/[>=0.61.1]",
         "gperf/[^3.1]",
     )
     requires = (

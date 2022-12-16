@@ -13,7 +13,14 @@ if "CI" in os.environ:
     print(f"Uploading public to: {public_repo}")
     internal_repo = os.environ["CONAN_REPO_INTERNAL"]
     print(f"Uploading internal to: {internal_repo}")
-    util.conan_init((fetch_repo, public_repo, internal_repo))
+
+    fetch_dev_repo = os.environ["CONAN_REPO_DEV_ALL"]
+    print(f"Fetching from: {fetch_repo}")
+    public_dev_repo = os.environ["CONAN_REPO_DEV_PUBLIC"]
+    print(f"Uploading public to: {public_repo}")
+    internal_dev_repo = os.environ["CONAN_REPO_DEV_INTERNAL"]
+    print(f"Uploading internal to: {internal_repo}")
+    util.conan_init((fetch_repo, public_repo, internal_repo, fetch_dev_repo, public_dev_repo, internal_dev_repo))
 else:
     print("Not uploading any packages")
     fetch_repo = "dev-all"

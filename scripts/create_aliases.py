@@ -3,14 +3,6 @@ import os
 import sys
 import subprocess
 
-branch = util.get_branch()
-print(f"Branch: {branch}")
-
-# Skip default branch
-if branch == util.get_default_branch():
-    print("Skipping default branch")
-    sys.exit(0)
-
 # Init git and conan in CICD
 if "CI" in os.environ:
     util.git_init()
@@ -28,6 +20,12 @@ else:
     public_repo = None
     internal_repo = None
 
+
+branch = util.get_branch()
+print(f"Branch: {branch}")
+if branch == util.get_default_branch():
+    print("Skipping default branch")
+    sys.exit(0)
 commit = util.get_commit()
 print(f"Commit: {commit}")
 

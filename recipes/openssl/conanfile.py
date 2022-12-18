@@ -20,6 +20,7 @@ class Openssl(Recipe):
         args = [
             f"--prefix={self.package_folder}",
             "no-ssl3-method",
+            "--libdir=lib",
         ]
         if self.options.shared:
             args.append("shared")

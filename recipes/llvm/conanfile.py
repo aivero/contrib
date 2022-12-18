@@ -25,8 +25,10 @@ class Llvm(Recipe):
         os.environ["CC"] = "clang"
         os.environ["CXX"] = "clang++"
 
-        # Enable parallel linking
-        defs["LLVM_PARALLEL_LINK_JOBS"] = multiprocessing.cpu_count()
+        # Limit thread use on arm
+        if self.settings.arch == "armv8":
+            defs["LLVM_PARALLEL_LINK_JOBS"] = 32
+            #defs["LLVM_PARALLEL_COMPILE_JOBS"] = 32
 
         # LLVM build options
         if self.settings.arch == "x86_64":

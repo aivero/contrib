@@ -30,7 +30,7 @@ def conan_init(repos):
             "-sf",
             os.environ["CONAN_CONFIG_DIR"],
         ],
-    , show=true)
+    show=true)
     for repo in repos:
         call(
             [
@@ -42,7 +42,7 @@ def conan_init(repos):
                 "-r",
                 repo,
             ],
-        , show=true)
+        show=true)
 
 
 def get_commit():

@@ -52,7 +52,19 @@ class Rustc(Recipe):
         ]
 
         self.exe(os.path.join(rust_folder, "configure"), args)
-        self.exe("python", [os.path.join(rust_folder, "x.py"), "install"])
+        args = "".join(
+            [
+                "-j 32",
+            ]
+        )
+        self.exe(
+            "python",
+            [
+                os.path.join(rust_folder, "x.py"),
+                "install ",
+                args,
+            ],
+        )
 
     def package_info(self):
         self.env_info.RUSTFLAGS = "-g -Copt-level=2"

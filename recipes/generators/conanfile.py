@@ -195,3 +195,6 @@ class GeneratorsPackage(Recipe):
     description = "Conan generators"
     license = "MIT"
     requires = ()
+    settings = None
+    options = None
+    default_options = None

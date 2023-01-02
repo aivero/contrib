@@ -6,6 +6,7 @@ class Libc(Recipe):
     license = "MIT"
     options = {}
     default_options = {}
+    settings = "libc"
 
     def requirements(self):
         if self.settings.libc == "glibc":

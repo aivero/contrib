@@ -52,17 +52,12 @@ class Rustc(Recipe):
         ]
 
         self.exe(os.path.join(rust_folder, "configure"), args)
-        args = "".join(
-            [
-                "-j 32",
-            ]
-        )
+
         self.exe(
             "python",
             [
                 os.path.join(rust_folder, "x.py"),
                 "install ",
-                args,
             ],
         )
 

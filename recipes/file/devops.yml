@@ -1,4 +1,4 @@
-- version: '5.44'
+- version: "5.44"
   bootstrap: true
   profiles:
     [

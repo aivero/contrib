@@ -18,9 +18,6 @@ generate-config:
   artifacts:
     paths:
       - generated-config.yml
-      - build_order.json
-      - lock.bundle
-      - "*.lock"
 
 child-pipeline:
   stage: test

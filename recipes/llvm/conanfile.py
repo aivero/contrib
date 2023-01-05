@@ -119,6 +119,7 @@ class Llvm(Recipe):
         # Stage 0 build (lld, clang, ar)
         targets = [
             "install-cxx",
+            "install-cxxabi",
             "install-compiler-rt",
             "install-clang",
             "install-clang-cpp",
@@ -176,6 +177,7 @@ class Llvm(Recipe):
             defs,
             targets=[
                 "install-cxx",
+                "install-cxxabi",
                 "install-compiler-rt",
             ],
             source_folder=source_folder,
@@ -216,6 +218,7 @@ class Llvm(Recipe):
 
         targets = [
             "install-cxx",
+            "install-cxxabi",
             "install-compiler-rt",
             "install-libclang",
             "install-clang",

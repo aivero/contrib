@@ -7,7 +7,7 @@ class GstPluginsGood(GstRecipe):
     license = "LGPL"
     # If set to true, select version highest semver matching version from devops.yml
     gst_match_version = True
-    settings = GstRecipe.settings + ("hardware")
+    settings = GstRecipe.settings + ("hardware",)
     exports = "*.patch"
     options = {
         "aivero_rvl_matroska": [True, False],

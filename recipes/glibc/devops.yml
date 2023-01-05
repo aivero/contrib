@@ -1,7 +1,2 @@
 - version: "2.31"
   bootstrap: true
-  profiles:
-    - linux-x86_64
-    - linux-armv8
-    - linux-armv8-llvm15-rust1.66
-    - linux-x86_64-llvm15-rust1.66

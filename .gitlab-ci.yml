@@ -2,8 +2,8 @@ stages:
   - build
   - test
 generate-config:
-  image: registry.gitlab.com/aivero/open-source/contrib/focal/linux-armv8:master
-  tags: [armv8,aws]
+  image: registry.gitlab.com/aivero/open-source/contrib/focal/linux-x86_64:master
+  tags: [saas-linux-large-amd64]
   stage: build
   rules:
     - if: '$PACKAGE_MANAGER_SET == null && $CI_PIPELINE_SOURCE != "merge_request_event" && $TRIAGE_BOT_SCHEDULED == null'

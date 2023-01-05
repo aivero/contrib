@@ -24,7 +24,7 @@ class CC(Recipe):
         else:
             abi = "gnu"
 
-        trible = f"{arch}-unknown-linux-{abi}"
+        triple = f"{arch}-unknown-linux-{abi}"
 
         llvm_deps_cpp_info = self.deps_cpp_info["llvm"]
         llvm_rootpath = llvm_deps_cpp_info.rootpath
@@ -38,7 +38,7 @@ class CC(Recipe):
         )
         llvm_inc = os.path.join(llvm_rootpath, "include")
         libcxx_inc = os.path.join(llvm_rootpath, "include", "c++", "v1")
-        libcxx_target_inc = os.path.join(llvm_rootpath, "include", trible, "c++", "v1")
+        libcxx_target_inc = os.path.join(llvm_rootpath, "include", triple, "c++", "v1")
 
         # -Wno-unused-command-line-argument is needed for some sanity tests in cmake
         cflags = f" -nostdinc -idirafter {libclang_inc} -idirafter {libc_inc} -idirafter {llvm_inc} {static_flags} -fPIC -Wno-unused-command-line-argument "

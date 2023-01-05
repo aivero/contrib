@@ -2,6 +2,7 @@ from build import *
 
 
 class Orc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Optimized Inner Loop Runtime Compiler"
     license = "LGPL"
     build_requires = (

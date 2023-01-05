@@ -2,6 +2,7 @@ from build import *
 
 
 class Rustc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Systems programming language focused on safety, speed and concurrency"
     license = "MIT"
     exports = ("*-boostrap-respect-cxxflags.patch",)

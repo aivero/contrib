@@ -2,6 +2,7 @@ from build import *
 
 
 class Libuuid(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Portable uuid C library"
     license = "BSD"
     build_requires = (

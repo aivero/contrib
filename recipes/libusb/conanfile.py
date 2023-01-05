@@ -2,6 +2,7 @@ from build import *
 
 
 class LibUSB(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A cross-platform library to access USB devices"
     license = "LGPL"
     build_requires = (
@@ -11,7 +12,9 @@ class LibUSB(Recipe):
     requires = ("eudev/[^3.2.9]",)
 
     def source(self):
-        self.get(f"https://github.com/libusb/libusb/releases/download/v{self.version}/libusb-{self.version}.tar.bz2")
+        self.get(
+            f"https://github.com/libusb/libusb/releases/download/v{self.version}/libusb-{self.version}.tar.bz2"
+        )
 
     def build(self):
         args = [

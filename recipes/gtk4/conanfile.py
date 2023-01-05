@@ -2,6 +2,7 @@ from build import *
 
 
 class Gtk4(GstRecipe):
+    settings = GstRecipe.settings + ("compiler",)
     description = "GObject-based multi-platform GUI toolkit"
     license = "LGPL"
     options = {
@@ -21,7 +22,7 @@ class Gtk4(GstRecipe):
         "shaderc/[>=2021.3]",
         "sassc/[^3.6.2]",
         "gobject-introspection/[^1.70.0]",
-        #"docbook-xsl/[^1.79.2]",
+        # "docbook-xsl/[^1.79.2]",
         "wayland-protocols/[^1.25]",
         "python-docutils/[>=0.16]",
         "python-gobject/[^3.40.1]",
@@ -30,9 +31,9 @@ class Gtk4(GstRecipe):
         "gdk-pixbuf2/[^2.42.6]",
         "libepoxy/[^1.5.9]",
         "graphene/[^1.10.6]",
-        #"iso-codes/[^4.9.0]",
+        # "iso-codes/[^4.9.0]",
         "wayland/[^1.20.0]",
-        #"libcups/[^]",
+        # "libcups/[^]",
     )
 
     def requirements(self):
@@ -42,7 +43,6 @@ class Gtk4(GstRecipe):
             self.requires("libxi/[^1.7.1]")
             self.requires("libxcursor/[^1.2.0]")
             self.requires("libxinerama/[^1.1.4]")
-
 
     def source(self):
         self.get(f"https://github.com/GNOME/gtk/archive/{self.version}.tar.gz")

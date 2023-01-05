@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonPillowRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Python Image Library"
     license = "BSD"
     build_requires = (
@@ -10,9 +11,7 @@ class PythonPillowRecipe(PythonRecipe):
         "python-setuptools/[^50.3.0]",
         "zlib/[^1.2.11]",
     )
-    requires = (
-        "openjpeg2/[^2.4.0]",
-    )
+    requires = ("openjpeg2/[^2.4.0]",)
 
     def requirements(self):
         self.requires(f"python/[~{self.settings.python}]")

@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxau(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 authorisation library"
     license = "MIT"
     build_requires = (
@@ -12,4 +13,6 @@ class Libxau(Recipe):
     requires = ("xorgproto/[>=2020.1]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXau-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXau-{self.version}.tar.gz"
+        )

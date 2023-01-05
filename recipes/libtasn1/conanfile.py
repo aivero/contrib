@@ -2,6 +2,7 @@ from build import *
 
 
 class Libtasn1(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "The ASN.1 library used in GNUTLS"
     license = "GPL"
     build_requires = (

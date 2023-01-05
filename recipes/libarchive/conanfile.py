@@ -2,6 +2,7 @@ from build import *
 
 
 class Libarchive(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Multi-format archive and compression library"
     license = "BSD"
     build_requires = (
@@ -17,7 +18,9 @@ class Libarchive(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/libarchive/libarchive/releases/download/v{self.version}/libarchive-{self.version}.tar.xz")
+        self.get(
+            f"https://github.com/libarchive/libarchive/releases/download/v{self.version}/libarchive-{self.version}.tar.xz"
+        )
 
     def build(self):
         self.cmake()

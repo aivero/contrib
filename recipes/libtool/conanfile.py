@@ -2,6 +2,7 @@ from build import *
 
 
 class Libtool(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A generic library support script"
     license = "GPL"
     exports = "libtool-prefix-fix.patch"

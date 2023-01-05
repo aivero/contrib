@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxi(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 Input extension library"
     license = "custom"
     build_requires = (
@@ -15,4 +16,6 @@ class Libxi(Recipe):
     )
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXi-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXi-{self.version}.tar.gz"
+        )

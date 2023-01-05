@@ -2,6 +2,7 @@ from build import *
 
 
 class Sdl2(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A library for portable low-level access to a video framebuffer, audio output, mouse, and keyboard"
     license = "MIT"
     build_requires = (
@@ -15,8 +16,9 @@ class Sdl2(Recipe):
     def source(self):
         self.get(f"https://www.libsdl.org/release/SDL2-{self.version}.tar.gz")
 
-
     def build(self):
         for req in ["libxext", "libxcb", "xorgproto", "libx11"]:
-            os.environ["CFLAGS"] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
+            os.environ[
+                "CFLAGS"
+            ] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
         self.cmake()

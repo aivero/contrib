@@ -2,6 +2,7 @@ from build import *
 
 
 class Freetype(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "FreeType is a software library to render fonts"
     license = "FTL"
     build_requires = (
@@ -16,7 +17,9 @@ class Freetype(Recipe):
             self.requires("libpng/[^1.6.37]", "private")
 
     def source(self):
-        self.get(f"https://download-mirror.savannah.gnu.org/releases/freetype/freetype-{self.version}.tar.xz")
+        self.get(
+            f"https://download-mirror.savannah.gnu.org/releases/freetype/freetype-{self.version}.tar.xz"
+        )
 
     def build(self):
         # Force use autotools

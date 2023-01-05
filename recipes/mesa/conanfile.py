@@ -2,6 +2,7 @@ from build import *
 
 
 class Mesa(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "An open-source implementation of the OpenGL specification"
     license = "custom"
     options = {
@@ -36,8 +37,7 @@ class Mesa(Recipe):
             self.requires("libxxf86vm/[^1.1.4]")
 
     def source(self):
-        self.get(
-            f"https://mesa.freedesktop.org/archive/mesa-{self.version}.tar.xz")
+        self.get(f"https://mesa.freedesktop.org/archive/mesa-{self.version}.tar.xz")
 
     def build(self):
         opts = {
@@ -58,5 +58,4 @@ class Mesa(Recipe):
         self.meson(opts)
 
     def package_info(self):
-        self.env_info.LIBGL_DRIVERS_PATH.append(
-            os.path.join(self.package_folder, "lib", "dri"))
+        self.env_info.LIBGL_DRIVERS_PATH.append(os.path.join(self.package_folder, "lib", "dri"))

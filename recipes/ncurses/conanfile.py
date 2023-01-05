@@ -2,6 +2,7 @@ from build import *
 
 
 class Ncurses(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "System V Release 4.0 curses emulation library"
     license = "MIT"
     build_requires = (

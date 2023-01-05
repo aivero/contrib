@@ -9,7 +9,9 @@ class LinuxHeaders(Recipe):
     settings = "os", "arch"
 
     def source(self):
-        self.get(f"https://cdn.kernel.org/pub/linux/kernel/v{self.version.split('.')[0]}.x/linux-{self.version}.tar.xz")
+        self.get(
+            f"https://cdn.kernel.org/pub/linux/kernel/v{self.version.split('.')[0]}.x/linux-{self.version}.tar.xz"
+        )
 
     def build(self):
         arch = {"x86_64": "x86_64", "armv8": "arm64"}[str(self.settings.arch)]

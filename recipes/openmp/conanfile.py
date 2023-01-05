@@ -2,6 +2,7 @@ from build import *
 
 
 class Openmp(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "LLVM OpenMP Runtime Library"
     license = "custom"
     build_requires = (
@@ -13,7 +14,9 @@ class Openmp(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/openmp-{self.version}.src.tar.xz")
+        self.get(
+            f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/openmp-{self.version}.src.tar.xz"
+        )
 
     def build(self):
         defs = {

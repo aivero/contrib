@@ -2,6 +2,7 @@ from build import *
 
 
 class Itstool(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "XML to PO and back again"
     license = "GPL"
     build_requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")

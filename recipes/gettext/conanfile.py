@@ -2,6 +2,7 @@ from build import *
 
 
 class Gettext(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "GNU internationalization library"
     license = "GPL"
     build_requires = (

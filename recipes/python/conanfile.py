@@ -3,6 +3,7 @@ from build import *
 
 
 class PythonRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Next generation of the python high-level scripting language"
     license = "MIT"
     build_requires = (
@@ -19,7 +20,9 @@ class PythonRecipe(PythonRecipe):
 
     def validate(self):
         if str(self.settings.python) not in str(self.version):
-            raise ConanInvalidConfiguration(f"Python version specified in devops.yml ({self.version}) is not compatible with version specified in profile: {self.settings.python}")
+            raise ConanInvalidConfiguration(
+                f"Python version specified in devops.yml ({self.version}) is not compatible with version specified in profile: {self.settings.python}"
+            )
 
     def source(self):
         self.get(f"https://www.python.org/ftp/python/{self.version}/Python-{self.version}.tar.xz")
@@ -49,9 +52,17 @@ class PythonRecipe(PythonRecipe):
         os.symlink(f"python{version}", os.path.join(self.package_folder, "bin", "python"))
 
         arch = {"x86_64": "x86_64", "armv8": "aarch64"}[str(self.settings.arch)]
-        with open(os.path.join(self.package_folder, "lib", f"python{self.version[:3]}", f"_sysconfigdata__linux_{arch}-linux-gnu.py"),
-                  "w") as py:
-            py.write('''import os
+        with open(
+            os.path.join(
+                self.package_folder,
+                "lib",
+                f"python{self.version[:3]}",
+                f"_sysconfigdata__linux_{arch}-linux-gnu.py",
+            ),
+            "w",
+        ) as py:
+            py.write(
+                """import os
 build_time_vars = {{
   "AR": os.environ.get("AR", ""),
   "ARFLAGS": "",
@@ -76,9 +87,10 @@ build_time_vars = {{
   "LDCXXSHARED": os.environ.get("CXX", "") + " -shared -Wl,-O1 -Wl,-Bsymbolic-functions ",
   "LDSHARED": os.environ.get("CC", "") + " -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -g -fwrapv -O2 ", 
 }}
-'''.format(self.version, self.version[0], self.version[2], arch))
-
-
+""".format(
+                    self.version, self.version[0], self.version[2], arch
+                )
+            )
 
     def package_info(self):
         self.env_info.PYTHON = os.path.join(self.package_folder, "bin", "python")

@@ -2,6 +2,7 @@ from build import *
 
 
 class LibpthreadStubs(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Library with weak aliases for pthread functions"
     license = "MIT"
     build_requires = (

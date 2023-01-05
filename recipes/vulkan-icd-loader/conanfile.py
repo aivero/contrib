@@ -2,6 +2,7 @@ from build import *
 
 
 class VulkanIcdLoader(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Vulkan Installable Client Driver (ICD) Loader"
     license = "custom"
     build_requires = (
@@ -15,17 +16,15 @@ class VulkanIcdLoader(Recipe):
         "wayland/[^1.19.0]",
         "git/[^2.30.0]",
     )
-    requires = (
-        "vulkan-headers/[^1.2.174]",
-    )
+    requires = ("vulkan-headers/[^1.2.174]",)
 
     def source(self):
         self.get(f"https://github.com/KhronosGroup/Vulkan-Loader/archive/v{self.version}.tar.gz")
 
     def build(self):
         for req in ["libxcb", "xorgproto", "libx11", "libxrandr", "libxrender"]:
-            os.environ["CFLAGS"] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
-        defs = {
-            "VULKAN_HEADERS_INSTALL_DIR": self.deps_cpp_info["vulkan-headers"].rootpath
-        }
+            os.environ[
+                "CFLAGS"
+            ] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
+        defs = {"VULKAN_HEADERS_INSTALL_DIR": self.deps_cpp_info["vulkan-headers"].rootpath}
         self.cmake(defs)

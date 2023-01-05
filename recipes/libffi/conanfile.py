@@ -2,6 +2,7 @@ from build import *
 
 
 class Libffi(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Portable foreign function interface library"
     license = "MIT"
     build_requires = (
@@ -10,4 +11,6 @@ class Libffi(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/libffi/libffi/releases/download/v{self.version}/libffi-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/libffi/libffi/releases/download/v{self.version}/libffi-{self.version}.tar.gz"
+        )

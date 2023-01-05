@@ -2,6 +2,7 @@ from build import *
 
 
 class AlsaLib(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "An alternative implementation of Linux sound support"
     license = "LGPL"
     build_requires = (

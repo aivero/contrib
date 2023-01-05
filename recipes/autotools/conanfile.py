@@ -2,6 +2,7 @@ from build import *
 
 
 class Autotools(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A suite of programming tools 'designed' to assist in making source code"
     license = "GPL"
     requires = (

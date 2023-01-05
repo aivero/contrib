@@ -2,6 +2,7 @@ from build import *
 
 
 class Graphene(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A thin layer of graphic data types"
     license = "MIT"
     build_requires = (

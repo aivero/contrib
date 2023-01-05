@@ -2,6 +2,7 @@ from build import *
 
 
 class AtSpi2Atk(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A GTK+ module that bridges ATK to D-Bus at-spi"
     license = "LGPL"
     build_requires = (
@@ -16,4 +17,6 @@ class AtSpi2Atk(Recipe):
 
     def source(self):
         version = self.version.replace(".", "_")
-        self.get(f"https://gitlab.gnome.org/GNOME/at-spi2-atk/-/archive/AT_SPI2_ATK_{version}/at-spi2-atk-AT_SPI2_ATK_{version}.tar.bz2")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/at-spi2-atk/-/archive/AT_SPI2_ATK_{version}/at-spi2-atk-AT_SPI2_ATK_{version}.tar.bz2"
+        )

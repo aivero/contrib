@@ -2,6 +2,7 @@ from build import *
 
 
 class Openssl(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "TLS/SSL and crypto library"
     license = "BSD"
     build_requires = (
@@ -12,7 +13,9 @@ class Openssl(Recipe):
 
     def source(self):
         if self.version.startswith("1"):
-            self.get(f"https://github.com/openssl/openssl/archive/OpenSSL_{self.version.replace('.', '_')}.tar.gz")
+            self.get(
+                f"https://github.com/openssl/openssl/archive/OpenSSL_{self.version.replace('.', '_')}.tar.gz"
+            )
         else:
             self.get(f"https://github.com/openssl/openssl/archive/openssl-{self.version}.tar.gz")
 

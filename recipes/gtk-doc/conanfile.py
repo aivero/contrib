@@ -2,6 +2,7 @@ from build import *
 
 
 class GtkDoc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Generate API documentation from comments added to C code,typically used to document the public API of GTK+ and GNOME libraries."
     license = "GPL"
     build_requires = (

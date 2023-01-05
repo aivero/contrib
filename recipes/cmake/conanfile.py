@@ -2,6 +2,7 @@ from build import *
 
 
 class CMake(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A cross-platform open-source make system"
     license = "custom"
     options = {}

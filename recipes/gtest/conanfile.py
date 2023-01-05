@@ -2,6 +2,7 @@ from build import *
 
 
 class GTest(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Google's C++ test framework"
     license = "BSD"
     build_requires = (
@@ -11,4 +12,3 @@ class GTest(Recipe):
 
     def source(self):
         self.get(f"https://github.com/google/googletest/archive/release-{self.version}.tar.gz")
-

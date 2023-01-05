@@ -2,6 +2,7 @@ from build import *
 
 
 class GstPython(GstRecipe):
+    settings = GstRecipe.settings + ("compiler",)
     description = "Gstreamer Python bindings"
     license = "LGPL"
     build_requires = (

@@ -2,6 +2,7 @@ from build import *
 
 
 class nlopt(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "library for nonlinear optimization, wrapping many algorithms for global and local, constrained or unconstrained, optimization "
     license = "MIT"
     build_requires = (

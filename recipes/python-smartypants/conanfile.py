@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonSmartypants(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Python with the SmartyPants"
     license = "BSD"
 

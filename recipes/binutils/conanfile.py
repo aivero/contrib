@@ -2,6 +2,7 @@ from build import *
 
 
 class Binutils(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A set of programs to assemble and manipulate binary and object files"
     license = "GPL"
     build_requires = (

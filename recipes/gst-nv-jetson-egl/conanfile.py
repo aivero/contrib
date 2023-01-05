@@ -2,6 +2,7 @@ from build import *
 
 
 class GstNvJetsonEgl(GstRecipe):
+    settings = GstRecipe.settings + ("compiler",)
     description = "NVIDIA jetson egl element"
     license = "LGPL"
     options = {"jetson": ["Nano", "TX2", "Xavier"]}
@@ -18,9 +19,17 @@ class GstNvJetsonEgl(GstRecipe):
 
     def source(self):
         if self.options.jetson in ("TX2", "Xavier"):
-            self.get(f"https://developer.nvidia.com/embedded/dlc/r{self.version}_Release_v1.0/TX2-AGX/sources/public_sources.tbz2".replace(".", "-"))
+            self.get(
+                f"https://developer.nvidia.com/embedded/dlc/r{self.version}_Release_v1.0/TX2-AGX/sources/public_sources.tbz2".replace(
+                    ".", "-"
+                )
+            )
         elif self.options.jetson == "Nano":
-            self.get(f"https://developer.nvidia.com/embedded/dlc/r{self.version}_Release_v1.0/Nano-TX1/sources/public_sources.tbz2".replace(".", "-"))
+            self.get(
+                f"https://developer.nvidia.com/embedded/dlc/r{self.version}_Release_v1.0/Nano-TX1/sources/public_sources.tbz2".replace(
+                    ".", "-"
+                )
+            )
         else:
             raise KeyError("Unknown option: " + self.options.jetson)
         tools.untargz("public_sources/gstegl_src.tbz2", self.source_folder)

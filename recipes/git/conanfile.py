@@ -9,6 +9,7 @@ INSTALL_SYMLINKS=1
 
 
 class Git(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "The fast distributed version control system"
     license = "GPL"
     build_requires = (
@@ -35,4 +36,6 @@ class Git(Recipe):
 
     def package_info(self):
         self.env_info.GIT_EXEC_PATH = os.path.join(self.package_folder, "libexec", "git-core")
-        self.env_info.GIT_SSL_CAINFO = os.path.join(self.deps_cpp_info["ca-certificates"].rootpath, "etc", "ssl", "certs", "cert.pem")
+        self.env_info.GIT_SSL_CAINFO = os.path.join(
+            self.deps_cpp_info["ca-certificates"].rootpath, "etc", "ssl", "certs", "cert.pem"
+        )

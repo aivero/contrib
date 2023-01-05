@@ -2,6 +2,7 @@ from build import *
 
 
 class Nodejs(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Evented I/O for V8 javascript"
     license = "MIT"
     build_requires = (
@@ -9,11 +10,7 @@ class Nodejs(Recipe):
         "autotools/[^1.0.0]",
         "python/[^3]",
     )
-    requires = (
-        "openssl1/[>=1.1.1h]",
-        "zlib/[^1.2.11]",
-        "libatomic/[^8.4.0]"
-    )
+    requires = ("openssl1/[>=1.1.1h]", "zlib/[^1.2.11]", "libatomic/[^8.4.0]")
 
     def source(self):
         self.get(f"https://github.com/nodejs/node/archive/v{self.version}.tar.gz")

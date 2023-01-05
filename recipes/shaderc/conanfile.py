@@ -2,6 +2,7 @@ from build import *
 
 
 class Shaderc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A collection of tools, libraries, and tests for Vulkan shader compilation."
     license = "Apache"
     options = {}

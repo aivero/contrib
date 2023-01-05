@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxinerama(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 Xinerama extension library"
     license = "custom"
     build_requires = (
@@ -12,4 +13,6 @@ class Libxinerama(Recipe):
     requires = ("libxext/[^1.3.4]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXinerama-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXinerama-{self.version}.tar.gz"
+        )

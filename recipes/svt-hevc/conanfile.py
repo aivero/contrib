@@ -2,6 +2,7 @@ from build import *
 
 
 class SvtHevc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "The Scalable Video Technology for HEVC Encoder"
     license = "BSD"
     build_requires = (

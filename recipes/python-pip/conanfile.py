@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonPipRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "High productivity build system"
     license = "MIT"
     build_requires = ("python-setuptools/[>=41.2.0]",)

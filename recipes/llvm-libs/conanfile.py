@@ -3,6 +3,7 @@ import multiprocessing
 
 
 class LlvmLibs(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Collection of modular and reusable compiler and toolchain technologies"
     license = "custom"
     exports = ("disable-system-libs.patch",)

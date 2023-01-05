@@ -2,6 +2,7 @@ from build import *
 
 
 class GstDevtools(GstRecipe):
+    settings = GstRecipe.settings + ("compiler",)
     description = "Development and debugging tools for GStreamer"
     license = "LGPL"
     options = {

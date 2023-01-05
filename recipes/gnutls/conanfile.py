@@ -2,6 +2,7 @@ from build import *
 
 
 class Gnutls(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A library which provides a secure layer over a reliable transport layer"
     license = "custom"
     build_requires = (

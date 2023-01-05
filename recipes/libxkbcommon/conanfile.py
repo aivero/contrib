@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxkbcommon(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Keymap handling library for toolkits and window systems"
     license = "MIT"
     build_requires = (
@@ -16,7 +17,9 @@ class Libxkbcommon(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/xkbcommon/libxkbcommon/archive/xkbcommon-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/xkbcommon/libxkbcommon/archive/xkbcommon-{self.version}.tar.gz"
+        )
 
     def build(self):
         opts = {

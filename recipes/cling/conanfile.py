@@ -2,6 +2,7 @@ from build import *
 
 
 class Cling(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Interactive C++ interpreter, built on the top of LLVM and Clang libraries"
     license = "custom"
     build_requires = (
@@ -9,9 +10,7 @@ class Cling(PythonRecipe):
         "git/[^2.30.0]",
         "cmake/[^3.18.4]",
     )
-    requires = (
-        "libxml2/[^2.9.10]",
-    )
+    requires = ("libxml2/[^2.9.10]",)
 
     def requirements(self):
         self.requires(f"python/[~{self.settings.python}]")

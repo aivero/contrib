@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonPygments(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Python syntax highlighter"
     license = "BSD"
     build_requires = (

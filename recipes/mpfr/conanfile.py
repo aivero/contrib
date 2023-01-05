@@ -2,6 +2,7 @@ from build import *
 
 
 class Mpfr(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Multiple-precision floating-point library"
     license = "LGPL"
     build_requires = (

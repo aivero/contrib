@@ -2,6 +2,7 @@ from build import *
 
 
 class GiDocgen(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Documentation generator for GObject-based libraries"
     license = "Apache"
     build_requires = (
@@ -18,4 +19,6 @@ class GiDocgen(PythonRecipe):
     )
 
     def source(self):
-        self.get(f"https://gitlab.gnome.org/GNOME/gi-docgen/-/archive/{self.version}/gi-docgen-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/gi-docgen/-/archive/{self.version}/gi-docgen-{self.version}.tar.gz"
+        )

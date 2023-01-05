@@ -2,6 +2,7 @@ from build import *
 
 
 class Texinfo(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "GNU documentation system for on-line information and printed output"
     license = "GPL"
     build_requires = (
@@ -17,4 +18,6 @@ class Texinfo(Recipe):
         self.env_info.MAKEINFO = os.path.join(self.package_folder, "bin", "makeinfo")
         self.env_info.PERL5LIB.append(os.path.join(self.package_folder, "share", "texinfo"))
         for mod in ["libintl-perl", "Text-Unidecode", "Unicode-EastAsianWidth"]:
-            self.env_info.PERL5LIB.append(os.path.join(self.package_folder, "share", "texinfo", "lib", mod, "lib"))
+            self.env_info.PERL5LIB.append(
+                os.path.join(self.package_folder, "share", "texinfo", "lib", mod, "lib")
+            )

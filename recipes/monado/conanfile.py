@@ -2,6 +2,7 @@ from build import *
 
 
 class Monado(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "An open source OpenXR runtime"
     license = "Boost"
     options = {
@@ -21,7 +22,9 @@ class Monado(Recipe):
     )
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/monado/monado/-/archive/v{self.version}/monado-v{self.version}.tar.bz2")
+        self.get(
+            f"https://gitlab.freedesktop.org/monado/monado/-/archive/v{self.version}/monado-v{self.version}.tar.bz2"
+        )
 
     def build(self):
         opts = {

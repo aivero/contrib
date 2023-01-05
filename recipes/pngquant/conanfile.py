@@ -2,6 +2,7 @@ from build import *
 
 
 class Pngquant(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Command-line utility to quantize PNGs down to 8-bit paletted PNGs"
     license = "BSD"
     build_requires = ("autotools/1.0.0",)
@@ -12,7 +13,9 @@ class Pngquant(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/kornelski/pngquant/archive/{self.version}/pngquant-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/kornelski/pngquant/archive/{self.version}/pngquant-{self.version}.tar.gz"
+        )
 
     def build(self):
         args = [

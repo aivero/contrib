@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxext(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 miscellaneous extensions library"
     license = "custom"
     build_requires = (
@@ -13,4 +14,6 @@ class Libxext(Recipe):
     requires = ("libx11/[^1.6.12]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXext-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXext-{self.version}.tar.gz"
+        )

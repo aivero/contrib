@@ -2,6 +2,7 @@ from build import *
 
 
 class Perl(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A highly capable, feature-rich programming language"
     license = "GPL"
     build_requires = (
@@ -31,4 +32,6 @@ class Perl(Recipe):
         arch = {"x86_64": "x86_64", "armv8": "aarch64"}[str(self.settings.arch)]
         self.env_info.PERL = "perl"
         self.env_info.PERL5LIB.append(os.path.join(self.package_folder, "lib", self.version))
-        self.env_info.PERL5LIB.append(os.path.join(self.package_folder, "lib", self.version, f"{arch}-linux-thread-multi"))
+        self.env_info.PERL5LIB.append(
+            os.path.join(self.package_folder, "lib", self.version, f"{arch}-linux-thread-multi")
+        )

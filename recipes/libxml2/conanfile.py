@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxml2Recipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "XML parsing library, version 2"
     license = "MIT"
     build_requires = (
@@ -14,8 +15,12 @@ class Libxml2Recipe(PythonRecipe):
         self.build_requires(f"python/[~{self.settings.python}]")
 
     def source(self):
-        self.get(f"https://gitlab.gnome.org/GNOME/libxml2/-/archive/v{self.version}/libxml2-v{self.version}.tar.bz2")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/libxml2/-/archive/v{self.version}/libxml2-v{self.version}.tar.bz2"
+        )
 
     def build(self):
-        os.environ["with_python_install_dir"] = os.path.join(self.package_folder, "lib", f"python{self.settings.python}", "site-packages")
+        os.environ["with_python_install_dir"] = os.path.join(
+            self.package_folder, "lib", f"python{self.settings.python}", "site-packages"
+        )
         self.autotools()

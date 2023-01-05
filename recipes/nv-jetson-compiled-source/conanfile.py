@@ -29,7 +29,14 @@ def get_lib_dir(basedir, libname):
 class NvJetsonCompiledSource(GstProject):
     license = "LGPL"
     description = "Compiled elements from NVIDIAs Jetson sources"
-    settings = {"os": None, "compiler": None, "build_type": None, "arch": "armv8", "hardware": {"l4t": {"board", "version"}}, "gstreamer": None}
+    settings = {
+        "os": None,
+        "compiler": None,
+        "build_type": None,
+        "arch": "armv8",
+        "hardware": {"l4t": {"board", "version"}},
+        "gstreamer": None,
+    }
     exports = ["*.patch"]
 
     build_requires = ("autotools/[^1.0.0]", "pkgconf/[^1.7.3]", "cc/[^1.0.0]")
@@ -55,7 +62,9 @@ class NvJetsonCompiledSource(GstProject):
         tools.patch(patch_file="configure.ac.patch", base_path="gstomx1_src")
 
         tools.untargz("Linux_for_Tegra/source/public/gstegl_src.tbz2", self.source_folder)
-        tools.untargz("Linux_for_Tegra/source/public/gst-nvvideo4linux2_src.tbz2", self.source_folder)
+        tools.untargz(
+            "Linux_for_Tegra/source/public/gst-nvvideo4linux2_src.tbz2", self.source_folder
+        )
         tools.rmdir("Linux_for_Tegra")
 
     def build(self):
@@ -76,7 +85,11 @@ class NvJetsonCompiledSource(GstProject):
             "NOCONFIGURE": "true",
             "GST_EGL_LIBS": "-lgstegl-1.0 -lnvbuf_utils -lEGL -lX11 -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0",
             "PKG_CONFIG_PATH": os.environ["PKG_CONFIG_PATH"] + ":" + pc_path_base,
-            "LIBRARY_PATH": os.environ["LIBRARY_PATH"] + ":" + os.path.join(self.package_folder, "lib") + ":" + os.path.join(self.build_folder, "usr/lib/aarch64-linux-gnu/tegra"),
+            "LIBRARY_PATH": os.environ["LIBRARY_PATH"]
+            + ":"
+            + os.path.join(self.package_folder, "lib")
+            + ":"
+            + os.path.join(self.build_folder, "usr/lib/aarch64-linux-gnu/tegra"),
             "CFLAGS": f" -I{self.build_folder} -Wno-error",
             "ERROR_CFLAGS": "",
         }
@@ -100,8 +113,21 @@ class NvJetsonCompiledSource(GstProject):
     def package(self):
         lib_folder = os.path.join(self.package_folder, "lib")
 
-        self.copy("*.so*", src="usr", dst="lib", keep_path=False, symlinks=False, excludes=("*libgst*.so*"))
-        self.copy("*libgst*.so*", dst="lib/gstreamer-1.0", keep_path=False, symlinks=False, excludes=("*libgstomx.*"))
+        self.copy(
+            "*.so*",
+            src="usr",
+            dst="lib",
+            keep_path=False,
+            symlinks=False,
+            excludes=("*libgst*.so*"),
+        )
+        self.copy(
+            "*libgst*.so*",
+            dst="lib/gstreamer-1.0",
+            keep_path=False,
+            symlinks=False,
+            excludes=("*libgstomx.*"),
+        )
 
     def package_info(self):
         self.env_info.JETSON_DRIVER_PATH = os.path.join(self.package_folder, "lib")

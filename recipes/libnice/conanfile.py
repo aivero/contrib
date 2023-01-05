@@ -2,7 +2,10 @@ from build import *
 
 
 class LibNiceRecipe(GstRecipe):
-    description = "An implementation of the IETF's Interactive Connectivity Establishment (ICE) standard"
+    settings = GstRecipe.settings + ("compiler",)
+    description = (
+        "An implementation of the IETF's Interactive Connectivity Establishment (ICE) standard"
+    )
     license = "LGPL"
     build_requires = (
         "cc/[^1.0.0]",
@@ -19,7 +22,9 @@ class LibNiceRecipe(GstRecipe):
     exports_sources = "nice.pc"
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/libnice/libnice/-/archive/{self.version}/libnice-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.freedesktop.org/libnice/libnice/-/archive/{self.version}/libnice-{self.version}.tar.gz"
+        )
 
     def package(self):
         tools.replace_prefix_in_pc_file("nice.pc", self.package_folder)

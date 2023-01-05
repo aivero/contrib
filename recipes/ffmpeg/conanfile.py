@@ -2,9 +2,11 @@ from build import *
 
 
 class FFMpeg(Recipe):
-    description = "A complete, cross-platform solution to record, convert and stream audio and video"
+    description = (
+        "A complete, cross-platform solution to record, convert and stream audio and video"
+    )
     license = "LGPL"
-    settings = Recipe.settings
+    settings = Recipe.settings + ("compiler",)
     options = {"nonfree": [True, False], "v4l2_m2m": [True, False], "shared": [True, False]}
     default_options = ("nonfree=False", "v4l2_m2m=True", "shared=True")
     build_requires = (

@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxshmfence(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Library that exposes a event API on top of Linux futexes"
     license = "custom"
     build_requires = (
@@ -12,4 +13,6 @@ class Libxshmfence(Recipe):
     requires = ("xorgproto/[>=2020.1]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libxshmfence-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libxshmfence-{self.version}.tar.gz"
+        )

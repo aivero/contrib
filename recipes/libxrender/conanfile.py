@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxrender(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X Rendering Extension client library"
     license = "MIT"
     build_requires = (
@@ -14,4 +15,6 @@ class Libxrender(Recipe):
     requires = ("libx11/[^1.6.12]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXrender-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXrender-{self.version}.tar.gz"
+        )

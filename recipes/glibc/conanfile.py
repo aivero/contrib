@@ -2,6 +2,7 @@ from build import *
 
 
 class Glibc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "GNU C Library"
     license = "GPL"
     options = {}
@@ -50,7 +51,9 @@ class Glibc(Recipe):
                 os.symlink("libm.so.6", "libm.so")
             for ld_script in ld_scripts:
                 shutil.copy2(f"/usr/lib/{arch}-linux-gnu/{ld_script}", ld_script)
-                tools.replace_path_in_file(ld_script, f"/usr/lib/{arch}-linux-gnu/", "", strict=False)
+                tools.replace_path_in_file(
+                    ld_script, f"/usr/lib/{arch}-linux-gnu/", "", strict=False
+                )
                 tools.replace_path_in_file(ld_script, f"/lib/{arch}-linux-gnu/", "")
             # Copy base glibc and fix linker scripts
             libs = [
@@ -70,7 +73,9 @@ class Glibc(Recipe):
             for lib in libs:
                 shutil.copy2(f"/lib/{arch}-linux-gnu/{lib}", lib)
                 for ld_script in ld_scripts:
-                    tools.replace_path_in_file(ld_script, f"/lib/{arch}-linux-gnu/{lib}", lib, strict=False)
+                    tools.replace_path_in_file(
+                        ld_script, f"/lib/{arch}-linux-gnu/{lib}", lib, strict=False
+                    )
             # Copy files from libgcc-9-dev
             libs = [
                 "libgcc_s.so",

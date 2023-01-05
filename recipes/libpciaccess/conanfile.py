@@ -2,7 +2,6 @@ from build import *
 
 
 class LibPciAccess(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Generic PCI access library"
     license = "MIT"
     build_requires = (

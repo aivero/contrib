@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonZippRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Pathlib-compatible object wrapper for zip files"
     license = "MIT"
     requires = ("python-setuptools/[^50.3.2]",)

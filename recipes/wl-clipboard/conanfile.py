@@ -2,7 +2,6 @@ from build import *
 
 
 class WlClipboard(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Command-line copy/paste utilities for Wayland"
     license = "GPL"
     build_requires = (

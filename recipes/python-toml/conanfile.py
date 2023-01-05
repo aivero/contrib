@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonToml(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "A Python library for parsing and creating TOML"
     license = "MIT"
     build_requires = ("python-setuptools/[>=40.4.0]",)

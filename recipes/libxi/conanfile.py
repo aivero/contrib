@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxi(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 Input extension library"
     license = "custom"
     build_requires = (

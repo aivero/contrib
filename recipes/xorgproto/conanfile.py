@@ -2,7 +2,6 @@ from build import *
 
 
 class Xorgproto(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "combined X.Org X11 Protocol headers"
     license = "custom"
     build_requires = (

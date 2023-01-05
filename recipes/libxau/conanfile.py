@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxau(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 authorisation library"
     license = "MIT"
     build_requires = (

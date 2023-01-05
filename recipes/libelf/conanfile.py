@@ -2,7 +2,6 @@ from build import *
 
 
 class Libelf(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Handle ELF object files and DWARF debugging information"
     license = "LGPL"
     requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")

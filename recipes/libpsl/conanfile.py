@@ -2,7 +2,6 @@ from build import *
 
 
 class Libpsl(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Public Suffix List library"
     license = "MIT"
     build_requires = (

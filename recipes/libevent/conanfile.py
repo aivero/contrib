@@ -2,7 +2,6 @@ from build import *
 
 
 class Libevent(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Event notification library https://libevent.org"
     license = "BSD"
     exports = "uninstall.patch"

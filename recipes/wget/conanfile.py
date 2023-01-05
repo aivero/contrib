@@ -2,7 +2,6 @@ from build import *
 
 
 class Wget(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Network utility to retrieve files from the Web"
     license = "GPL"
     build_requires = (

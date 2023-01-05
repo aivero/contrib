@@ -2,7 +2,6 @@ from build import *
 
 
 class Sassc(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "C implementation of Sass CSS preprocessor."
     license = "MIT"
     build_requires = (

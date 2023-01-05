@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonPillowRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Python Image Library"
     license = "BSD"
     build_requires = (

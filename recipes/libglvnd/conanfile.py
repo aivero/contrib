@@ -2,7 +2,6 @@ from build import *
 
 
 class Libglvnd(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "The GL Vendor-Neutral Dispatch library"
     license = "custom"
     options = {

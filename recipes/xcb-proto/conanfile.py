@@ -2,7 +2,6 @@ from build import *
 
 
 class XcbProto(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "XML-XCB protocol descriptions"
     license = "MIT"
     build_requires = (

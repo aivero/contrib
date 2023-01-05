@@ -32,7 +32,6 @@ Cflags: -I${includedir}
 
 
 class NvJetsonV4l2(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "NVIDIA built Accelerated GStreamer Plugins"
     license = "LGPL"
     options = {"jetson": ["Nano", "TX2", "Xavier"]}

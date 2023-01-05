@@ -2,7 +2,6 @@ from build import *
 
 
 class Nasm(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "80x86 assembler designed for portability and modularity"
     license = "BSD"
     requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")

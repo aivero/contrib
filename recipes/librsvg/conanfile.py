@@ -2,7 +2,6 @@ from build import *
 
 
 class Librsvg(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "SVG rendering library"
     license = "LGPL"
     build_requires = (

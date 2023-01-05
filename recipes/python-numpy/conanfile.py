@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonNumpyRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "conan package for Python Numpy module"
     license = "BSD"
     build_requires = (

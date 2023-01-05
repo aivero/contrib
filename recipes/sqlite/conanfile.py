@@ -7,7 +7,6 @@ def conv_version(version):
 
 
 class Sqlite(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A C library that implements an SQL database engine"
     license = "custom"
     build_requires = (

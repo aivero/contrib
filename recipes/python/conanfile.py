@@ -3,7 +3,6 @@ from build import *
 
 
 class PythonRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Next generation of the python high-level scripting language"
     license = "MIT"
     build_requires = (

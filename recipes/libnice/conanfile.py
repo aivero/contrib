@@ -2,7 +2,6 @@ from build import *
 
 
 class LibNiceRecipe(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = (
         "An implementation of the IETF's Interactive Connectivity Establishment (ICE) standard"
     )

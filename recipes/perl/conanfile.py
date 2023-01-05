@@ -2,7 +2,6 @@ from build import *
 
 
 class Perl(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A highly capable, feature-rich programming language"
     license = "GPL"
     build_requires = (

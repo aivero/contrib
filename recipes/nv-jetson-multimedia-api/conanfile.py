@@ -2,7 +2,6 @@ from build import *
 
 
 class NvJetsonMultimediaApi(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Multimedia API is a collection of lower-level APIs that support flexible application development"
     license = "LGPL"
     exports_sources = ["public_sources.tbz2"]

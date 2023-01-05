@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxshmfence(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Library that exposes a event API on top of Linux futexes"
     license = "custom"
     build_requires = (

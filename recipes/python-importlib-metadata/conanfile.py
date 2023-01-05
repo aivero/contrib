@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonImportlibMetadataRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Read metadata from Python packages"
     license = "Apache"
     requires = ("python-zipp/[^3.1.0]",)

@@ -2,7 +2,6 @@ from build import *
 
 
 class Gmp(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A free library for arbitrary precision arithmetic"
     license = "GPL"
     build_requires = (

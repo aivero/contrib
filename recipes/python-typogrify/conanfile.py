@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonTypogrify(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "filters to make caring about typography on the web a bit easier"
     license = "BSD"
     build_requires = (

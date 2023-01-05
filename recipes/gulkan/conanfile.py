@@ -2,7 +2,6 @@ from build import *
 
 
 class Gulkan(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A GLib library for Vulkan abstraction"
     license = "MIT"
     build_requires = (

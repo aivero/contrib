@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonMarkdown(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Python implementation of John Gruber's Markdown."
     license = "BSD"
     build_requires = ("python-setuptools/[>=40.1.0]",)

@@ -2,7 +2,6 @@ from build import *
 
 
 class Freetype(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "FreeType is a software library to render fonts"
     license = "FTL"
     build_requires = (

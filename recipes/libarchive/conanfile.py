@@ -2,7 +2,6 @@ from build import *
 
 
 class Libarchive(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Multi-format archive and compression library"
     license = "BSD"
     build_requires = (

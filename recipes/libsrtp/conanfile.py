@@ -2,7 +2,6 @@ from build import *
 
 
 class Libsrtp(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Library for SRTP (Secure Realtime Transport Protocol)"
     license = "BSD"
     build_requires = (

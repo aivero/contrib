@@ -2,7 +2,6 @@ from build import *
 
 
 class VulkanHeaders(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Vulkan header files"
     license = "apache"
     build_requires = ("cc/[^1.0.0]", "cmake/[^3.18.0]")

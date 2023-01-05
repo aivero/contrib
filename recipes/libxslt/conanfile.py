@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxslt(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "XML stylesheet transformation library"
     license = "custom"
     build_requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")

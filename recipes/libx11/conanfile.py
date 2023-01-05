@@ -2,7 +2,6 @@ from build import *
 
 
 class Libx11(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 client-side library"
     license = "MIT"
     build_requires = (

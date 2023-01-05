@@ -2,7 +2,6 @@ from build import *
 
 
 class LibUSB(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A cross-platform library to access USB devices"
     license = "LGPL"
     build_requires = (

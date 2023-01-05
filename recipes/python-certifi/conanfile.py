@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonCertifi(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Python package for providing Mozilla's CA Bundle"
     license = "GPL"
     requires = ("python-setuptools/[>=40]",)

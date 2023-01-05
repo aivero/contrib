@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonVirtualenvRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Virtual Python Environment builder"
     license = "MIT"
     requires = (

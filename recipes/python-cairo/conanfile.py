@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonCairoRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Python bindings for the cairo graphics library"
     license = "LGPL"
     build_requires = ("cc/[^1.0.0]", "meson/[>=0.55.3]")

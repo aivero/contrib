@@ -2,7 +2,6 @@ from build import *
 
 
 class Mozjpeg(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "JPEG image codec with accelerated baseline compression and decompression"
     license = "custom"
     build_requires = (

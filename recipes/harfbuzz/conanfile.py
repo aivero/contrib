@@ -2,7 +2,6 @@ from build import *
 
 
 class Harfbuzz(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "HarfBuzz text shaping engine"
     license = "MIT"
     build_requires = (

@@ -2,7 +2,6 @@ from build import *
 
 
 class RustRecipe(RustRecipe):
-    settings = RustRecipe.settings + ("compiler",)
     description = "Virtual rust package"
     license = "MIT"
     requires = (

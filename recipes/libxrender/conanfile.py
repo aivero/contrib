@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxrender(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X Rendering Extension client library"
     license = "MIT"
     build_requires = (

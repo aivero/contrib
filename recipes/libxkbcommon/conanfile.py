@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxkbcommon(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Keymap handling library for toolkits and window systems"
     license = "MIT"
     build_requires = (

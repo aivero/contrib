@@ -2,7 +2,6 @@ from build import *
 
 
 class Gtk4(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "GObject-based multi-platform GUI toolkit"
     license = "LGPL"
     options = {

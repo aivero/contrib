@@ -2,7 +2,6 @@ from build import *
 
 
 class MesonRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "High productivity build system"
     license = "Apache"
     requires = (

@@ -2,7 +2,6 @@ from build import *
 
 
 class Libk4a(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Azure Kinect SDK"
     license = "MIT"
     exports = "k4a.pc"

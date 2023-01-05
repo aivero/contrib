@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxxf86vm(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 XFree86 video mode extension library"
     license = "custom"
     build_requires = (

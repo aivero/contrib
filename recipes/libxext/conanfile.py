@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxext(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 miscellaneous extensions library"
     license = "custom"
     build_requires = (

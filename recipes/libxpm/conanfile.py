@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxpm(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 pixmap library"
     license = "custom"
     build_requires = (

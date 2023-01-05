@@ -2,7 +2,6 @@ from build import *
 
 
 class Curl(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "An URL retrieval utility and library"
     license = "MIT"
     build_requires = (

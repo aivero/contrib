@@ -2,7 +2,6 @@ from build import *
 
 
 class Eudev(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "OpenRC compatible fork of systemd-udev"
     license = "GPL"
     build_requires = (

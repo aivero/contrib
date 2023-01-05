@@ -2,7 +2,6 @@ from build import *
 
 
 class Gtk3(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "GObject-based multi-platform GUI toolkit"
     license = "LGPL"
     options = {

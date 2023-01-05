@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonJinja(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "A simple pythonic template language written in Python"
     license = "BSD"
     requires = (

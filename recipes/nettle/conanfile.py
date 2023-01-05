@@ -2,7 +2,6 @@ from build import *
 
 
 class Nettle(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A low-level cryptographic library"
     license = "GPL"
     build_requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")

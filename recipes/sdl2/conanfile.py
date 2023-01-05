@@ -2,7 +2,6 @@ from build import *
 
 
 class Sdl2(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A library for portable low-level access to a video framebuffer, audio output, mouse, and keyboard"
     license = "MIT"
     build_requires = (

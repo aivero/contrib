@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonDistlibRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Low-level components of distutils2/packaging"
     license = "PSF"
 

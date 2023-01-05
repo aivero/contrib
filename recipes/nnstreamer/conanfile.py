@@ -3,7 +3,6 @@ from build import *
 
 
 class GstNnstreamer(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = (
         "Neural Network (NN) Streamer, Stream Processing Paradigm for Neural Network Apps/Devices."
     )

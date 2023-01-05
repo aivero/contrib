@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxinerama(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 Xinerama extension library"
     license = "custom"
     build_requires = (

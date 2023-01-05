@@ -2,7 +2,6 @@ from build import *
 
 
 class Openjpeg2(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "An open source JPEG 2000 codec, version 2.4.0"
     license = "BSD"
     build_requires = (

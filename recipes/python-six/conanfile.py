@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonSixRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Python 2 and 3 compatibility utilities"
     license = "MIT"
     build_requires = (

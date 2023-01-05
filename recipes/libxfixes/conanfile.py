@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxfixes(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 miscellaneous 'fixes' extension library"
     license = "custom"
     build_requires = (

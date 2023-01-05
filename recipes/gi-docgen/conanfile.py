@@ -2,7 +2,6 @@ from build import *
 
 
 class GiDocgen(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Documentation generator for GObject-based libraries"
     license = "Apache"
     build_requires = (

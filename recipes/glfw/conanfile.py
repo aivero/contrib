@@ -2,7 +2,6 @@ from build import *
 
 
 class Glfwc(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop."
     license = "ZLIB"
     options = {"x11": [True, False]}

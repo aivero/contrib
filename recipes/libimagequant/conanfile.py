@@ -2,7 +2,6 @@ from build import *
 
 
 class Libimagequant(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = (
         "Library for high-quality conversion of RGBA images to 8-bit indexed-color (palette) images"
     )

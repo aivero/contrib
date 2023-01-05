@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxcursor(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X cursor management library"
     license = "custom"
     build_requires = (

@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonDocutils(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = (
         "Set of tools for processing plaintext docs into formats such as HTML, XML, or LaTeX"
     )

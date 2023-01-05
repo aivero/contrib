@@ -2,7 +2,6 @@ from build import *
 
 
 class LinuxTools(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Linux tools"
     license = "GPL"
 

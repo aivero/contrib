@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxtst(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X11 Testing Resource extension library"
     license = "custom"
     build_requires = (

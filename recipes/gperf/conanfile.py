@@ -2,7 +2,6 @@ from build import *
 
 
 class Gperf(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A portable, high level programming interface to various calling conventions"
     license = "GPL"
     build_requires = (

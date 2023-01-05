@@ -2,7 +2,6 @@ from build import *
 
 
 class Gxr(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A glib wrapper for the OpenVR and the OpenXR APIs"
     license = "MIT"
     build_requires = (

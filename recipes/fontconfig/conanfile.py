@@ -2,7 +2,6 @@ from build import *
 
 
 class Fontconfig(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A library for configuring and customizing font access"
     license = "MIT"
     build_requires = (

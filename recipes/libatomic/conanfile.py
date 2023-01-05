@@ -2,7 +2,6 @@ from build import *
 
 
 class Libatomic(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "GNU libatomic"
     license = "GPL"
     options = {}

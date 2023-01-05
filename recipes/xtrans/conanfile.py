@@ -2,7 +2,6 @@ from build import *
 
 
 class Xtrans(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "X transport library"
     license = "MIT"
     build_requires = (

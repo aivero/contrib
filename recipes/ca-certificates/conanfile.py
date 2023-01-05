@@ -2,7 +2,6 @@ from build import *
 
 
 class CaCertificates(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Common CA certificates PEM files from Mozilla"
     license = "MPL"
     options = {}

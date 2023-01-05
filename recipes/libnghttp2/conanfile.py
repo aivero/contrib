@@ -2,7 +2,6 @@ from build import *
 
 
 class Libnghttp2(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Framing layer of HTTP/2 is implemented as a reusable C library"
     license = "MIT"
     build_requires = (

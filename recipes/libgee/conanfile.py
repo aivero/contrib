@@ -2,7 +2,6 @@ from build import *
 
 
 class Libgee(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A collection library providing GObject-based interfaces and classes for commonly used data structures"
     license = "LGPL"
     build_requires = (

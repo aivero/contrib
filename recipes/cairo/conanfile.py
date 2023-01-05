@@ -2,7 +2,6 @@ from build import *
 
 
 class Cairo(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "2D graphics library with support for multiple output devices"
     license = "LGPL"
     options = {

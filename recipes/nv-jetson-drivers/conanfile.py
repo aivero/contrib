@@ -25,7 +25,6 @@ def get_lib_dir(basedir, libname):
 
 
 class NvJetsonDrivers(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "NVIDIA built Accelerated GStreamer Plugins"
     license = "LGPL"
     options = {"jetson": ["Nano", "TX2", "Xavier"]}

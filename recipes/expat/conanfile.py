@@ -2,7 +2,6 @@ from build import *
 
 
 class Expat(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "An XML parser library"
     license = "MIT"
     build_requires = (

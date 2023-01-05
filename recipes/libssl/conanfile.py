@@ -2,7 +2,6 @@ from build import *
 
 
 class Libssl(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Virtual libssl"
     license = "MIT"
     options = {}

@@ -2,7 +2,6 @@ from build import *
 
 
 class Libepoxy(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Library handling OpenGL function pointer management"
     license = "MIT"
     options = {

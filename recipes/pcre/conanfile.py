@@ -2,7 +2,6 @@ from build import *
 
 
 class Pcre(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A library that implements Perl 5-style regular expressions"
     license = "BSD"
     build_requires = (

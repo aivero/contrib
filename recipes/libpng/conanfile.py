@@ -2,7 +2,6 @@ from build import *
 
 
 class Libpng(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A collection of routines used to create PNG format graphics files"
     license = "custom"
     build_requires = (

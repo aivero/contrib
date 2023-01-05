@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonFilelockRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "A platform independent file lock"
     license = "custom"
     requires = ("python-setuptools/[>=41.2.0]",)

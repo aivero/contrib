@@ -3,7 +3,6 @@ from conans.errors import ConanInvalidConfiguration
 
 
 class GstRecipe(GstRustProject):
-    settings = GstRustProject.settings + ("compiler",)
     description = "All-batteries included GStreamer WebRTC producer"
     license = "MIT"
     exports = "*.patch"

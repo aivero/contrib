@@ -2,7 +2,6 @@ from build import *
 
 
 class Strace(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A diagnostic, debugging and instructional userspace tracer"
     license = "BSD"
     build_requires = (

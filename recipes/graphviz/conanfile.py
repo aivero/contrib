@@ -2,7 +2,6 @@ from build import *
 
 
 class Graphviz(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Graph Visualization Tools"
     license = "EPL"
     build_requires = (

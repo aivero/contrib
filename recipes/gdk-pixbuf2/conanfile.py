@@ -2,7 +2,6 @@ from build import *
 
 
 class GdkPixbuf2(Recipe):
-    settings = Recipe.settings + ("compiler",)
     librsvg_version = "2.53.0"
     description = "An image loading library"
     license = "LGPL"

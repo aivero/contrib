@@ -2,7 +2,6 @@ from build import *
 
 
 class X265(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "x265 is the leading H.265 / HEVC encoder software library"
     license = "GPL"
     exports = "no-integrated-as.patch"

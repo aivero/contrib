@@ -2,7 +2,6 @@ from build import *
 
 
 class Libsoup3(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "HTTP client/server library for GNOME"
     license = "LGPL"
     build_requires = (

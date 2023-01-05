@@ -2,7 +2,6 @@ from build import *
 
 
 class Libxml2Recipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "XML parsing library, version 2"
     license = "MIT"
     build_requires = (

@@ -2,7 +2,6 @@ from build import *
 
 
 class Xrdesktop(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A library for XR interaction with classical desktop compositors"
     license = "MIT"
     build_requires = (

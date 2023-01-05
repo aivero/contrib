@@ -2,7 +2,6 @@ from build import *
 
 
 class Vala(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Compiler for the GObject type system"
     license = "LGPL"
     build_requires = (

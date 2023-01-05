@@ -2,7 +2,6 @@ from build import *
 
 
 class VulkanIcdLoader(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Vulkan Installable Client Driver (ICD) Loader"
     license = "custom"
     build_requires = (

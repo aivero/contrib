@@ -2,7 +2,6 @@ from build import *
 
 
 class Libffi(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Portable foreign function interface library"
     license = "MIT"
     build_requires = (

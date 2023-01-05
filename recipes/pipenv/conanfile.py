@@ -2,7 +2,6 @@ from build import *
 
 
 class Pipenv(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Sacred Marriage of Pipfile, Pip, & Virtualenv."
     license = "MIT"
     requires = (

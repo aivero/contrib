@@ -2,7 +2,6 @@ from build import *
 
 
 class Openssl1(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "TLS/SSL and crypto library version 1"
     license = "BSD"
     build_requires = (

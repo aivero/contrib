@@ -2,7 +2,6 @@ from build import *
 
 
 class Nodejs(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Evented I/O for V8 javascript"
     license = "MIT"
     build_requires = (

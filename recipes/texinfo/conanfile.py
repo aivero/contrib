@@ -2,7 +2,6 @@ from build import *
 
 
 class Texinfo(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "GNU documentation system for on-line information and printed output"
     license = "GPL"
     build_requires = (

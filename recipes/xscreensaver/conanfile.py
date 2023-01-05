@@ -2,7 +2,6 @@ from build import *
 
 
 class Xscreensaver(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Screen saver and locker for the X Window System"
     license = "BSD"
     build_requires = (

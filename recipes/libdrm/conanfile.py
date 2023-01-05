@@ -2,7 +2,6 @@ from build import *
 
 
 class Libdrm(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Direct Rendering Manager headers and kernel modules"
     license = "MIT"
     build_requires = (

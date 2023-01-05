@@ -2,7 +2,6 @@ from build import *
 
 
 class Yarn(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Fast, reliable, and secure dependency management"
     license = "BSD"
     build_requires = ("npm/[>=7.0.5]",)

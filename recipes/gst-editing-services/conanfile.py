@@ -2,7 +2,6 @@ from build import *
 
 
 class GstEditingServices(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = " This is a high-level library for facilitating the creation of audio/video non-linear editors."
     license = "LGPL"
     exports = "*.patch"

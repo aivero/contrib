@@ -8,7 +8,6 @@ mapper = {
 
 
 class GstNvJetsonV4l2(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "NVIDIA jetson v4l2 element"
     license = "LGPL"
     options = {"jetson": ["Nano", "TX2", "Xavier"]}

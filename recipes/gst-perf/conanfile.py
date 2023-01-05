@@ -3,7 +3,6 @@ from build import *
 
 
 class GstPerfRecipe(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "Performance Evaluation tool for Gstreamer"
     license = "LGPL"
     build_requires = (

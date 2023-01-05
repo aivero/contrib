@@ -2,7 +2,6 @@ from build import *
 
 
 class SccacheRecipe(RustRecipe):
-    settings = RustRecipe.settings + ("compiler",)
     description = "Development and debugging tools for GStreamer"
     license = "Apache"
     build_requires = ("pkgconf/[^1.7.3]",)

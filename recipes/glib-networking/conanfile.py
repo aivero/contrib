@@ -2,7 +2,6 @@ from build import *
 
 
 class GlibNetworking(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Network extensions for GLib"
     license = "GPL"
     build_requires = (

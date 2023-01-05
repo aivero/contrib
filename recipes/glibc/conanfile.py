@@ -2,7 +2,6 @@ from build import *
 
 
 class Glibc(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "GNU C Library"
     license = "GPL"
     options = {}

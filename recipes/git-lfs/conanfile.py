@@ -2,7 +2,6 @@ from build import *
 
 
 class GitLFS(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = " Git extension for versioning large files "
     license = "MIT"
     build_requires = (

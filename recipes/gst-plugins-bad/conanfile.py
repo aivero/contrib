@@ -3,7 +3,6 @@ from conans.errors import ConanInvalidConfiguration
 
 
 class GstPluginsBad(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "A set of plugins that aren't up to par compared to the rest"
     license = "LGPL"
     exports = "*.patch"

@@ -2,7 +2,6 @@ from build import *
 
 
 class Direnv(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A shell extension that manages your environment"
     license = "MIT"
     build_requires = (

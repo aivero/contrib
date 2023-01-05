@@ -2,7 +2,6 @@ from build import *
 
 
 class GstSvtHevcRecipe(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "The Scalable Video Technology for HEVC Encoder GStreamer plugin"
     license = "LGPL"
     build_requires = ("cc/[^1.0.0]", "cmake/[^3.18.4]", "yasm/[^1.3.0]")

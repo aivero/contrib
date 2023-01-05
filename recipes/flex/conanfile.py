@@ -2,7 +2,6 @@ from build import *
 
 
 class Flex(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Flex, the fast lexical analyzer generator"
     license = "BSD"
     build_requires = (

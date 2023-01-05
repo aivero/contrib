@@ -2,7 +2,6 @@ from build import *
 
 
 class GObjectIntrospection(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Middleware layer between C libraries (using GObject) and language bindings"
     license = "LGPL"
     build_requires = (

@@ -3,7 +3,6 @@ from conans.errors import ConanInvalidConfiguration
 
 
 class GstPluginsBase(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "A well-groomed and well-maintained collection of GStreamer plugins and elements"
     license = "LGPL"
     options = {

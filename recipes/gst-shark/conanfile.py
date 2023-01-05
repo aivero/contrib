@@ -2,7 +2,6 @@ from build import *
 
 
 class GstSharkRecipe(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "GstShark is a front-end for GStreamer traces "
     license = "LGPL"
     build_requires = (

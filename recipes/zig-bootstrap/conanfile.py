@@ -2,7 +2,6 @@ from build import *
 
 
 class ZigBootstrap(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "a general-purpose programming language and toolchain for maintaining robust, optimal, and reusable software"
     license = "MIT"
 

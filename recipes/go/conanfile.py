@@ -2,7 +2,6 @@ from build import *
 
 
 class Go(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Core compiler tools for the Go programming language"
     license = "BSD"
 

@@ -2,7 +2,6 @@ from build import *
 
 
 class GstVaapi(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "Hardware-accelerated video decoding, encoding and processing on Intel graphics through VA-API"
     license = "LGPL"
     options = {

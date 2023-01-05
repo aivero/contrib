@@ -2,7 +2,6 @@ from build import *
 
 
 class GstNvJetsonEgl(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "NVIDIA jetson egl element"
     license = "LGPL"
     options = {"jetson": ["Nano", "TX2", "Xavier"]}

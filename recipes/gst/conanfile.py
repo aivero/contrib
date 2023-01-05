@@ -3,7 +3,6 @@ from conans.errors import ConanInvalidConfiguration
 
 
 class Gst(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "A framework for streaming media"
     # If set to true, select version highest semver matching version from devops.yml
     gst_match_version = True

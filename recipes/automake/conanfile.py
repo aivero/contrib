@@ -2,7 +2,6 @@ from build import *
 
 
 class Automake(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "A GNU tool for automatically creating Makefiles"
     license = "GPL"
     exports = "automake-include-fix.patch"

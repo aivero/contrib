@@ -2,7 +2,6 @@ from build import *
 
 
 class Elfutils(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Handle ELF object files and DWARF debugging information"
     license = "LGPL"
     build_requires = (

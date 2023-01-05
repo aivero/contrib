@@ -2,7 +2,6 @@ from build import *
 
 
 class CC(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "Virtual c/c++ compiler package"
     license = "MIT"
 

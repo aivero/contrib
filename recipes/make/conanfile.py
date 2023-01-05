@@ -2,7 +2,6 @@ from build import *
 
 
 class Make(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "GNU make utility to maintain groups of programs"
     license = "GPL"
     build_requires = "cc/[^1.0.0]"

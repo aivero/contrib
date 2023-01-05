@@ -2,7 +2,6 @@ from build import *
 
 
 class PythonGobjectRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Python GObject bindings"
     license = "LGPL"
     build_requires = (

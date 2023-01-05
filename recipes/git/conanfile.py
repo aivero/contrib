@@ -9,7 +9,6 @@ INSTALL_SYMLINKS=1
 
 
 class Git(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "The fast distributed version control system"
     license = "GPL"
     build_requires = (

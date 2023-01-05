@@ -2,7 +2,6 @@ from build import *
 
 
 class Tcl(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "The Tcl scripting language"
     license = "custom"
     build_requires = (

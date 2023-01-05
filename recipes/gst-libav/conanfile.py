@@ -2,7 +2,6 @@ from build import *
 
 
 class GstLibav(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
     description = "GStreamer plugin for the libav* library (former FFmpeg)"
     license = "LGPL"
     build_requires = (

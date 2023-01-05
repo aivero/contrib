@@ -2,7 +2,6 @@ from build import *
 
 
 class File(Recipe):
-    settings = Recipe.settings + ("compiler",)
     description = "File type identification utility"
     license = "custom"
     build_requires = ()

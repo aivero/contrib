@@ -2,7 +2,6 @@ from build import *
 
 
 class Cling(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
     description = "Interactive C++ interpreter, built on the top of LLVM and Clang libraries"
     license = "custom"
     build_requires = (

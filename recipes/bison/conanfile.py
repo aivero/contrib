@@ -2,6 +2,7 @@ from build import *
 
 
 class Bison(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Bison is a general-purpose parser generator"
     license = "GPL"
     build_requires = (

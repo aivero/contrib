@@ -2,6 +2,7 @@ from build import *
 
 
 class Direnv(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A shell extension that manages your environment"
     license = "MIT"
     build_requires = (
@@ -14,8 +15,5 @@ class Direnv(Recipe):
         self.get(f"https://github.com/direnv/direnv/archive/v{self.version}.tar.gz")
 
     def build(self):
-        args = [
-            f"PREFIX={self.package_folder}",
-            "GOFLAGS=-buildmode=pie -trimpath -modcacherw"
-        ]
+        args = [f"PREFIX={self.package_folder}", "GOFLAGS=-buildmode=pie -trimpath -modcacherw"]
         self.make(args)

@@ -2,6 +2,7 @@ from build import *
 
 
 class Lldb(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Next generation, high-performance debugger"
     license = "Apache"
     options = {}
@@ -22,9 +23,17 @@ class Lldb(PythonRecipe):
         self.requires(f"python/[~{self.settings.python}]")
 
     def source(self):
-        self.get(f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/llvm-{self.version}.src.tar.xz")
-        self.get(f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/clang-{self.version}.src.tar.xz", os.path.join(self.src, "projects", "clang"))
-        self.get(f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/lldb-{self.version}.src.tar.xz", os.path.join(self.src, "projects", "lldb"))
+        self.get(
+            f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/llvm-{self.version}.src.tar.xz"
+        )
+        self.get(
+            f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/clang-{self.version}.src.tar.xz",
+            os.path.join(self.src, "projects", "clang"),
+        )
+        self.get(
+            f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/lldb-{self.version}.src.tar.xz",
+            os.path.join(self.src, "projects", "lldb"),
+        )
 
     def build(self):
         defs = {

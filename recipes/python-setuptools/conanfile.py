@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonSetuptoolsRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Easily download, build, install, upgrade, and uninstall Python packages"
     license = "Apache"
 

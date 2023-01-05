@@ -2,6 +2,7 @@ from build import *
 
 
 class Yasm(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Yasm is a complete rewrite of the NASM assembler under the new BSD License"
     license = "BSD"
     build_requires = (

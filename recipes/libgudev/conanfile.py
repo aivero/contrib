@@ -2,6 +2,7 @@ from build import *
 
 
 class GLib(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "libgudev, a library providing GObject bindings for libudev"
     license = "LGPL"
     build_requires = ("cc/[^1.0.0]", "meson/[>=0.55.3]")

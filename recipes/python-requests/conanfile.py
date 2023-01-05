@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonRequestsRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Python Requests module"
     license = "Apache"
     build_requires = (
@@ -11,7 +12,6 @@ class PythonRequestsRecipe(PythonRecipe):
 
     def requirements(self):
         self.requires(f"python/[~{self.settings.python}]")
-
 
     def source(self):
         self.get(f"https://github.com/psf/requests/archive/v{self.version}.tar.gz")

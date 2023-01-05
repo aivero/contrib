@@ -2,7 +2,10 @@ from build import *
 
 
 class Libimagequant(Recipe):
-    description = "Library for high-quality conversion of RGBA images to 8-bit indexed-color (palette) images"
+    settings = Recipe.settings + ("compiler",)
+    description = (
+        "Library for high-quality conversion of RGBA images to 8-bit indexed-color (palette) images"
+    )
     license = "BSD"
     build_requires = (
         "autotools/1.0.0",
@@ -10,7 +13,9 @@ class Libimagequant(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/ImageOptim/libimagequant/archive/{self.version}/libimagequant-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/ImageOptim/libimagequant/archive/{self.version}/libimagequant-{self.version}.tar.gz"
+        )
 
     def build(self):
         os.environ["DESTDIR"] = self.package_folder

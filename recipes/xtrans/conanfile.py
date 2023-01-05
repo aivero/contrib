@@ -2,6 +2,7 @@ from build import *
 
 
 class Xtrans(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X transport library"
     license = "MIT"
     build_requires = (
@@ -10,4 +11,6 @@ class Xtrans(Recipe):
     )
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/xtrans-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/xtrans-{self.version}.tar.gz"
+        )

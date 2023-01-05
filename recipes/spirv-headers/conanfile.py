@@ -2,6 +2,7 @@ from build import *
 
 
 class SpirvTools(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "API and commands for processing SPIR-V modules"
     license = "custom"
     build_requires = (

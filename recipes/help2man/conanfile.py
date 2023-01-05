@@ -2,6 +2,7 @@ from build import *
 
 
 class Help2Man(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Conversion tool to create man files"
     license = "GPL"
     build_requires = (

@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxpm(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 pixmap library"
     license = "custom"
     build_requires = (
@@ -9,9 +10,7 @@ class Libxpm(Recipe):
         "autotools/[^1.0.0]",
         "xorg-util-macros/[^1.19.1]",
     )
-    requires = (
-        "libxext/[^1.3.4]",
-    )
+    requires = ("libxext/[^1.3.4]",)
 
     def source(self):
         self.get(

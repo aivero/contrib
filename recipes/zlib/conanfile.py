@@ -2,6 +2,7 @@ from build import *
 
 
 class Zlib(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A Massively Spiffy Yet Delicately Unobtrusive Compression Library (Also Free, Not to Mention Unencumbered by Patents)"
     license = "custom"
     build_requires = (

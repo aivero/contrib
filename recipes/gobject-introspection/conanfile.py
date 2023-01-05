@@ -2,6 +2,7 @@ from build import *
 
 
 class GObjectIntrospection(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Middleware layer between C libraries (using GObject) and language bindings"
     license = "LGPL"
     build_requires = (
@@ -22,4 +23,6 @@ class GObjectIntrospection(PythonRecipe):
         self.get(f"https://github.com/GNOME/gobject-introspection/archive/{version}.tar.gz")
 
     def package_info(self):
-        self.env_info.PYTHONPATH.append(os.path.join(self.package_folder, "lib", "gobject-introspection"))
+        self.env_info.PYTHONPATH.append(
+            os.path.join(self.package_folder, "lib", "gobject-introspection")
+        )

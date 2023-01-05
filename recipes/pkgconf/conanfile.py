@@ -2,6 +2,7 @@ from build import *
 
 
 class Pkgconf(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Package compiler and linker metadata toolkit"
     license = "custom"
     build_requires = (

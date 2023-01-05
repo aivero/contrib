@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxrandr(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 RandR extension library"
     license = "MIT"
     build_requires = (
@@ -15,4 +16,6 @@ class Libxrandr(Recipe):
     )
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXrandr-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXrandr-{self.version}.tar.gz"
+        )

@@ -2,6 +2,7 @@ from build import *
 
 
 class LibPciAccess(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Generic PCI access library"
     license = "MIT"
     build_requires = (
@@ -11,4 +12,6 @@ class LibPciAccess(Recipe):
     )
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libpciaccess-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libpciaccess-{self.version}.tar.gz"
+        )

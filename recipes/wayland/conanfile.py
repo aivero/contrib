@@ -2,6 +2,7 @@ from build import *
 
 
 class Wayland(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A computer display server protocol"
     license = "MIT"
     exports = "disable-tests.patch"

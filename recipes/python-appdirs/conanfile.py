@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonAppdirsRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = 'A small Python module for determining appropriate platform-specific dirs, e.g. a "user data dir".'
     license = "MIT"
     build_requires = ("python-setuptools/[>=41.2.0]",)

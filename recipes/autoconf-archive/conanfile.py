@@ -2,6 +2,7 @@ from build import *
 
 
 class AutoconfArchive(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A collection of freely re-usable Autoconf macros"
     license = "GPL"
     build_requires = (
@@ -10,4 +11,6 @@ class AutoconfArchive(Recipe):
     )
 
     def source(self):
-        self.get(f"https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-{self.version}.tar.xz")
+        self.get(
+            f"https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-{self.version}.tar.xz"
+        )

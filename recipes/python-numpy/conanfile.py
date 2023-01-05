@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonNumpyRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "conan package for Python Numpy module"
     license = "BSD"
     build_requires = (
@@ -17,4 +18,6 @@ class PythonNumpyRecipe(PythonRecipe):
         self.requires(f"python/[~{self.settings.python}]")
 
     def source(self):
-        self.get(f"https://github.com/numpy/numpy/releases/download/v{self.version}/numpy-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/numpy/numpy/releases/download/v{self.version}/numpy-{self.version}.tar.gz"
+        )

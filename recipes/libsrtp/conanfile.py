@@ -2,18 +2,15 @@ from build import *
 
 
 class Libsrtp(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Library for SRTP (Secure Realtime Transport Protocol)"
     license = "BSD"
     build_requires = (
-        "cc/[^1.0.0]", 
+        "cc/[^1.0.0]",
         "cmake/[^3.18.4]",
     )
-    requires = (
-        "libssl/[^1.0.0]",
-    )
-    exports_sources = (
-        "libsrtp2.pc",
-    )
+    requires = ("libssl/[^1.0.0]",)
+    exports_sources = ("libsrtp2.pc",)
 
     def source(self):
         self.get(f"https://github.com/cisco/libsrtp/archive/v{self.version}.tar.gz")

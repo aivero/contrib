@@ -2,6 +2,7 @@ from build import *
 
 
 class Dbus(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Freedesktop.org message bus system"
     license = "GPL"
     build_requires = (

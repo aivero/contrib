@@ -2,6 +2,7 @@ from build import *
 
 
 class Musl(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Lightweight implementation of C standard library"
     license = "MIT"
     requires = ("linux-headers/[^5.4.50]",)

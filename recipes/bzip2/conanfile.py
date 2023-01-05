@@ -2,6 +2,7 @@ from build import *
 
 
 class Bzip2(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A high-quality data compression program"
     license = "custom"
     build_requires = (

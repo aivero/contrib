@@ -2,6 +2,7 @@ from build import *
 
 
 class Mpc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Library for the arithmetic of complex numbers with arbitrarily high precision"
     license = "LGPL"
     build_requires = (

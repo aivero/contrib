@@ -2,6 +2,7 @@ from build import *
 
 
 class Expat(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "An XML parser library"
     license = "MIT"
     build_requires = (
@@ -10,4 +11,6 @@ class Expat(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/libexpat/libexpat/releases/download/R_{self.version.replace('.', '_')}/expat-{self.version}.tar.bz2")
+        self.get(
+            f"https://github.com/libexpat/libexpat/releases/download/R_{self.version.replace('.', '_')}/expat-{self.version}.tar.bz2"
+        )

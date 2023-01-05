@@ -2,6 +2,7 @@ from build import *
 
 
 class Go(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Core compiler tools for the Go programming language"
     license = "BSD"
 
@@ -14,7 +15,7 @@ class Go(Recipe):
 
     def package(self):
         self.copy("go/*")
-        bin_path =  os.path.join(self.package_folder, "bin")
+        bin_path = os.path.join(self.package_folder, "bin")
         os.mkdir(bin_path)
         os.symlink("../go/bin/go", os.path.join(bin_path, "go"))
         os.symlink("../go/bin/gofmt", os.path.join(bin_path, "gofmt"))

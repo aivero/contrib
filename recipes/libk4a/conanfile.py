@@ -2,6 +2,7 @@ from build import *
 
 
 class Libk4a(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Azure Kinect SDK"
     license = "MIT"
     exports = "k4a.pc"
@@ -15,14 +16,18 @@ class Libk4a(Recipe):
             debian_repo_url = "https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk"
         if arch == "armv8":
             arch = "arm64"
-            debian_repo_url = "https://packages.microsoft.com/ubuntu/18.04/multiarch/prod/pool/main/libk/"
+            debian_repo_url = (
+                "https://packages.microsoft.com/ubuntu/18.04/multiarch/prod/pool/main/libk/"
+            )
 
         libk4a = f"libk4a{version_short}_{self.version}_{arch}.deb"
         libk4a_dev = f"libk4a{version_short}-dev_{self.version}_{arch}.deb"
 
         # Download `libk4a` and `libk4a-dev` for headers and shared objects
         tools.download(f"{debian_repo_url}/libk4a{version_short}/{libk4a}", filename=libk4a)
-        tools.download(f"{debian_repo_url}/libk4a{version_short}-dev/{libk4a_dev}", filename=libk4a_dev)
+        tools.download(
+            f"{debian_repo_url}/libk4a{version_short}-dev/{libk4a_dev}", filename=libk4a_dev
+        )
 
         # Extract shared objects, including the closed-source `libdepthengine.so*`
         self.run(f"dpkg -x {libk4a} libk4a")

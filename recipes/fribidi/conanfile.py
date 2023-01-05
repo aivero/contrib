@@ -2,6 +2,7 @@ from build import *
 
 
 class Fribidi(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "The Free Implementation of the Unicode Bidirectional Algorithm"
     license = "LGPL"
     build_requires = (

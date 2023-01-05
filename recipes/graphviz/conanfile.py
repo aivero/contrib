@@ -2,6 +2,7 @@ from build import *
 
 
 class Graphviz(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Graph Visualization Tools"
     license = "EPL"
     build_requires = (
@@ -12,4 +13,6 @@ class Graphviz(Recipe):
     )
 
     def source(self):
-        self.get(f"https://www2.graphviz.org/Packages/stable/portable_source/graphviz-{self.version}.tar.gz")
+        self.get(
+            f"https://www2.graphviz.org/Packages/stable/portable_source/graphviz-{self.version}.tar.gz"
+        )

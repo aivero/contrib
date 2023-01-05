@@ -2,6 +2,7 @@ from build import *
 
 
 class Pango(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A library for layout and rendering of text"
     license = "LGPL"
     options = {

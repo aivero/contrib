@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxxf86vm(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 XFree86 video mode extension library"
     license = "custom"
     build_requires = (
@@ -13,4 +14,6 @@ class Libxxf86vm(Recipe):
     requires = ("libxext/[^1.3.4]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXxf86vm-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXxf86vm-{self.version}.tar.gz"
+        )

@@ -3,16 +3,12 @@ from build import *
 
 
 class GstNnstreamer(GstRecipe):
+    settings = GstRecipe.settings + ("compiler",)
     description = (
         "Neural Network (NN) Streamer, Stream Processing Paradigm for Neural Network Apps/Devices."
     )
     license = "LGPL"
-    build_requires = (
-        "cc/[^1.0.0]",
-        "meson/[>=0.57.2]",
-        "flex/[^2.6.4]",
-        "bison/[^3.7.6]"
-    )
+    build_requires = ("cc/[^1.0.0]", "meson/[>=0.57.2]", "flex/[^2.6.4]", "bison/[^3.7.6]")
 
     def requirements(self):
         self.requires(f"gst-plugins-base/[~{self.settings.gstreamer}]")

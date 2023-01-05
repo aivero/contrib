@@ -2,6 +2,7 @@ from build import *
 
 
 class Libxfixes(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "X11 miscellaneous 'fixes' extension library"
     license = "custom"
     build_requires = (
@@ -12,4 +13,6 @@ class Libxfixes(Recipe):
     requires = ("libx11/[^1.6.12]",)
 
     def source(self):
-        self.get(f"https://xorg.freedesktop.org/releases/individual/lib/libXfixes-{self.version}.tar.gz")
+        self.get(
+            f"https://xorg.freedesktop.org/releases/individual/lib/libXfixes-{self.version}.tar.gz"
+        )

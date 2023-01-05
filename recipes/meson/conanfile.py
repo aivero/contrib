@@ -2,6 +2,7 @@ from build import *
 
 
 class MesonRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "High productivity build system"
     license = "Apache"
     requires = (
@@ -12,4 +13,6 @@ class MesonRecipe(PythonRecipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/mesonbuild/meson/releases/download/{self.version}/meson-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/mesonbuild/meson/releases/download/{self.version}/meson-{self.version}.tar.gz"
+        )

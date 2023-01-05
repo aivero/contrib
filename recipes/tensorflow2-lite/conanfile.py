@@ -3,6 +3,7 @@ from build import *
 
 
 class Tensorflow2Lite(Recipe):
+    settings = Recipe.settings + ("compiler",)
     name = "tensorflow2-lite"
     description = "https://www.tensorflow.org"
     license = "LGPL"

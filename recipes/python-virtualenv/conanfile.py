@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonVirtualenvRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Virtual Python Environment builder"
     license = "MIT"
     requires = (
@@ -13,6 +14,4 @@ class PythonVirtualenvRecipe(PythonRecipe):
     )
 
     def source(self):
-        self.get(
-            f"https://github.com/pypa/virtualenv/archive/{self.version}.tar.gz"
-        )
+        self.get(f"https://github.com/pypa/virtualenv/archive/{self.version}.tar.gz")

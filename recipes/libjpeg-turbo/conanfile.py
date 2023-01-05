@@ -2,6 +2,7 @@ from build import *
 
 
 class LibjpegTurbo(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "JPEG image codec with accelerated baseline compression and decompression"
     license = "custom"
     build_requires = (
@@ -12,7 +13,9 @@ class LibjpegTurbo(Recipe):
     )
 
     def source(self):
-        self.get(f"https://downloads.sourceforge.net/project/libjpeg-turbo/{self.version}/libjpeg-turbo-{self.version}.tar.gz")
+        self.get(
+            f"https://downloads.sourceforge.net/project/libjpeg-turbo/{self.version}/libjpeg-turbo-{self.version}.tar.gz"
+        )
 
     def build(self):
         defs = {
@@ -22,4 +25,3 @@ class LibjpegTurbo(Recipe):
             "ENABLE_STATIC": False,
         }
         self.cmake(defs)
-

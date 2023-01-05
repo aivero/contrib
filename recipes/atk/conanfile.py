@@ -2,6 +2,7 @@ from build import *
 
 
 class Atk(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "GObject-based multi-platform GUI toolkit"
     license = "LGPL"
     options = {
@@ -17,8 +18,12 @@ class Atk(Recipe):
 
     def build_requirements(self):
         if self.options.introspection:
-            self.build_requires("gobject-introspection/[^1.59.3]",)
+            self.build_requires(
+                "gobject-introspection/[^1.59.3]",
+            )
 
     def source(self):
         version = self.version.replace(".", "_")
-        self.get(f"https://gitlab.gnome.org/GNOME/atk/-/archive/ATK_{version}/atk-ATK_{version}.tar.bz2")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/atk/-/archive/ATK_{version}/atk-ATK_{version}.tar.bz2"
+        )

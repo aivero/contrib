@@ -2,6 +2,7 @@ from build import *
 
 
 class Flex(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Flex, the fast lexical analyzer generator"
     license = "BSD"
     build_requires = (
@@ -11,7 +12,9 @@ class Flex(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/westes/flex/releases/download/v{self.version}/flex-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/westes/flex/releases/download/v{self.version}/flex-{self.version}.tar.gz"
+        )
 
     def build(self):
         # args = [

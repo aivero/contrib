@@ -2,6 +2,7 @@ from build import *
 
 
 class Glfwc(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop."
     license = "ZLIB"
     options = {"x11": [True, False]}
@@ -20,7 +21,9 @@ class Glfwc(Recipe):
 
     def build(self):
         for req in ["libxext", "libxcb", "xorgproto", "libx11", "libxrender", "libxi", "libxfixes"]:
-            os.environ["CFLAGS"] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
+            os.environ[
+                "CFLAGS"
+            ] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
         defs = {
             "BUILD_SHARED_LIBS": True,
             "GLFW_BUILD_EXAMPLES": False,

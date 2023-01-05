@@ -3,6 +3,7 @@ from conans.errors import ConanInvalidConfiguration
 
 
 class GstRecipe(GstRustProject):
+    settings = GstRustProject.settings + ("compiler",)
     description = "All-batteries included GStreamer WebRTC producer"
     license = "MIT"
     exports = "*.patch"
@@ -20,7 +21,7 @@ class GstRecipe(GstRustProject):
             shutil.move(os.path.join(self.src, pfile), self.source_folder)
 
         shutil.rmtree(self.src)
-    
+
     def deploy(self):
         # webrtc-signalling server
         self.copy("*server", src="bin", dst="bin", keep_path=False)

@@ -2,13 +2,16 @@ from build import *
 
 
 class ZigBootstrap(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "a general-purpose programming language and toolchain for maintaining robust, optimal, and reusable software"
     license = "MIT"
 
     def build(self):
         arch = {"x86_64": "x86_64", "armv8": "aarch64"}[str(self.settings.arch)]
-        self.get(f"https://ziglang.org/download/{self.version}/zig-linux-{arch}-{self.version}.tar.xz")
-    
+        self.get(
+            f"https://ziglang.org/download/{self.version}/zig-linux-{arch}-{self.version}.tar.xz"
+        )
+
     def package(self):
         os.mkdir(os.path.join(self.package_folder, "bin"))
         for exe in ("cc", "c++", "ar", "ranlib", "ld.lld"):

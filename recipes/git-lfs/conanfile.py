@@ -1,12 +1,15 @@
 from build import *
 
+
 class GitLFS(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = " Git extension for versioning large files "
     license = "MIT"
     build_requires = (
         "make/[^4.3]",
         "go/[^1.15.3]",
     )
+
     def source(self):
         self.get(f"https://github.com/git-lfs/git-lfs/archive/refs/tags/v{self.version}.tar.gz")
 

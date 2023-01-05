@@ -2,6 +2,7 @@ from build import *
 
 
 class Xrdesktop(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A library for XR interaction with classical desktop compositors"
     license = "MIT"
     build_requires = (
@@ -12,4 +13,6 @@ class Xrdesktop(Recipe):
     requires = ("gxr/[^0.15.2]",)
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/xrdesktop/xrdesktop/-/archive/{self.version}/xrdesktop-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.freedesktop.org/xrdesktop/xrdesktop/-/archive/{self.version}/xrdesktop-{self.version}.tar.gz"
+        )

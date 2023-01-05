@@ -2,6 +2,7 @@ from build import *
 
 
 class LibVpx(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "WebM VP8/VP9 Codec SDK"
     license = "BSD"
     build_requires = (

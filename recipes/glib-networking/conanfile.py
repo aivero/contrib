@@ -2,6 +2,7 @@ from build import *
 
 
 class GlibNetworking(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Network extensions for GLib"
     license = "GPL"
     build_requires = (
@@ -14,10 +15,10 @@ class GlibNetworking(Recipe):
     )
 
     def source(self):
-        self.get(f"https://gitlab.gnome.org/GNOME/glib-networking/-/archive/{self.version}/glib-networking-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/glib-networking/-/archive/{self.version}/glib-networking-{self.version}.tar.gz"
+        )
 
     def build(self):
-        opts = {
-            "gnutls": True
-        }
+        opts = {"gnutls": True}
         self.meson(opts)

@@ -2,6 +2,7 @@ from build import *
 
 
 class Pcre(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A library that implements Perl 5-style regular expressions"
     license = "BSD"
     build_requires = (
@@ -15,8 +16,10 @@ class Pcre(Recipe):
     )
 
     def source(self):
-        self.get(f"https://sourceforge.net/projects/pcre/files/pcre/{self.version}/pcre-{self.version}.tar.bz2")
-    
+        self.get(
+            f"https://sourceforge.net/projects/pcre/files/pcre/{self.version}/pcre-{self.version}.tar.bz2"
+        )
+
     def build(self):
         args = [
             "--enable-unicode-properties",

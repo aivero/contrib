@@ -2,6 +2,7 @@ from build import *
 
 
 class Fontconfig(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A library for configuring and customizing font access"
     license = "MIT"
     build_requires = (
@@ -16,7 +17,9 @@ class Fontconfig(Recipe):
     )
 
     def source(self):
-        self.get(f"https://www.freedesktop.org/software/fontconfig/release/fontconfig-{self.version}.tar.xz")
+        self.get(
+            f"https://www.freedesktop.org/software/fontconfig/release/fontconfig-{self.version}.tar.xz"
+        )
 
     def package(self):
         with tools.chdir(f"{self.package_folder}/etc/fonts/conf.d"):

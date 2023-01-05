@@ -2,6 +2,7 @@ from build import *
 
 
 class PythonGobjectRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "Python GObject bindings"
     license = "LGPL"
     build_requires = (
@@ -14,7 +15,9 @@ class PythonGobjectRecipe(PythonRecipe):
     )
 
     def source(self):
-        self.get(f"https://gitlab.gnome.org/GNOME/pygobject/-/archive/{self.version}/pygobject-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/pygobject/-/archive/{self.version}/pygobject-{self.version}.tar.gz"
+        )
 
     def build(self):
         opts = {

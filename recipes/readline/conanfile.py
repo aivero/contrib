@@ -2,6 +2,7 @@ from build import *
 
 
 class Readline(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "GNU readline library"
     license = "GPL"
     build_requires = (

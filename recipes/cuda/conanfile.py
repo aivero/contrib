@@ -17,10 +17,12 @@ nv_arch_map = {
     "x86_64": "x86_64",
 }
 
+
 class CudaRecipe(PythonRecipe):
+    settings = PythonRecipe.settings + ("compiler",)
     description = "NVIDIA's GPU programming toolkit"
     license = "Proprietary"
-    exports_sources = ("*.pc")
+    exports_sources = "*.pc"
     build_requires = (
         "cc/[^1.0.0]",
         "libxml2/[^2.9.10]",
@@ -31,17 +33,28 @@ class CudaRecipe(PythonRecipe):
         nv_arch = nv_arch_map[str(self.settings.arch)]
         nv_version = driver_map[self.version]
         if self.settings.arch == "x86_64":
-            if (self.version.startswith("10")):
-                version_short =  ".".join(self.version.split(".")[:2])
-                tools.download(f"https://developer.download.nvidia.com/compute/cuda/{version_short}/Prod/local_installers/cuda_{self.version}_{nv_version}_linux.run", filename=f"cuda.run")
+            if self.version.startswith("10"):
+                version_short = ".".join(self.version.split(".")[:2])
+                tools.download(
+                    f"https://developer.download.nvidia.com/compute/cuda/{version_short}/Prod/local_installers/cuda_{self.version}_{nv_version}_linux.run",
+                    filename=f"cuda.run",
+                )
             else:
-                tools.download(f"https://developer.download.nvidia.com/compute/cuda/{self.version}/local_installers/cuda_{self.version}_{nv_version}_linux.run", filename=f"cuda.run")
+                tools.download(
+                    f"https://developer.download.nvidia.com/compute/cuda/{self.version}/local_installers/cuda_{self.version}_{nv_version}_linux.run",
+                    filename=f"cuda.run",
+                )
         elif self.settings.arch == "armv8":
-                tools.download(f"https://developer.download.nvidia.com/compute/cuda/{self.version}/local_installers/cuda_{self.version}_{nv_version}_linux_sbsa.run", filename=f"cuda.run")
+            tools.download(
+                f"https://developer.download.nvidia.com/compute/cuda/{self.version}/local_installers/cuda_{self.version}_{nv_version}_linux_sbsa.run",
+                filename=f"cuda.run",
+            )
 
         tmp_dir = os.path.join(self.build_folder, "tmp")
         os.mkdir(tmp_dir)
-        self.run(f'sh cuda.run  --silent --override --override-driver-check --tmpdir={tmp_dir} --extract="{self.build_folder}"')
+        self.run(
+            f'sh cuda.run  --silent --override --override-driver-check --tmpdir={tmp_dir} --extract="{self.build_folder}"'
+        )
         os.remove("cuda.run")
         self.run(f"sh NVIDIA-Linux-{nv_arch}-{nv_version}.run --extract-only")
         os.remove(f"NVIDIA-Linux-{nv_arch}-{nv_version}.run")
@@ -70,4 +83,3 @@ class CudaRecipe(PythonRecipe):
         # NVIDIA archs: https://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/
         gpu_arch = "sm_60" if self.settings.arch == "x86_64" else "sm_50"
         self.env_info.CUDAFLAGS = f" --cuda-gpu-arch={gpu_arch} -I{os.path.join(self.package_folder, 'include')} --cuda-path={self.package_folder}"
-

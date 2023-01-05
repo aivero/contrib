@@ -2,6 +2,7 @@ from build import *
 
 
 class AtSpi2Core(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Protocol definitions and daemon for D-Bus at-spi"
     license = "LGPL"
     build_requires = ("cc/[^1.0.0]", "meson/[>=0.55.3]")
@@ -12,4 +13,6 @@ class AtSpi2Core(Recipe):
 
     def source(self):
         version = self.version.replace(".", "_")
-        self.get(f"https://gitlab.gnome.org/GNOME/at-spi2-core/-/archive/AT_SPI2_CORE_{version}/at-spi2-core-AT_SPI2_CORE_{version}.tar.gz")
+        self.get(
+            f"https://gitlab.gnome.org/GNOME/at-spi2-core/-/archive/AT_SPI2_CORE_{version}/at-spi2-core-AT_SPI2_CORE_{version}.tar.gz"
+        )

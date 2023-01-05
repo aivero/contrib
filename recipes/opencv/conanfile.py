@@ -2,6 +2,7 @@ from build import *
 
 
 class OpenCV(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "OpenCV is an open source computer vision and machine learning software library."
     license = "BSD"
     build_requires = (

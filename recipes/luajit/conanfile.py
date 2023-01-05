@@ -2,6 +2,7 @@ from build import *
 
 
 class Luajit(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Just-in-time compiler and drop-in replacement for Lua 5.1"
     license = "MIT"
     build_requires = (

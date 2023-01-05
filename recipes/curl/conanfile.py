@@ -2,6 +2,7 @@ from build import *
 
 
 class Curl(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "An URL retrieval utility and library"
     license = "MIT"
     build_requires = (
@@ -22,4 +23,6 @@ class Curl(Recipe):
         self.autotools()
 
     def package_info(self):
-        self.env_info.CURL_CA_BUNDLE = os.path.join(self.deps_cpp_info["ca-certificates"].rootpath, "etc", "ssl", "certs", "cert.pem")
+        self.env_info.CURL_CA_BUNDLE = os.path.join(
+            self.deps_cpp_info["ca-certificates"].rootpath, "etc", "ssl", "certs", "cert.pem"
+        )

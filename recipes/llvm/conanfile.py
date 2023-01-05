@@ -3,6 +3,7 @@ import multiprocessing
 
 
 class Llvm(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Collection of modular and reusable compiler and toolchain technologies"
     license = "custom"
     exports = ("*-disable-system-libs.patch",)
@@ -28,7 +29,7 @@ class Llvm(Recipe):
         # Limit thread use on arm
         if self.settings.arch == "armv8":
             defs["LLVM_PARALLEL_LINK_JOBS"] = 32
-            #defs["LLVM_PARALLEL_COMPILE_JOBS"] = 32
+            # defs["LLVM_PARALLEL_COMPILE_JOBS"] = 32
 
         # LLVM build options
         if self.settings.arch == "x86_64":

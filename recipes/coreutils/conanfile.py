@@ -2,7 +2,10 @@ from build import *
 
 
 class Coreutils(Recipe):
-    description = "The basic file, shell and text manipulation utilities of the GNU operating system"
+    settings = Recipe.settings + ("compiler",)
+    description = (
+        "The basic file, shell and text manipulation utilities of the GNU operating system"
+    )
     license = "GPL"
 
     def source(self):

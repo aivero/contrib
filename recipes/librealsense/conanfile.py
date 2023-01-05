@@ -4,7 +4,7 @@ from build import *
 class LibRealsenseRecipe(PythonRecipe):
     description = "Intel RealSense SDK"
     license = "Apache"
-    settings = PythonRecipe.settings + ("hardware",)
+    settings = PythonRecipe.settings + ("hardware", "compiler")
     exports = (
         "libusb-fix.patch",
         "pkgconfig-fix.patch",
@@ -47,7 +47,7 @@ class LibRealsenseRecipe(PythonRecipe):
             "BUILD_NODEJS_BINDINGS": False,
             "BUILD_UNIT_TESTS": False,
             "CMAKE_CUDA_COMPILER": "clang++",
-            "BUILD_TOOLS": True
+            "BUILD_TOOLS": True,
         }
         if self.options.libuvc:
             # Workaround for https://github.com/IntelRealSense/librealsense/issues/6656

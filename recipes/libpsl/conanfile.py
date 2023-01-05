@@ -2,6 +2,7 @@ from build import *
 
 
 class Libpsl(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Public Suffix List library"
     license = "MIT"
     build_requires = (
@@ -11,4 +12,6 @@ class Libpsl(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/rockdaboot/libpsl/releases/download/{self.version}/libpsl-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/rockdaboot/libpsl/releases/download/{self.version}/libpsl-{self.version}.tar.gz"
+        )

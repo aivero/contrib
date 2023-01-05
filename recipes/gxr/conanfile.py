@@ -2,6 +2,7 @@ from build import *
 
 
 class Gxr(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "A glib wrapper for the OpenVR and the OpenXR APIs"
     license = "MIT"
     build_requires = (
@@ -15,4 +16,6 @@ class Gxr(Recipe):
     )
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/xrdesktop/gxr/-/archive/{self.version}/gxr-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.freedesktop.org/xrdesktop/gxr/-/archive/{self.version}/gxr-{self.version}.tar.gz"
+        )

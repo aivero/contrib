@@ -2,6 +2,7 @@ from build import *
 
 
 class Cairo(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "2D graphics library with support for multiple output devices"
     license = "LGPL"
     options = {
@@ -34,7 +35,9 @@ class Cairo(Recipe):
         self.requires("libxext/[^1.3.4]")
 
     def source(self):
-        self.get(f"https://gitlab.freedesktop.org/cairo/cairo/-/archive/{self.version}/cairo-{self.version}.tar.gz")
+        self.get(
+            f"https://gitlab.freedesktop.org/cairo/cairo/-/archive/{self.version}/cairo-{self.version}.tar.gz"
+        )
 
     def build(self):
         args = [

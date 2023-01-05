@@ -2,6 +2,7 @@ from build import *
 
 
 class CaCertificates(Recipe):
+    settings = Recipe.settings + ("compiler",)
     description = "Common CA certificates PEM files from Mozilla"
     license = "MPL"
     options = {}
@@ -20,7 +21,8 @@ class CaCertificates(Recipe):
     def build(self):
         os.environ["DESTDIR"] = self.package_folder
         os.environ[
-            "CFLAGS"] += f" -ldl -lpthread -I{self.deps_cpp_info['openssl'].rootpath}/include"
+            "CFLAGS"
+        ] += f" -ldl -lpthread -I{self.deps_cpp_info['openssl'].rootpath}/include"
         self.make(target="all")
 
         # NetLock Arany contains invalid utf-8 characters, which is not supported in Python 3.6

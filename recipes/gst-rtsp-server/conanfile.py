@@ -2,6 +2,7 @@ from build import *
 
 
 class GstRtspServer(GstRecipe):
+    settings = GstRecipe.settings + ("compiler",)
     description = "A framework for streaming media"
     license = "LGPL"
     exports = "*.patch"

@@ -11,11 +11,23 @@ class CC(Recipe):
         self.requires(f"llvm/[^{self.settings.compiler.version}]")
 
     def package_info(self):
-        llvm_deps_cpp_info = self.deps_cpp_info["llvm"]
-        llvm_rootpath = llvm_deps_cpp_info.rootpath
-        static_flags = ""
         if self.settings.libc == "musl":
             static_flags = "-static"
+        else:
+            static_flags = ""
+        if self.settings.arch == "x86_64":
+            arch = "x86_64"
+        elif self.settings.arch == "armv8":
+            arch = "aarch64"
+        if self.settings.libc == "musl":
+            abi = "musl"
+        else:
+            abi = "gnu"
+
+        trible = f"{arch}-unknown-linux-{abi}"
+
+        llvm_deps_cpp_info = self.deps_cpp_info["llvm"]
+        llvm_rootpath = llvm_deps_cpp_info.rootpath
         libc_inc = self.env["LIBC_INCLUDE_PATH"]
         libclang_inc = os.path.join(
             llvm_rootpath,
@@ -26,9 +38,11 @@ class CC(Recipe):
         )
         llvm_inc = os.path.join(llvm_rootpath, "include")
         libcxx_inc = os.path.join(llvm_rootpath, "include", "c++", "v1")
+        libcxx_target_inc = os.path.join(llvm_rootpath, "include", trible, "c++", "v1")
+
         # -Wno-unused-command-line-argument is needed for some sanity tests in cmake
         cflags = f" -nostdinc -idirafter {libclang_inc} -idirafter {libc_inc} -idirafter {llvm_inc} {static_flags} -fPIC -Wno-unused-command-line-argument "
-        cxxflags = f" -nostdinc++ -idirafter {libcxx_inc} {cflags} "
+        cxxflags = f" -nostdinc++ -idirafter {libcxx_inc} -idirafter {libcxx_target_inc} {cflags} "
 
         self.env_info.CFLAGS = cflags
         self.env_info.CXXFLAGS = cxxflags

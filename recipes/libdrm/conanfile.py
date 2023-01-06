@@ -7,8 +7,8 @@ class Libdrm(Recipe):
     build_requires = (
         "cc/[^1.0.0]",
         "meson/[>=0.55.3]",
-        "libpciaccess/[>=0.16]",
     )
+    requires = ("libpciaccess/[>=0.16]",)
 
     def source(self):
         self.get(f"http://dri.freedesktop.org/libdrm/libdrm-{self.version}.tar.xz")

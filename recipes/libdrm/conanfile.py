@@ -18,5 +18,6 @@ class Libdrm(Recipe):
             "amdgpu": True,
             "nouveau": True,
             "radeon": True,
+            "intel": True,
         }
         self.meson(opts)

@@ -26,7 +26,7 @@ class Mesa(Recipe):
         "libglvnd/[^1.3.2]",
         "zlib/[^1.2.11]",
         "expat/[^2.2.7]",
-        "libdrm/[>=2.4.109]",
+        "libdrm/[^2.4.114]",
     )
 
     def requirements(self):

@@ -9,7 +9,6 @@ class IntelMediaDriver(Recipe):
     requires = (
         "intel-gmmlib/[^22.1.3]",
         "libva/[^2.13.0]",
-        "libpciaccess/[^0.16]",
     )
 
     def source(self):

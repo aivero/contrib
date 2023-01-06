@@ -55,10 +55,7 @@ class Mesa(Recipe):
             opts["vulkan-drivers"] = "intel"
         if self.settings.arch == "armv8":
             opts["gallium-drivers"] = "nouveau,tegra,swrast"
-
-        # For some reason, cicd fails when calling meson introspect on the mesa
-        # package. Workaround here is to no do the opt_check
-        self.meson(opts, opt_check=False)
+        self.meson(opts)
 
     def package_info(self):
         self.env_info.LIBGL_DRIVERS_PATH.append(os.path.join(self.package_folder, "lib", "dri"))

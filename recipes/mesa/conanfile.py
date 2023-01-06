@@ -20,6 +20,7 @@ class Mesa(Recipe):
         "bison/[^3.3]",
         "flex/[^2.6.4]",
         "python-mako/[^1.1.0]",
+        "glslang/[^11.2.0]",
     )
     requires = (
         "libglvnd/[^1.3.2]",

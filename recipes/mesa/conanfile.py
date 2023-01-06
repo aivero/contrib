@@ -25,7 +25,7 @@ class Mesa(Recipe):
         "libglvnd/[^1.3.2]",
         "zlib/[^1.2.11]",
         "expat/[^2.2.7]",
-        "libdrm/[>=2.4.99]",
+        "libdrm/[>=2.4.109]",
     )
 
     def requirements(self):
@@ -50,8 +50,7 @@ class Mesa(Recipe):
         if self.options.x11:
             opts["platforms"] = "x11"
         if self.settings.arch == "x86_64":
-            opts["dri-drivers"] = "i915,i965"
-            opts["gallium-drivers"] = "iris"
+            opts["gallium-drivers"] = "iris,i915"
             opts["vulkan-drivers"] = "intel"
         if self.settings.arch == "armv8":
             opts["gallium-drivers"] = "nouveau,tegra,swrast"

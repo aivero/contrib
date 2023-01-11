@@ -1,5 +1,5 @@
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-index 01d754c3eb..b587279860 100644
+index 38e4e4d8ee..cb48d80e16 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 @@ -42,6 +42,12 @@
@@ -15,7 +15,7 @@ index 01d754c3eb..b587279860 100644
   */
  
  
-@@ -2798,12 +2804,12 @@ gst_matroska_demux_handle_seek_event (GstMatroskaDemux * demux,
+@@ -2811,12 +2817,12 @@ gst_matroska_demux_handle_seek_event (GstMatroskaDemux * demux,
  
    GST_DEBUG_OBJECT (demux, "configuring seek");
  
@@ -48,7 +48,7 @@ index c4fc73caad..3e65addd55 100644
  /*
   * TODO: add this tag & mappings
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
-index 0147de216a..a7b9dd421e 100644
+index 0147de216a..5629625efa 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 @@ -40,6 +40,11 @@
@@ -191,7 +191,7 @@ index 0147de216a..a7b9dd421e 100644
 +  }
 +
 +  /* This Gstreamer tag did not have an official Matroska tag to map to.
-+   * Instead map it to the unofficial GSTREAMER_TAG Matroska tag. */
++     Instead map it to the unofficial GSTREAMER_TAG Matroska tag. */
 +  simpletag_master = gst_ebml_write_master_start (ebml,
 +      GST_MATROSKA_ID_SIMPLETAG);
 +  gst_ebml_write_ascii (ebml, GST_MATROSKA_ID_TAGNAME,
@@ -208,7 +208,7 @@ index 0147de216a..a7b9dd421e 100644
  
  static void
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
-index 6fadbba956..67aba94368 100644
+index 6fadbba956..c1288f22b8 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
 @@ -2351,7 +2351,6 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
@@ -228,7 +228,7 @@ index 6fadbba956..67aba94368 100644
 +      gchar **tokenized = g_strsplit (value, "@", 2);
 +      gchar *tagname_gst, *value_gst;
 +
-+      /* The format of the GSTREAMER_TAG Matroska should be `<tag_name>@<tag_value>. We ensure
++      /* The format of the GSTREAMER_TAG Matroska should be `<tag_name>@<tag_value>. We ensure                                                                                            ...
 +       * that `tag_name` actually exists otherwise we cannot deserialize the tags value.
 +       * Also, `datetime` tags are not supported here, as they conflict with the information
 +       * stored in GST_MATROSKA_ID_DATEUTC */

@@ -11,7 +11,7 @@ class PythonRecipe(PythonRecipe):
     )
     requires = (
         "libssl/[^1.0.0]",
-        "expat/[^2.2.7]",
+        "expat/[^2.4.1]",
         "libffi/[^3.3]",
         "bzip2/[^1.0.8]",
         "sqlite/[^3.30.1]",

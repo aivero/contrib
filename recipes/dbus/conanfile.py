@@ -9,7 +9,7 @@ class Dbus(Recipe):
         "autotools/[^1.0.0]",
         "autoconf-archive/[>=2019.01.06]",
     )
-    requires = ("expat/[^2.2.7]",)
+    requires = ("expat/[^2.4.1]")
 
     def source(self):
         self.get(

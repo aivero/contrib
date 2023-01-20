@@ -274,11 +274,7 @@ impl RgbdDemux {
                 true
             }
 
-            _ => {
-                gst_debug!(CAT, obj: element, "Got a new event: {:?}", event);
-                let sink_pad = element.static_pad("sink").unwrap();
-                sink_pad.event_default(Some(element), event)
-            }
+            _ => self.sink_pad.event_default(Some(element), event),
         }
     }
 

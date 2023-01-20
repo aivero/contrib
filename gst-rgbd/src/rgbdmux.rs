@@ -660,7 +660,7 @@ impl RgbdMux {
         // Set the format for MJPG stream
         if pad_caps.is_subset(gst::Caps::new_simple("image/jpeg", &[]).as_ref()) {
             let src_field_name = format!("{}_format", stream_name);
-            src_caps.set(&src_field_name, &"image/jpeg");
+            src_caps.set(&src_field_name, "image/jpeg");
         }
 
         // Filter out all CAPS we don't care about and map those we do into strings

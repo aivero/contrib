@@ -1,4 +1,4 @@
-- version: 03df4f253cc56bcb3c61df9202991fd6f2094f5b
+- version: master
   profiles:
     - linux-x86_64
     - linux-x86_64-dev

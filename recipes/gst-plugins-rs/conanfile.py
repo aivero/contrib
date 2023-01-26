@@ -15,12 +15,17 @@ class GstRecipe(GstRustProject):
         self.requires(f"gst-plugins-bad/[~{self.settings.gstreamer}]")
 
     def source(self):
+        if self.version == "master":
+            version = "03df4f253cc56bcb3c61df9202991fd6f2094f5b"
+        else:
+            version = self.version
+
         get(
             self,
-            f"https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs/-/archive/{self.version}/gst-plugins-rs-{self.version}.tar.gz",
+            f"https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs/-/archive/{version}/gst-plugins-rs-{version}.tar.gz",
         )
-        os.system(f"mv gst-plugins-rs-{self.version} {self.source_folder}/gst-plugins-rs")
-        os.system(f"rm -rf gst-plugins-rs-{self.version}")
+        os.system(f"mv gst-plugins-rs-{version} {self.source_folder}/gst-plugins-rs")
+        os.system(f"rm -rf gst-plugins-rs-{version}")
 
     def build(self):
         self.cargo(

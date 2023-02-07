@@ -16,7 +16,7 @@ class GstRecipe(GstRustProject):
 
     def source(self):
         if self.version == "master":
-            version = "03df4f253cc56bcb3c61df9202991fd6f2094f5b"
+            version = "0ed74d0aa45c7e0160acc47661cf20c844101298"
         else:
             version = self.version
 

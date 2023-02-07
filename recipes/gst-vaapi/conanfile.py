@@ -44,7 +44,7 @@ class GstVaapi(GstRecipe):
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gstreamer-vaapi")
         opts = {}
-        if "1.21" in self.version:
+        if "1.21" in self.version or "1.22" in self.version:
             opts = {
                 "drm": self.options.drm,
                 "egl": self.options.egl,

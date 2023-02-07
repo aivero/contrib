@@ -72,7 +72,9 @@ class GstPluginsBase(GstRecipe):
             "videorate": True,
             "tools": True,
         }
-        if "1.21" in self.version:
+        if "1.22" in self.version:
+            opts["videoconvertscale"] = True
+        elif "1.21" in self.version:
             opts["videoconvertscale"] = True
         else:
             opts["videoconvert"] = True

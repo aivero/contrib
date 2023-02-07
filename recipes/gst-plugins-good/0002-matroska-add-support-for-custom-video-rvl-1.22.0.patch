@@ -1,8 +1,8 @@
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-index b587279860..e95b9f1773 100644
+index 058455be91..12b0d1f313 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-@@ -6487,6 +6487,37 @@ gst_matroska_demux_video_caps (GstMatroskaTrackVideoContext *
+@@ -6515,6 +6515,37 @@ gst_matroska_demux_video_caps (GstMatroskaTrackVideoContext *
      caps = gst_video_info_to_caps (&info);
      *codec_name = gst_pb_utils_get_codec_description (caps);
      context->alignment = 32;
@@ -54,7 +54,7 @@ index 3e65addd55..b5606221a3 100644
  #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L1       "A_MPEG/L1"
  #define GST_MATROSKA_CODEC_ID_AUDIO_MPEG1_L2       "A_MPEG/L2"
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
-index a7b9dd421e..1564fbf4e1 100644
+index 4780832de9..1855e97662 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 @@ -148,6 +148,10 @@ static GstStaticPadTemplate videosink_templ =
@@ -68,7 +68,7 @@ index a7b9dd421e..1564fbf4e1 100644
          "video/x-prores, "
          COMMON_VIDEO_CAPS "; "
          "video/x-wmv, " "wmvversion = (int) [ 1, 3 ], " COMMON_VIDEO_CAPS "; "
-@@ -1263,6 +1267,29 @@ skip_details:
+@@ -1264,6 +1268,29 @@ skip_details:
        else if (!strcmp (fstr, "RGB"))
          videocontext->fourcc = GST_MAKE_FOURCC ('R', 'G', 'B', 24);
      }

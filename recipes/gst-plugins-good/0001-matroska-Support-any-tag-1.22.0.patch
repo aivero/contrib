@@ -1,5 +1,5 @@
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-index 01d754c3eb..b587279860 100644
+index 1e771b04d0..058455be91 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 @@ -42,6 +42,12 @@
@@ -15,7 +15,7 @@ index 01d754c3eb..b587279860 100644
   */
  
  
-@@ -2798,12 +2804,12 @@ gst_matroska_demux_handle_seek_event (GstMatroskaDemux * demux,
+@@ -2811,12 +2817,12 @@ gst_matroska_demux_handle_seek_event (GstMatroskaDemux * demux,
  
    GST_DEBUG_OBJECT (demux, "configuring seek");
  
@@ -48,7 +48,7 @@ index c4fc73caad..3e65addd55 100644
  /*
   * TODO: add this tag & mappings
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
-index 0147de216a..a7b9dd421e 100644
+index ca90b6ac35..4780832de9 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 @@ -40,6 +40,11 @@
@@ -63,7 +63,7 @@ index 0147de216a..a7b9dd421e 100644
   */
  
  #ifdef HAVE_CONFIG_H
-@@ -3443,21 +3448,21 @@ static const struct
+@@ -3444,21 +3449,21 @@ static const struct
  }
  gst_matroska_tag_conv[] = {
    {
@@ -100,7 +100,7 @@ index 0147de216a..a7b9dd421e 100644
  };
  
  /* Every stagefright implementation on android up to and including 6.0.1 is using
-@@ -3470,23 +3475,16 @@ gst_matroska_mux_tag_list_is_empty (const GstTagList * list)
+@@ -3471,23 +3476,16 @@ gst_matroska_mux_tag_list_is_empty (const GstTagList * list)
    int i;
    for (i = 0; i < gst_tag_list_n_tags (list); i++) {
      const gchar *tag = gst_tag_list_nth_tag_name (list, i);
@@ -133,7 +133,7 @@ index 0147de216a..a7b9dd421e 100644
      }
    }
    return TRUE;
-@@ -3499,32 +3497,56 @@ gst_matroska_mux_write_simple_tag (const GstTagList * list, const gchar * tag,
+@@ -3500,32 +3498,56 @@ gst_matroska_mux_write_simple_tag (const GstTagList * list, const gchar * tag,
    GstEbmlWrite *ebml = (GstEbmlWrite *) data;
    guint i;
    guint64 simpletag_master;

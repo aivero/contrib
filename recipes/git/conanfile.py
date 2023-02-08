@@ -27,6 +27,7 @@ class Git(Recipe):
     def build(self):
         with open(os.path.join(self.src, "config.mak"), "w") as cfg:
             cfg.write(CONFIG_MAK.format(f"-I{self.source_folder} {os.environ['CFLAGS']}"))
+
         args = [
             f"prefix={self.package_folder}",
         ]
@@ -34,6 +35,7 @@ class Git(Recipe):
         self.make(args, target="install")
 
     def package_info(self):
+        self.env_info.GIT_CONFIG_SYSTEM = "/etc/gitconfig"
         self.env_info.GIT_EXEC_PATH = os.path.join(self.package_folder, "libexec", "git-core")
         self.env_info.GIT_SSL_CAINFO = os.path.join(
             self.deps_cpp_info["ca-certificates"].rootpath, "etc", "ssl", "certs", "cert.pem"

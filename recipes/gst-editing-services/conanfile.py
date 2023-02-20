@@ -50,7 +50,7 @@ class GstEditingServices(GstRecipe):
 
     def source(self):
         self.get(
-            f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"
+            f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/47c183cdfdd75fc0baf8218aae6621df1fe4e87b.tar.gz"
         )
         self.patch("ges_launch_custom_config.patch")
 

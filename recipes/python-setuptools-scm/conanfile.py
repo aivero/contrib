@@ -1,12 +1,13 @@
 from build import *
 
 
-class PythonSetuptoolsScm(PythonRecipe):
+class PythonSetuptoolsScm(PipRecipe):
     description = "Handles managing your python package versions in scm metadata"
     license = "MIT"
-    requires = ("python-setuptools/[>=40.4.0]",)
-
-    def source(self):
-        self.get(
-            f"https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-{self.version}.tar.gz"
-        )
+    requires = (
+        "python-setuptools/[>=40.4.0]",
+        "python-tomli/[^2.0.1]",
+    )
+    build_requires = (
+        "python-pip/[>=20.3.4]",
+    )

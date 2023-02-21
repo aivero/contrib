@@ -1,1 +1,3 @@
 - version: 20.0.21
+- version: 20.0.21
+  profiles: [linux-x86_64-dev-python-3.10]

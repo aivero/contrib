@@ -55,7 +55,7 @@ class PythonRecipe(PythonRecipe):
             os.path.join(
                 self.package_folder,
                 "lib",
-                f"python{self.version[:3]}",
+                f"python{version}",
                 f"_sysconfigdata__linux_{arch}-linux-gnu.py",
             ),
             "w",
@@ -87,7 +87,7 @@ build_time_vars = {{
   "LDSHARED": os.environ.get("CC", "") + " -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -g -fwrapv -O2 ", 
 }}
 """.format(
-                    self.version, self.version[0], self.version[2], arch
+                    self.version, self.version[0], self.version.split(".")[1], arch
                 )
             )
 

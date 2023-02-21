@@ -7,7 +7,7 @@ class SpirvTools(Recipe):
     license = "custom"
     build_requires = (
         "cmake/[^3.18.4]",
-        "python/[^3.8.5]",
+        "python/[^3]",
         "git/[^2.29.1]",
         "ninja/[^1.10.0]",
     )

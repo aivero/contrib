@@ -3,6 +3,7 @@ from build import *
 class Avahi(Recipe):
     description = "Avahi - Service Discovery for Linux using mDNS/DNS-SD -- compatible with Bonjour"
     license = "GPL"
+    settings = Recipe.settings + ("python",)
     build_requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")
     requires = (
         "glib/[^2.70.0]",
@@ -10,9 +11,12 @@ class Avahi(Recipe):
         "dbus/[^1.12.20]",
         "gdbm/[^1.19]",
         "libevent/[^2.1.11]",
-        "python/[^3.8.12]",
         "six/[^1.16.0]",
     )
+
+    def requires(self):
+       self.requires(f"python/[^{self.settings.python}]")
+
 
     def source(self):
         self.get(f"https://github.com/lathiat/avahi/releases/download/v{self.version}/avahi-{self.version}.tar.gz")

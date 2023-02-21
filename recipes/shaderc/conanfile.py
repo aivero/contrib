@@ -9,7 +9,7 @@ class Shaderc(Recipe):
     build_requires = (
         "cc/[^1.0.0]",
         "cmake/[^3.18.4]",
-        "python/[^3.8.5]",
+        "python/[^3]",
         "git/[^2.29.1]",
     )
 

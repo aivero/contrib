@@ -12,7 +12,6 @@ These are the open source componets developed and maintained by Aivero.
 
 ## How to Contribute
 
-
 This project welcomes third-party code via merge requests.
 
 You are welcome to propose and discuss enhancements using issues. Please label issues with the following labels:
@@ -32,6 +31,8 @@ Please adhere to the following standards:
 - Use `cargo fmt` to format code before commiting
 
 ## Setup Conan
+We provide our software in a public Conan repository.
+Please make sure you use a distribution with glibc version 2.31+ (E.g. Ubuntu 20.04 or newer).
 
 ```bash
 # Install Conan (Requires Python 3 and pip)

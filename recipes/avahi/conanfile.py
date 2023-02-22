@@ -14,8 +14,8 @@ class Avahi(Recipe):
         "six/[^1.16.0]",
     )
 
-    def requires(self):
-       self.requires(f"python/[^{self.settings.python}]")
+    def requirements(self):
+       self.requires(f"python/[~{self.settings.python}]")
 
 
     def source(self):
@@ -36,3 +36,6 @@ class Avahi(Recipe):
             "--disable-manpages",
         ]
         self.autotools(args)
+
+    def package_info(self):
+        self.env_info.BINDGEN_EXTRA_CLANG_ARGS =  f"-I{os.path.join(self.package_folder, 'include')}"

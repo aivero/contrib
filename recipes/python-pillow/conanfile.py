@@ -7,7 +7,7 @@ class PythonPillowRecipe(PythonRecipe):
     build_requires = (
         "cc/[^1.0.0]",
         "pkgconf/[^1.6.3]",
-        "python-setuptools/[^50.3.0]",
+        "python-setuptools/[^67.3]",
         "zlib/[^1.2.11]",
     )
     requires = ("openjpeg2/[^2.4.0]",)

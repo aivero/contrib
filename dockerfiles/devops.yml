@@ -86,3 +86,14 @@
     - linux-x86_64
   docker:
     file: focal-x86_64-balena.Dockerfile
+
+- name: l4t-cuda
+  profiles:
+    - linux-armv8-l4t-t186
+  docker:
+    file: bionic-armv8-l4t-r32.7.1-t186-cuda-10.2.Dockerfile
+- name: l4t-cuda
+  profiles:
+    - linux-armv8-l4t-t210
+  docker:
+    file: bionic-armv8-l4t-r32.7.1-t210-cuda-10.2.Dockerfile

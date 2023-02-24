@@ -17,6 +17,7 @@ class LibRealsenseRecipe(PythonRecipe):
         "cc/[^1.0.0]",
         "cmake/[^3.18.4]",
         "git/[^2.30.0]",
+        "glibc/[^2.31.0]",
     )
     requires = ("libusb/[^1.0.23]",)
 
@@ -33,7 +34,6 @@ class LibRealsenseRecipe(PythonRecipe):
     def source(self):
         self.get(f"https://github.com/IntelRealSense/librealsense/archive/v{self.version}.tar.gz")
         self.patch("pkgconfig-fix.patch")
-        self.patch("libusb-fix.patch")
         self.patch("cuda-clang-support.patch")
         self.patch("0001-Add-udev-include-dir.patch")
 

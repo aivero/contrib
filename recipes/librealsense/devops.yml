@@ -1,48 +1,36 @@
-- version: 2.50.0
+- version: 2.53.1
   profiles:
     - linux-x86_64
     - linux-armv8
     - linux-armv8-rpi-pi4
     - linux-x86_64-dev-python-3.10
 
-- version: 2.50.0
+- version: 2.53.1
   profiles:
     - linux-armv8-l4t-t186
-  image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t186:latest
-  before_script:
-    - apt-get update
-    - apt-get install -y cuda-toolkit-10-2 python3-pip
-    - pip3 install conan
+  image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t186
+  needs: ["l4t-cuda"]
 
-- version: 2.50.0
+- version: 2.53.1
   profiles:
     - linux-armv8-l4t-t210
-  image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t210:latest
-  before_script:
-    - apt-get update
-    - apt-get install -y cuda-toolkit-10-2 python3-pip
-    - pip3 install conan
+  image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t210
+  needs: ["l4t-cuda"]
 
-- version: 2.50.0
+- version: 2.53.1
   profiles:
     - linux-armv8-l4t-t186
-  image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t186:latest
-  before_script:
-    - apt-get update
-    - apt-get install -y cuda-toolkit-10-2 python3-pip
-    - pip3 install conan
+  image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t186
+  needs: ["l4t-cuda"]
   conan:
     options:
       python: True
 
-- version: 2.50.0
+- version: 2.53.1
   profiles:
     - linux-armv8-l4t-t210
-  image: registry.gitlab.com/aivero/prop/workspace/dcd-docker/linux-armv8-l4t-t210:latest
-  before_script:
-    - apt-get update
-    - apt-get install -y cuda-toolkit-10-2 python3-pip
-    - pip3 install conan
+  image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t210
+  needs: ["l4t-cuda"]
   conan:
     options:
       python: True

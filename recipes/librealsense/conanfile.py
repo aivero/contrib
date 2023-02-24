@@ -17,7 +17,6 @@ class LibRealsenseRecipe(PythonRecipe):
         "cc/[^1.0.0]",
         "cmake/[^3.18.4]",
         "git/[^2.30.0]",
-        "glibc/[^2.31.0]",
     )
     requires = ("libusb/[^1.0.23]",)
 

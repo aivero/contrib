@@ -2,6 +2,7 @@
   profiles:
     - linux-x86_64
     - linux-armv8
+    - linux-armv8-rpi-pi3
     - linux-armv8-rpi-pi4
     - linux-x86_64-dev-python-3.10
 

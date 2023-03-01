@@ -172,8 +172,8 @@ impl BaseSrcImpl for RealsenseSrc {
                     // Applies to depth and color streams.
                     _ => settings.streams.get_stream_resolution(settings.align_to),
                 };
-                s.set(&format!("{}_width", stream_id), &width);
-                s.set(&format!("{}_height", stream_id), &height);
+                s.set(&format!("{}_width", stream_id), width);
+                s.set(&format!("{}_height", stream_id), height);
             }
 
             // Add `camerameta` into `streams`, if enabled

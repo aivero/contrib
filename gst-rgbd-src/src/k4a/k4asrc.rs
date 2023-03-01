@@ -176,26 +176,26 @@ impl BaseSrcImpl for K4aSrc {
                 selected_streams.push(STREAM_ID_DEPTH.to_string());
                 caps.set(
                     &format!("{}_format", STREAM_ID_DEPTH),
-                    &k4a_image_format_to_gst_video_format(DEPTH_FORMAT).unwrap(),
+                    k4a_image_format_to_gst_video_format(DEPTH_FORMAT).unwrap(),
                 );
                 // If rectified, the resolution of the depth stream is identical to color stream.
                 if settings.rectify_depth {
                     caps.set(
                         &format!("{}_width", STREAM_ID_DEPTH),
-                        &stream_properties.color_resolution.width,
+                        stream_properties.color_resolution.width,
                     );
                     caps.set(
                         &format!("{}_height", STREAM_ID_DEPTH),
-                        &stream_properties.color_resolution.height,
+                        stream_properties.color_resolution.height,
                     );
                 } else {
                     caps.set(
                         &format!("{}_width", STREAM_ID_DEPTH),
-                        &stream_properties.depth_resolution.width,
+                        stream_properties.depth_resolution.width,
                     );
                     caps.set(
                         &format!("{}_height", STREAM_ID_DEPTH),
-                        &stream_properties.depth_resolution.height,
+                        stream_properties.depth_resolution.height,
                     );
                 }
             }
@@ -204,15 +204,15 @@ impl BaseSrcImpl for K4aSrc {
                 selected_streams.push(STREAM_ID_IR.to_string());
                 caps.set(
                     &format!("{}_format", STREAM_ID_IR),
-                    &k4a_image_format_to_gst_video_format(IR_FORMAT).unwrap(),
+                    k4a_image_format_to_gst_video_format(IR_FORMAT).unwrap(),
                 );
                 caps.set(
                     &format!("{}_width", STREAM_ID_IR),
-                    &stream_properties.ir_resolution.width,
+                    stream_properties.ir_resolution.width,
                 );
                 caps.set(
                     &format!("{}_height", STREAM_ID_IR),
-                    &stream_properties.ir_resolution.height,
+                    stream_properties.ir_resolution.height,
                 );
             }
             // Add color stream with its format, width and height into the caps, if enabled
@@ -220,15 +220,15 @@ impl BaseSrcImpl for K4aSrc {
                 selected_streams.push(STREAM_ID_COLOR.to_string());
                 caps.set(
                     &format!("{}_format", STREAM_ID_COLOR),
-                    &stream_properties.color_format,
+                    stream_properties.color_format,
                 );
                 caps.set(
                     &format!("{}_width", STREAM_ID_COLOR),
-                    &stream_properties.color_resolution.width,
+                    stream_properties.color_resolution.width,
                 );
                 caps.set(
                     &format!("{}_height", STREAM_ID_COLOR),
-                    &stream_properties.color_resolution.height,
+                    stream_properties.color_resolution.height,
                 );
             }
             // Add IMU stream, if enabled
@@ -1139,7 +1139,7 @@ impl ElementImpl for K4aSrc {
                     (
                         // Framerates at which K4A is capable of providing stream
                         "framerate",
-                        &gst::List::new(&[
+                        &gst::List::new([
                             &gst::Fraction::new(allowed_framerates[0], 1),
                             &gst::Fraction::new(allowed_framerates[1], 1),
                             &gst::Fraction::new(allowed_framerates[2], 1),

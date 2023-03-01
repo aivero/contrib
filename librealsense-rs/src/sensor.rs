@@ -195,7 +195,7 @@ impl Sensor {
             rs2::rs2_set_option,
             self.0.cast::<rs2_options>(),
             rs2_option::RS2_OPTION_VISUAL_PRESET,
-            value as f32,
+            value,
         )
     }
 }

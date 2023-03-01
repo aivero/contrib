@@ -17,21 +17,3 @@
     - linux-armv8-l4t-t210
   image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t210
   needs: ["l4t-cuda"]
-
-- version: 2.53.1
-  profiles:
-    - linux-armv8-l4t-t186
-  image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t186
-  needs: ["l4t-cuda"]
-  conan:
-    options:
-      python: True
-
-- version: 2.53.1
-  profiles:
-    - linux-armv8-l4t-t210
-  image: registry.gitlab.com/aivero/open-source/contrib/l4t-cuda/linux-armv8-l4t-t210
-  needs: ["l4t-cuda"]
-  conan:
-    options:
-      python: True

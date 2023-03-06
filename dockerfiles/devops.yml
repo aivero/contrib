@@ -1,3 +1,15 @@
+- name: docker
+  profiles:
+    - linux-armv8
+  docker:
+    file: docker-armv8.Dockerfile
+
+- name: docker
+  profiles:
+    - linux-x86_64
+  docker:
+    file: docker-x86_64.Dockerfile
+
 - name: alpine
   profiles:
     - linux-armv8

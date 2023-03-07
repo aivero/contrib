@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y wget unzip ca-c
   apt-get update && apt-get install -y --no-install-recommends docker-ce docker-ce-cli containerd.io && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p ~/.docker/cli-plugins/ && curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose && chmod +x ~/.docker/cli-plugins/docker-compose
 
-ARG BALENA_CLI_VERSION=v14.5.10
+ARG BALENA_CLI_VERSION=v15.0.0
 WORKDIR /balena
 RUN wget https://github.com/balena-io/balena-cli/releases/download/${BALENA_CLI_VERSION}/balena-cli-${BALENA_CLI_VERSION}-linux-x64-standalone.zip -O balena.zip && unzip balena.zip && mv balena-cli/balena . && chmod +x balena && rm -rf balena-cli balena.zip
 ENV PATH=$PATH:/balena

@@ -1,5 +1,5 @@
 from build import *
-
+from os import path
 
 class GlibNetworking(Recipe):
     description = "Network extensions for GLib"
@@ -10,7 +10,7 @@ class GlibNetworking(Recipe):
     )
     requires = (
         "glib/[^2.70.3]",
-        "gnutls/[^3.6.15]",
+        "openssl/[^3.0.7]",
     )
 
     def source(self):
@@ -19,5 +19,12 @@ class GlibNetworking(Recipe):
         )
 
     def build(self):
-        opts = {"gnutls": True}
+        opts = {
+            "gnutls": False,
+            "openssl": True,
+        }
         self.meson(opts)
+
+    def package_info(self):
+        self.runenv_info.GIO_EXTRA_MODULES = path.join(self.package_folder, "lib/gio/modules")
+

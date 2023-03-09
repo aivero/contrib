@@ -3,7 +3,7 @@ from build import *
 
 class GstRgbdSrc(GstRustProject):
     description = "GStreamer plugin containing `video/rgbd` sources for RealSense and Azure Kinect DK (K4A) devices"
-    license = "LGPL"
+    license = "MIT"
     build_requires = ("rust/[^1.0.0]", "capnproto/[^0.8]")
     requires = (
         "capnproto/[^0.8.0]",

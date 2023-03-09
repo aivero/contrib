@@ -3,7 +3,7 @@ from build import *
 
 class AiveroRgbDToolkit(GstProject):
     description = "Package containing all open source RGB-D elements"
-    license = "LGPL"
+    license = "MIT"
     exports_sources = ["*.adoc", "scripts/*"]
     requires = (
         f"gst-rgbd/{branch()}",

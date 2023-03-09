@@ -2,10 +2,10 @@
 name = "gstreamer-frame-aligner"
 version = "0.0.0"
 authors = ["Joao Alves <joao.alves@aivero.com>"]
-license = "Proprietary"
+license = "MIT"
 description = "GStreamer plugin to align depth frames to color frames"
 keywords = ["GStreamer", "Rust"]
-repository = "https://github.com/aivero/contrib"
+repository = "https://gitlab.com/aivero/open-source/contrib"
 edition = "2018"
 readme = "README.md"
 

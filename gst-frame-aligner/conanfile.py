@@ -1,7 +1,7 @@
 from build import *
 
 class GstreamerFrameAligner(GstRustProject):
-    license = "LGPL"
+    license = "MIT"
     author = ("Joao Alves <joao.alves@aivero.com>", "Niclas Overby <niclas.overby@aivero.com>")
     description = "Gstreamer align frames utilities"
     build_requires = (

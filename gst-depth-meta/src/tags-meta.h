@@ -1,5 +1,3 @@
-// License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2019 Aivero. All Rights Reserved.
 #pragma once
 
 #include <gst/gst.h>

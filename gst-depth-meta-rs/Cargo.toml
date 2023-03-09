@@ -3,7 +3,7 @@ name = "gst-depth-meta"
 version = "2.0.0"
 authors = ["Niclas Overby <niclas.overby@aivero.com>", "Tobias Morell <tobias.morell@aivero.com>", "Andrej Orsula <andrej.orsula@aivero.com>"]
 description = "Rust bindings to gstreamer-depth-meta"
-license = "Apache 2.0"
+license = "MIT"
 edition = "2018"
 
 [dependencies]

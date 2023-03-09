@@ -2,10 +2,10 @@
 name = "gst-util"
 version = "0.0.0" # Overwritten during conan create.
 authors = ["Jimmi Christensen <jimmi.christensen@aivero.com>"]
-license = "LGPL"
+license = "MIT"
 description = "Utility library for making it a bit easier to work with gstreamer from rust"
 keywords = ["GStreamer", "Rust"]
-repository = "https://github.com/aivero/contrib"
+repository = "https://gitlab.com/aivero/open-source/contrib"
 edition = "2018"
 readme = "README.md"
 

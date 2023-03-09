@@ -1,7 +1,5 @@
 # k4a-rs
-
 Unofficial Rust FFI bindings for Azure Kinect SDK (`k4a`). For more information, please visit the [official API documentation](https://microsoft.github.io/Azure-Kinect-Sensor-SDK).
-These bindings are MIT licensed. Please see the LICENSE file.
 
 ## Overview
 

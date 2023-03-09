@@ -1,5 +1,3 @@
-// License: MIT. See LICENSE file in root directory.
-// Copyright(c) 2019 Aivero. All Rights Reserved.
 #![doc(
     html_logo_url = "https://2iexix426zex1jl94h409m26-wpengine.netdna-ssl.com/wp-content/uploads/2018/09/jira-logo-transparent.png"
 )]

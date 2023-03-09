@@ -2,10 +2,10 @@
 name = "gst-rgbd"
 version = "0.0.0" # Overwritten during conan create.
 authors = ["Andrej Orsula <andrej.orsula@aivero.com>", "Tobias Morell <tobias.morell@aivero.com>", "Niclas Overby <niclas.overby@aivero.com"]
-license = "LGPL"
+license = "MIT"
 description = "GStreamer plugin for demuxing and muxing `video/rgbd` streams"
 keywords = ["RGB-D", "Demux", "Mux", "GStreamer", "Rust"]
-repository = "https://github.com/aivero/contrib"
+repository = "https://gitlab.com/aivero/open-source/contrib"
 edition = "2018"
 readme = "README.md"
 build = "build.rs"

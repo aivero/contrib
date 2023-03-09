@@ -1,6 +1,3 @@
-// License: MIT. See LICENSE file in root directory.
-// Copyright(c) 2019 Aivero. All Rights Reserved.
-
 use crate::config::Config;
 use crate::context::Context;
 use crate::error::Error;

@@ -276,5 +276,5 @@ static gboolean plugin_init(GstPlugin *plugin) {
 #endif
 
 GST_PLUGIN_DEFINE(GST_VERSION_MAJOR, GST_VERSION_MINOR, colorizer,
-                  "Depth image colorizer", plugin_init, VERSION, "LGPL",
+                  "Depth image colorizer", plugin_init, VERSION, "MIT",
                   PACKAGE_NAME, GST_PACKAGE_ORIGIN)

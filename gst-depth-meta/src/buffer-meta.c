@@ -1,5 +1,3 @@
-// License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2019 Aivero. All Rights Reserved.
 #include "buffer-meta.h"
 
 GType buffer_meta_api_get_type(void) {

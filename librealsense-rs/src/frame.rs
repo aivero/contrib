@@ -1,5 +1,3 @@
-// License: MIT. See LICENSE file in root directory.
-// Copyright(c) 2019 Aivero. All Rights Reserved.
 use crate::error::Error;
 use crate::metadata::{Metadata, MetadataAttribute};
 use crate::stream_profile::StreamProfile;

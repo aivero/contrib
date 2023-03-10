@@ -11,8 +11,8 @@ class LibRealsenseRecipe(PythonRecipe):
         "cuda-clang-support.patch",
         "0001-Add-udev-include-dir.patch",
     )
-    options = {"cuda": [True, False], "python": [True, False]}
-    default_options = ("cuda=False", "python=False")
+    options = {"cuda": [True, False], "python": [True, False], "libuvc": [True, False]}
+    default_options = ("cuda=False", "python=False", "libuvc=False")
     build_requires = (
         "cc/[^1.0.0]",
         "cmake/[^3.18.4]",
@@ -25,6 +25,8 @@ class LibRealsenseRecipe(PythonRecipe):
             self.requires(f"python/[~{self.settings.python}]")
 
     def configure(self):
+        if self.settings.arch == "armv8":
+            self.options.libuvc = True
         if self.settings.hardware == "l4t":
             self.options.cuda = True
 
@@ -46,4 +48,7 @@ class LibRealsenseRecipe(PythonRecipe):
             "CMAKE_CUDA_COMPILER": "clang++",
             "BUILD_TOOLS": True,
         }
+        if self.options.libuvc:
+            # Workaround for https://github.com/IntelRealSense/librealsense/issues/6656
+            defs["FORCE_LIBUVC"] = True
         self.cmake(defs)

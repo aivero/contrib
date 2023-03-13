@@ -252,8 +252,8 @@ def get_all_images_names(key, project_id) -> str:
     while response.text != "[]":
         
         response = get_page(key, project_id, i)
-
-        images = images + [i["location"] for i in response.json]
+        parsed = json.loads(response.text)
+        images = images + [i["location"] for i in parsed ]
         i = i + 1
 
     return images

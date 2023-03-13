@@ -7,7 +7,7 @@ RUN apt update && \
   OS=Linux && \
   ARCH=x86_64 && \
   curl -sL "https://github.com/google/go-containerregistry/releases/download/${VERSION}/go-containerregistry_${OS}_${ARCH}.tar.gz" > go-containerregistry.tar.gz && \
-  tar -zxvf go-containerregistry.tar.gz -C /usr/local/bin/ crane==1.59.0
+  tar -zxvf go-containerregistry.tar.gz -C /usr/local/bin/ crane
 FROM --platform=linux/amd64 gitlab.com:443/aivero/dependency_proxy/containers/amd64/ubuntu:focal
 COPY --from=builder /usr/local/bin/conan /usr/local/bin/conan 
 COPY --from=builder /usr/local/bin/crane /usr/local/bin/crane

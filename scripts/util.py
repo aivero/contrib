@@ -7,6 +7,8 @@ import re
 import asyncio
 import pathlib
 import functools
+import requests 
+import json
 
 
 def git_init():
@@ -232,3 +234,36 @@ def remove_alias(ins, branch, public_repo, internal_repo):
 def remove_aliases(branch, public_repo, internal_repo):
     for ins in find_instances():
         remove_alias(ins, branch, public_repo, internal_repo)
+        
+        
+
+def get_all_images_names(key, project_id) -> str:
+    def get_page(key, project_id, page=0):
+        page_expression = "" if page == 0 else f'?page={page}' 
+        response = requests.get(f'https://gitlab.com/api/v4/projects/{project_id}/registry/repositories{page_expression}', headers={"PRIVATE-TOKEN" :key })
+        if (response.status_code != 200):
+            print("status code != 200")
+            raise Exception("response:", response.text)
+        return response
+    
+    images = []
+    response = get_page(key, project_id, 0)
+    i = 1
+    while response.text != "[]":
+        
+        response = get_page(key, project_id, i)
+
+        images = images + [i["location"] for i in response.json]
+        i = i + 1
+
+    return images
+        
+
+    
+    
+        
+def crane_tag(image, alias, source="master" ):
+    call(["crane", "tag", f'{image}:{source}', alias])
+    
+def crane_auth(user, password, registry):
+    call(["crane", "auth", "login", "-u", user, "-p", password, registry ])

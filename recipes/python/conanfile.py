@@ -85,7 +85,8 @@ build_time_vars = {{
   "SHLIB_SUFFIX": ".so",
   "LDCXXSHARED": os.environ.get("CXX", "") + " -shared -Wl,-O1 -Wl,-Bsymbolic-functions ",
   "LDSHARED": os.environ.get("CC", "") + " -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -g -fwrapv -O2 ", 
-  "VERSION": "{1}.{2}"
+  "VERSION": "{1}.{2}",
+  "LINKFORSHARED": "-Xlinker -export-dynamic",
 }}
 """.format(
                     self.version, self.version[0], self.version.split(".")[1], arch

@@ -32,3 +32,16 @@ where
         self.map_err(|e| e.to_err_msg(domain))
     }
 }
+
+pub trait LogError<T, E> {
+    fn log_err(self, cat: gst::DebugCategory, level: gst::DebugLevel) -> Result<T, E>;
+}
+
+impl<T, E: std::fmt::Display> LogError<T, E> for Result<T, E> {
+    fn log_err(self, cat: gst::DebugCategory, level: gst::DebugLevel) -> Result<T, E> {
+        self.map_err(|err| {
+            gst::gst_log_with_level!(cat, level: level, "{}", err);
+            err
+        })
+    }
+}

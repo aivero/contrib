@@ -651,26 +651,42 @@ impl RealsenseSrc {
     /// * If RealSense pipeline has not yet started
     fn get_frameset(&self) -> Result<Frame, gst::FlowError> {
         let internals = self.internals.lock().unwrap();
+        let (timeout, framerate) = {
+            let settings = self.settings.read().unwrap();
+            (settings.wait_for_frames_timeout, settings.streams.framerate)
+        };
 
         // Get RealSense pipeline
         let pipeline = internals.pipeline.as_ref().unwrap();
         let mut waited = gst::ClockTime::from_nseconds(0);
 
+        // If we wait more than the time below before returning a frame, the we should emit a
+        // warning as this would indicate that the realsensesrc does not produces frames at the
+        // desired framerate
+        let frame_duration = gst::ClockTime::SECOND.nseconds() / (framerate as u64);
+        let warning_wait_time = gst::ClockTime::from_nseconds((frame_duration * 3) / 2);
+
         // Wait for frameset, i.e. rs2::Frame with multiple Frames attached to it
-        // Wait 10ms and check (a) if unlock() has been called and (b) we get a frameset or (c) we exceeded the max timeout
+        // Wait 10ms and check (a) if unlock() has been called and (b) we get a frameset or
+        // (c) we exceeded the max timeout.
         // Allows for terminating the pipeline quicker that the `wait_for_frames_timeout`
         loop {
             if self.unlock.load(Ordering::Relaxed) {
                 return Err(gst::FlowError::Flushing);
             }
             match pipeline.wait_for_frames(10) {
-                Ok(frameset) => return Ok(frameset),
-                Err(err) => {
-                    gst::gst_info!(CAT, "wait_for_frameset returned {}", err);
-                    waited += gst::ClockTime::from_mseconds(10);
+                Ok(frameset) => {
+                    if waited >= warning_wait_time {
+                        gst::gst_warning!(
+                            CAT,
+                            "Not producing frames at targeted framerate {}",
+                            framerate
+                        );
+                    }
+                    return Ok(frameset);
                 }
+                Err(_) => waited += gst::ClockTime::from_mseconds(10),
             }
-            let timeout = self.settings.read().unwrap().wait_for_frames_timeout;
             let timeout = gst::ClockTime::from_mseconds(timeout.into());
             if waited > timeout {
                 gst::gst_error!(CAT, "Timed out while getting frameset");

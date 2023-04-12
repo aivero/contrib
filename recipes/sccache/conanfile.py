@@ -12,7 +12,7 @@ class SccacheRecipe(RustRecipe):
         self.requires(f"rustc/[~{self.settings.rust}]")
 
     def source(self):
-        self.get(f"https://github.com/mozilla/sccache/archive/{self.version}.tar.gz")
+        self.get(f"https://github.com/mozilla/sccache/archive/v{self.version}.tar.gz")
 
     def package_info(self):
         self.env_info.RUSTC_WRAPPER = "sccache"

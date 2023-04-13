@@ -1,7 +1,7 @@
 from build import *
 
 
-class Rustc(Recipe):
+class Rustc(PythonRecipe):
     description = "Systems programming language focused on safety, speed and concurrency"
     license = "MIT"
     exports = ("*-boostrap-respect-cxxflags.patch",)
@@ -10,7 +10,6 @@ class Rustc(Recipe):
         "curl/[^7.72.0]",
         "pkgconf/[^1.7.3]",
         "git/[^2.29.1]",
-        "python/[^3]",
     )
     requires = (
         "cc/[^1.0.0]",
@@ -19,6 +18,9 @@ class Rustc(Recipe):
         "openssl1/[>=1.1.1h]",
         "libssl/[^1.0.0]",
     )
+
+    def build_requirements(self):
+        self.build_requires(f"python/[~{self.settings.python}]")
 
     def source(self):
         self.get(

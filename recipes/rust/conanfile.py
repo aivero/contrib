@@ -4,10 +4,7 @@ from build import *
 class RustRecipe(RustRecipe):
     description = "Virtual rust package"
     license = "MIT"
-    requires = (
-        "sccache/[>=0.4.1]",
-        "pkgconf/[^1.7.3]",
-    )
+    requires = ("pkgconf/[^1.7.3]",)
 
     def package_info(self):
         # if not os.path.exists(cache_folder):

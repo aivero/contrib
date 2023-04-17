@@ -267,3 +267,8 @@ def crane_tag(image, alias, source="master" ):
     
 def crane_auth(user, password, registry):
     call(["crane", "auth", "login", "-u", user, "-p", password, registry ])
+    
+def check_if_docker_image_exist(image):
+    call(["crane", "manifest", image])
+    
+ 

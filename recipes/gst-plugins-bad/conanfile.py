@@ -96,10 +96,12 @@ class GstPluginsBad(GstRecipe):
             self.requires("libgudev/[>=233]")
         if self.options.x265:
             self.requires("x265/[>=2.7]")
+        if self.options.va:
+            self.requires("libva/[^2.14.0]")
 
     def source(self):
         self.get(
-            f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/47c183cdfdd75fc0baf8218aae6621df1fe4e87b.tar.gz"
+            f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/3044b0992f5cccbff7ad0e36302093f735c282ec.tar.gz"
         )
 
     def build(self):

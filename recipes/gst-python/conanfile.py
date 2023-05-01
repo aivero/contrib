@@ -15,7 +15,7 @@ class GstPython(GstRecipe):
 
     def source(self):
         self.get(
-            f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/47c183cdfdd75fc0baf8218aae6621df1fe4e87b.tar.gz"
+            f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/3044b0992f5cccbff7ad0e36302093f735c282ec.tar.gz"
         )
 
     def build(self):

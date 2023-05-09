@@ -7,13 +7,13 @@ import re
 import asyncio
 import pathlib
 import functools
-import requests 
+import requests
 import json
 
 
 def git_init():
     # git checkout branch
-    call(["git", "checkout", "-B", os.environ["CI_BUILD_REF_NAME"], os.environ["CI_BUILD_REF"]])
+    call(["git", "checkout", "-B", os.environ["CI_COMMIT_REF_NAME"], os.environ["CI_BUILD_REF"]])
 
     # Fetch all branches
     call(["git", "config", "remote.origin.fetch", '"+refs/heads/*:refs/remotes/origin/*"'])
@@ -32,7 +32,8 @@ def conan_init(repos):
             "-sf",
             os.environ["CONAN_CONFIG_DIR"],
         ],
-    show=True)
+        show=True,
+    )
     for repo in repos:
         call(
             [
@@ -44,7 +45,8 @@ def conan_init(repos):
                 "-r",
                 repo,
             ],
-        show=True)
+            show=True,
+        )
 
 
 def get_commit():
@@ -234,41 +236,39 @@ def remove_alias(ins, branch, public_repo, internal_repo):
 def remove_aliases(branch, public_repo, internal_repo):
     for ins in find_instances():
         remove_alias(ins, branch, public_repo, internal_repo)
-        
-        
+
 
 def get_all_images_names(key, project_id) -> str:
     def get_page(key, project_id, page=0):
-        page_expression = "" if page == 0 else f'?page={page}' 
-        response = requests.get(f'https://gitlab.com/api/v4/projects/{project_id}/registry/repositories{page_expression}', headers={"PRIVATE-TOKEN" :key })
-        if (response.status_code != 200):
+        page_expression = "" if page == 0 else f"?page={page}"
+        response = requests.get(
+            f"https://gitlab.com/api/v4/projects/{project_id}/registry/repositories{page_expression}",
+            headers={"PRIVATE-TOKEN": key},
+        )
+        if response.status_code != 200:
             print("status code != 200")
             raise Exception("response:", response.text)
         return response
-    
+
     images = []
     response = get_page(key, project_id, 0)
     i = 1
     while response.text != "[]":
-        
         response = get_page(key, project_id, i)
         parsed = json.loads(response.text)
-        images = images + [i["location"] for i in parsed ]
+        images = images + [i["location"] for i in parsed]
         i = i + 1
 
     return images
-        
 
-    
-    
-        
-def crane_tag(image, alias, source="master" ):
-    call(["crane", "tag", f'{image}:{source}', alias])
-    
+
+def crane_tag(image, alias, source="master"):
+    call(["crane", "tag", f"{image}:{source}", alias])
+
+
 def crane_auth(user, password, registry):
-    call(["crane", "auth", "login", "-u", user, "-p", password, registry ])
-    
+    call(["crane", "auth", "login", "-u", user, "-p", password, registry])
+
+
 def check_if_docker_image_exist(image):
     call(["crane", "manifest", image])
-    
- 

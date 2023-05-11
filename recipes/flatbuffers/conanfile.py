@@ -8,8 +8,7 @@ import shutil
 from build import *
 
 
-class FlatbuffersConan(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class FlatbuffersConan(CppRecipe):
     license = "Apache"
     description = "Memory Efficient Serialization Library"
     build_requires = ("cc/[^1.0.0]", "cmake/[^3.15.3]")

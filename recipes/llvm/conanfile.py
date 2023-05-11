@@ -2,8 +2,7 @@ from build import *
 import multiprocessing
 
 
-class Llvm(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Llvm(CppRecipe):
     description = "Collection of modular and reusable compiler and toolchain technologies"
     license = "custom"
     exports = ("*-disable-system-libs.patch",)

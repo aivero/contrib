@@ -1,8 +1,7 @@
 from build import *
 
 
-class Lldb(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
+class Lldb(CppPythonRecipe):
     description = "Next generation, high-performance debugger"
     license = "Apache"
     options = {}

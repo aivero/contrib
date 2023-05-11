@@ -18,8 +18,7 @@ nv_arch_map = {
 }
 
 
-class CudaRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
+class CudaRecipe(CppPythonRecipe):
     description = "NVIDIA's GPU programming toolkit"
     license = "Proprietary"
     exports_sources = "*.pc"

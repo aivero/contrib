@@ -1,8 +1,7 @@
 from build import *
 
 
-class AndroidNdk(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class AndroidNdk(CppRecipe):
     description = "Android NDK"
     license = "Apache"
     options = {}

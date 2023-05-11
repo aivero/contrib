@@ -1,8 +1,7 @@
 from build import *
 
 
-class Eigen(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Eigen(CppRecipe):
     description = (
         "Lightweight C++ template library for vector and matrix math, a.k.a. linear algebra."
     )

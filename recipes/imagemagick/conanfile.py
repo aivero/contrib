@@ -1,8 +1,7 @@
 from build import *
 
 
-class Imagemagick(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Imagemagick(CppRecipe):
     description = "An image viewing/manipulation program"
     license = "ImageMagick"
     build_requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")

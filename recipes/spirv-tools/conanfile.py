@@ -1,8 +1,7 @@
 from build import *
 
 
-class SpirvTools(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class SpirvTools(CppRecipe):
     description = "API and commands for processing SPIR-V modules"
     license = "custom"
     build_requires = (

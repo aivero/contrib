@@ -1,8 +1,7 @@
 from build import *
 
 
-class Gnutls(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Gnutls(CppRecipe):
     description = "A library which provides a secure layer over a reliable transport layer"
     license = "custom"
     build_requires = (

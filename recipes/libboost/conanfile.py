@@ -1,8 +1,7 @@
 from build import *
 
 
-class LibBoost(Recipe):
-    settings = GstRecipe.settings + ("compiler",)
+class LibBoost(CppRecipe):
     description = "Free C++ Source libraries"
     license = "custom"
     build_requires = (
@@ -12,4 +11,6 @@ class LibBoost(Recipe):
     )
 
     def source(self):
-        self.get(f"https://github.com/boostorg/boost/releases/download/boost-{self.version}/boost-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/boostorg/boost/releases/download/boost-{self.version}/boost-{self.version}.tar.gz"
+        )

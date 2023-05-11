@@ -1,8 +1,7 @@
 from build import *
 
 
-class IntelMediaDriver(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class IntelMediaDriver(CppRecipe):
     description = "Intel Media Driver for VAAPI Broadwell iGPUs"
     license = "MIT"
     build_requires = ("cc/[^1.0.0]", "cmake/[^3.18.4]")

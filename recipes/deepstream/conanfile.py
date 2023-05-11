@@ -1,8 +1,7 @@
 from build import *
 
 
-class Deepstream(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Deepstream(CppRecipe):
     description = "Complete streaming analytics toolkit for AI-based video"
     license = "Proprietary"
     options = {"jetson": ["Nano", "TX2", "Xavier"]}

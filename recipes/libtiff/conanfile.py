@@ -1,8 +1,7 @@
 from build import *
 
 
-class Libtiff(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Libtiff(CppRecipe):
     description = "Library for manipulation of TIFF images"
     license = "custom"
     build_requires = (

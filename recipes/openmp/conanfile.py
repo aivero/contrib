@@ -1,8 +1,7 @@
 from build import *
 
 
-class Openmp(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Openmp(CppRecipe):
     description = "LLVM OpenMP Runtime Library"
     license = "custom"
     build_requires = (

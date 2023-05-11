@@ -1,8 +1,7 @@
 from build import *
 
 
-class IntelGmmlib(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class IntelGmmlib(CppRecipe):
     description = "Intel Graphics Memory Management Library"
     license = "MIT"
     build_requires = ("cc/[^1.0.0]", "cmake/[^3.18.4]")

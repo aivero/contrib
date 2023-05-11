@@ -1,8 +1,7 @@
 from build import *
 
 
-class Capnproto(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Capnproto(CppRecipe):
     description = "Cap'n Proto serialization/RPC system"
     license = "MIT"
     build_requires = (

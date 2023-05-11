@@ -2,7 +2,6 @@ from build import *
 
 
 class RustLibstd(RustRecipe):
-    settings = RustRecipe.settings + ("compiler",)
     description = "Rust libstd"
     license = "MIT"
     keep_imports = True

@@ -1,8 +1,7 @@
 from build import *
 
 
-class Atk(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Atk(CppRecipe):
     description = "GObject-based multi-platform GUI toolkit"
     license = "LGPL"
     options = {

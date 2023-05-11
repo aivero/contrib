@@ -1,8 +1,7 @@
 from build import *
 
 
-class Monado(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Monado(CppRecipe):
     description = "An open source OpenXR runtime"
     license = "Boost"
     options = {

@@ -2,8 +2,7 @@ from os.path import join
 from build import *
 
 
-class Tensorflow2Lite(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Tensorflow2Lite(CppRecipe):
     name = "tensorflow2-lite"
     description = "https://www.tensorflow.org"
     license = "LGPL"

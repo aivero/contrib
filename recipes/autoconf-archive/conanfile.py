@@ -1,8 +1,7 @@
 from build import *
 
 
-class AutoconfArchive(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class AutoconfArchive(CppRecipe):
     description = "A collection of freely re-usable Autoconf macros"
     license = "GPL"
     build_requires = (

@@ -1,8 +1,7 @@
 from build import *
 
 
-class Mesa(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Mesa(CppRecipe):
     description = "An open-source implementation of the OpenGL specification"
     license = "custom"
     options = {

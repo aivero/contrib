@@ -4,7 +4,7 @@ from build import *
 class PythonCython(Recipe):
     description = "Python to C compiler"
     license = "Apache"
-    settings = "build_type", "compiler", "python"
+    settings = "build_type", "python"
     build_requires = (
         "cc/[^1.0.0]",
         "pkgconf/[^1.6.3]",

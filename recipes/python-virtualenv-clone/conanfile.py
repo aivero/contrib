@@ -1,8 +1,7 @@
 from build import *
 
 
-class PythonVirtualenvClone(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
+class PythonVirtualenvClone(CppPythonRecipe):
     description = "A script for cloning a non-relocatable virtualenv."
     license = "GPL"
     requires = ("python-setuptools/[>=40]",)

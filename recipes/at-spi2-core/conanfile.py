@@ -1,8 +1,7 @@
 from build import *
 
 
-class AtSpi2Core(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class AtSpi2Core(CppRecipe):
     description = "Protocol definitions and daemon for D-Bus at-spi"
     license = "LGPL"
     build_requires = ("cc/[^1.0.0]", "meson/[>=0.55.3]")

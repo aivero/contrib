@@ -1,8 +1,7 @@
 from build import *
 
 
-class GstLibcamera(GstRecipe):
-    settings = GstRecipe.settings + ("compiler",)
+class GstLibcamera(CppGstRecipe):
     description = "The libcamera package"
     license = "LGPL"
     options = {
@@ -10,11 +9,7 @@ class GstLibcamera(GstRecipe):
         "cam": ["auto", "enabled"],
         "test": [True, False],
     }
-    default_options = (
-        "gstreamer=enabled",
-        "cam=enabled",
-        "test=True"
-    )
+    default_options = ("gstreamer=enabled", "cam=enabled", "test=True")
     build_requires = (
         "git/[^2.34.1]",
         "cc/[^1.0.0]",
@@ -30,6 +25,7 @@ class GstLibcamera(GstRecipe):
         "libevent/[^2.1.11]",
         "libtiff/[^4.3.0]",
     )
+
     def requirements(self):
         self.requires(f"gst-plugins-bad/[~{self.settings.gstreamer}]")
 
@@ -38,9 +34,7 @@ class GstLibcamera(GstRecipe):
 
     def build(self):
         req = "libtiff"
-        os.environ[
-            "CXXFLAGS"
-        ] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
+        os.environ["CXXFLAGS"] += f" -I{os.path.join(self.deps_cpp_info[req].rootpath, 'include')}"
 
         os.environ["CXXFLAGS"] += " -Wno-error"
         opts = {
@@ -49,4 +43,3 @@ class GstLibcamera(GstRecipe):
             "test": self.options.test,
         }
         self.meson(opts)
-

@@ -1,8 +1,7 @@
 from build import *
 
 
-class SwigRecipe(PythonRecipe):
-    settings = PythonRecipe.settings + ("compiler",)
+class SwigRecipe(CppPythonRecipe):
     description = "Generate scripting interfaces to C/C++ code"
     license = "custom"
     build_requires = (

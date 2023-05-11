@@ -1,8 +1,7 @@
 from build import *
 
 
-class Lld(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class Lld(CppRecipe):
     description = "Linker from the LLVM project"
     license = "custom"
     build_requires = (

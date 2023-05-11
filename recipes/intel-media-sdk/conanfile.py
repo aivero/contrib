@@ -1,8 +1,7 @@
 from build import *
 
 
-class IntelMediaSdk(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class IntelMediaSdk(CppRecipe):
     description = (
         "API to access hardware-accelerated video on Intel Gen graphics hardware platforms"
     )

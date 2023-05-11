@@ -1,8 +1,7 @@
 from build import *
 
 
-class GTest(Recipe):
-    settings = Recipe.settings + ("compiler",)
+class GTest(CppRecipe):
     description = "Google's C++ test framework"
     license = "BSD"
     build_requires = (

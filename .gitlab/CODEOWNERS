@@ -1,0 +1,8 @@
+dockerfiles/ @hejsil @raffael_santi @noverby
+gst-*/ @hejsil @raffael_santi @jmalves5
+recipes/ @noverby @hejsil @raffael_santi @jmalves5
+.gitlab-ci.yml @hejsil @noverby @raffael_santi
+.triage-policies.yml @hejsil @raffael_santi
+scripts/ @noverby @hejsil @raffael_santi
+lib*/ @hejsil @KunalAivero
+@raffael_santi

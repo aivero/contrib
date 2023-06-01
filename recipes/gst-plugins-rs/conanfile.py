@@ -22,7 +22,7 @@ class GstRecipe(GstRustProject):
         )
         os.system(f"mv gst-plugins-rs-{version} {self.source_folder}/gst-plugins-rs")
         os.system(f"rm -rf gst-plugins-rs-{version}")
-        self.patch("0001-awss3src-print-error-on-wrong-uri.patch")
+        self.patch("0001-awss3src-add-location-property.patch")
 
     def build(self):
         self.cargo(

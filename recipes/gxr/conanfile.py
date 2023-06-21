@@ -9,9 +9,11 @@ class Gxr(Recipe):
         "meson/[>=0.55.3]",
     )
     requires = (
-        "gulkan/[^0.15.2]",
+        "gulkan/[^0.16.0]",
         "gtk3/[^3.24.28]",
         "json-glib/[^1.6.2]",
+        "wayland/[^1.20.0]",
+        "openxr/[^1.0.27]",
     )
 
     def source(self):

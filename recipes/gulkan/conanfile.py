@@ -13,6 +13,8 @@ class Gulkan(Recipe):
         "glslang/[^11.2.0]",
         "gdk-pixbuf2/[^2.40.0]",
         "graphene/[^1.10.6]",
+        "libdrm/[^2.4.114]",
+        "libxkbcommon/[^1.0.1]",
     )
 
     def source(self):
@@ -27,5 +29,6 @@ class Gulkan(Recipe):
 
         opts = {
             "examples": False,
+            "tests": False,
         }
         self.meson(opts)

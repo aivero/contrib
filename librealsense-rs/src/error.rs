@@ -42,23 +42,17 @@ impl Error {
     /// * `message` - Descriptive error message
     /// * `function` - The function that caused the error
     /// * `args` - The argument that caused the error
-    /// * `exception_type` - The categorty of error
     ///
     /// # Returns
     /// * New [`Error`](../error/struct.Error.html)
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-    pub(crate) fn new(
-        message: &str,
-        function: &str,
-        args: &str,
-        exception_type: rs2::rs2_exception_type,
-    ) -> Self {
+    pub fn new(message: &str, function: &str, args: &str) -> Self {
         Self(unsafe {
             rs2::rs2_create_error(
                 message.as_ptr() as *const i8,
                 function.as_ptr() as *const i8,
                 args.as_ptr() as *const i8,
-                exception_type,
+                rs2::rs2_exception_type_RS2_EXCEPTION_TYPE_UNKNOWN,
             )
         })
     }
@@ -69,23 +63,17 @@ impl Error {
     /// * `message` - Descriptive error message
     /// * `function` - The function that caused the error
     /// * `args` - The argument that caused the error
-    /// * `exception_type` - The categorty of error
     ///
     /// # Returns
     /// * New [`Error`](../error/struct.Error.html)
     #[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
-    pub(crate) fn new(
-        message: &str,
-        function: &str,
-        args: &str,
-        exception_type: rs2::rs2_exception_type,
-    ) -> Self {
+    pub fn new(message: &str, function: &str, args: &str) -> Self {
         Self(unsafe {
             rs2::rs2_create_error(
                 message.as_ptr() as *const u8,
                 function.as_ptr() as *const u8,
                 args.as_ptr() as *const u8,
-                exception_type,
+                rs2::rs2_exception_type_RS2_EXCEPTION_TYPE_UNKNOWN,
             )
         })
     }

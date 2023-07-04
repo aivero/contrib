@@ -144,7 +144,6 @@ impl Sensor {
                 ),
                 "Sensor::get_option()",
                 "option",
-                0,
             ));
         }
 
@@ -173,7 +172,6 @@ impl Sensor {
                 ),
                 "Sensor::set_option()",
                 "option",
-                0,
             ));
         }
         if self.is_option_read_only(option)? {
@@ -184,7 +182,6 @@ impl Sensor {
                 ),
                 "Sensor::set_option()",
                 "option",
-                0,
             ));
         }
 

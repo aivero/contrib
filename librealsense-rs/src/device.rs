@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::low_level_utils::cstring_to_string;
+use crate::raw_data_buffer::RawDataBuffer;
 use crate::sensor::SensorList;
 
 // Expose `rs2_camera_info` for external use.
@@ -119,6 +120,15 @@ impl Device {
     /// * `Err(Error)` on failure.
     pub fn set_advanced_mode(&self, enable: bool) -> Result<(), Error> {
         Error::call2(rs2::rs2_toggle_advanced_mode, self.0, enable as i32)
+    }
+
+    /// Serialize the current configuration of the device as json and return it.
+    ///
+    /// # Returns
+    /// * `Ok(RawDataBuffer)` on success.
+    /// * `Err(Error)` on failure.
+    pub fn serialize_json(&self) -> Result<RawDataBuffer, Error> {
+        Error::call1(rs2::rs2_serialize_json, self.0).map(RawDataBuffer)
     }
 
     /// Configure device with JSON.

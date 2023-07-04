@@ -2,8 +2,6 @@ use glib::*;
 use gst::glib;
 use std::fmt::{Display, Formatter};
 
-pub(crate) use rs2::stream_profile::StreamResolution;
-
 pub(crate) use super::streams::StreamId;
 
 // Default behaviour of playing from rosbag recording specified by `rosbag-location` property.
@@ -58,8 +56,8 @@ pub(crate) struct Settings {
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct StreamsSettings {
     pub(crate) enabled_streams: EnabledStreams,
-    pub(crate) depth_resolution: StreamResolution,
-    pub(crate) color_resolution: StreamResolution,
+    pub(crate) depth_resolution: rs2::StreamResolution,
+    pub(crate) color_resolution: rs2::StreamResolution,
     pub(crate) framerate: i32,
 }
 
@@ -122,11 +120,11 @@ impl Default for Settings {
                     infra2: DEFAULT_ENABLE_INFRA2,
                     color: DEFAULT_ENABLE_COLOR,
                 },
-                depth_resolution: StreamResolution {
+                depth_resolution: rs2::StreamResolution {
                     width: DEFAULT_DEPTH_WIDTH,
                     height: DEFAULT_DEPTH_HEIGHT,
                 },
-                color_resolution: StreamResolution {
+                color_resolution: rs2::StreamResolution {
                     width: DEFAULT_COLOR_WIDTH,
                     height: DEFAULT_COLOR_HEIGHT,
                 },
@@ -193,7 +191,7 @@ impl EnabledStreams {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Enum)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Enum, Default)]
 #[repr(u32)]
 #[enum_type(name = "GstRealsenseSrcLogLevel")]
 pub(crate) enum LogLevel {
@@ -204,17 +202,12 @@ pub(crate) enum LogLevel {
     #[enum_value(name = "Warn", nick = "warn")]
     Warn,
     #[enum_value(name = "Error", nick = "error")]
+    #[default]
     Error,
     #[enum_value(name = "Fatal", nick = "fatal")]
     Fatal,
     #[enum_value(name = "None", nick = "none")]
     None,
-}
-
-impl Default for LogLevel {
-    fn default() -> Self {
-        LogLevel::Error
-    }
 }
 
 impl LogLevel {

@@ -70,18 +70,32 @@
     file: vsftpd/Dockerfile
 
 - name: alpine-curl-jq-openssl-nodejs
-  version: "3.8"
+  version: "3.15"
   profiles:
     - linux-x86_64
   docker:
     file: alpine-x86_64-curl-jq-openssl-nodejs.Dockerfile
 
 - name: alpine-curl-jq-openssl-nodejs
-  version: "3.8"
+  version: "3.15"
   profiles:
     - linux-armv8
   docker:
     file: alpine-armv8-curl-jq-openssl-nodejs.Dockerfile
+
+- name: alpine-curl-balena-io-contracts
+  version: "3.15-master"
+  profiles:
+    - linux-x86_64
+  docker:
+    file: alpine-x86_64-curl-balena-io-contracts.Dockerfile
+
+- name: alpine-curl-balena-io-contracts
+  version: "3.15-master"
+  profiles:
+    - linux-armv8
+  docker:
+    file: alpine-armv8-curl-balena-io-contracts.Dockerfile
 
 - name: focal
   profiles:

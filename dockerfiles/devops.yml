@@ -69,19 +69,19 @@
   docker:
     file: vsftpd/Dockerfile
 
-- name: alpine-curl-jq-openssl-nodejs
+- name: alpine-curl-jq-openssl-nodejs-inotifytools
   version: "3.15"
   profiles:
     - linux-x86_64
   docker:
-    file: alpine-x86_64-curl-jq-openssl-nodejs.Dockerfile
+    file: alpine-x86_64-curl-jq-openssl-nodejs-inotifytools.Dockerfile
 
-- name: alpine-curl-jq-openssl-nodejs
+- name: alpine-curl-jq-openssl-nodejs-inotifytools
   version: "3.15"
   profiles:
     - linux-armv8
   docker:
-    file: alpine-armv8-curl-jq-openssl-nodejs.Dockerfile
+    file: alpine-armv8-curl-jq-openssl-nodejs-inotifytools.Dockerfile
 
 - name: alpine-curl-balena-io-contracts
   version: "3.15-master"

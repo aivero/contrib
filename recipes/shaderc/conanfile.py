@@ -1,7 +1,7 @@
 from build import *
 
 
-class Shaderc(Recipe):
+class Shaderc(PythonRecipe):
     description = "A collection of tools, libraries, and tests for Vulkan shader compilation."
     license = "Apache"
     options = {}

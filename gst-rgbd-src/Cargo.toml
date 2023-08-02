@@ -18,7 +18,7 @@ readme = "README.md"
 build = "build.rs"
 
 [features]
-default = [ "libk4a", "librealsense2" ]
+default = [ "librealsense2" ]
 
 [dependencies]
 capnp = "0.14.0"

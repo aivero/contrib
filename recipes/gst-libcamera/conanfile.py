@@ -4,6 +4,7 @@ from build import *
 class GstLibcamera(CppGstRecipe):
     description = "The libcamera package"
     license = "LGPL"
+    exports = "0001-libcamerasrc-Implement-GstPhotography-interface.patch"
     options = {
         "gstreamer": ["auto", "enabled"],
         "cam": ["auto", "enabled"],
@@ -31,6 +32,7 @@ class GstLibcamera(CppGstRecipe):
 
     def source(self):
         self.get(f"https://github.com/kbingham/libcamera/archive/refs/tags/v{self.version}.tar.gz")
+        self.patch("0001-libcamerasrc-Implement-GstPhotography-interface.patch")
 
     def build(self):
         req = "libtiff"

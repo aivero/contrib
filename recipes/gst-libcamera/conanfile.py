@@ -9,8 +9,9 @@ class GstLibcamera(CppGstRecipe):
         "gstreamer": ["auto", "enabled"],
         "cam": ["auto", "enabled"],
         "test": [True, False],
+        "v4l2":[True, False],
     }
-    default_options = ("gstreamer=enabled", "cam=enabled", "test=True")
+    default_options = ("gstreamer=enabled", "cam=enabled", "test=True", "v4l2=True",)
     build_requires = (
         "git/[^2.34.1]",
         "cc/[^1.0.0]",
@@ -43,5 +44,6 @@ class GstLibcamera(CppGstRecipe):
             "gstreamer": self.options.gstreamer,
             "cam": self.options.cam,
             "test": self.options.test,
+            "v4l2": self.options.v4l2,
         }
         self.meson(opts)

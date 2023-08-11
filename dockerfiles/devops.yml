@@ -137,3 +137,10 @@
     - linux-armv8-l4t-t210
   docker:
     file: bionic-armv8-l4t-r32.7.1-t210-cuda-10.2.Dockerfile
+
+- name: promtail-avahi
+  version: "2.8.3"
+  profiles:
+    - linux-armv8
+  docker:
+    file: promtail/promtail-armv8-avahi.Dockerfile

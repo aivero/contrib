@@ -1,0 +1,35 @@
+server:
+  http_listen_port: 0
+  grpc_listen_port: 0
+positions:
+  filename: /tmp/positions.yaml
+clients:
+  - url: ${LOKI_URL}
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: ${DOCKER_HOST}
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["logging=promtail"]
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'logstream'
+      - source_labels: ['__meta_docker_container_label_loggingjobname']
+        target_label: 'job'
+    pipeline_stages:
+      - docker: {}
+      - static_labels:
+          aivero_component: dcd
+          balena_app_name: "${BALENA_APP_NAME}"
+          balena_device_arch: "${BALENA_DEVICE_ARCH}"
+          balena_device_type: "${BALENA_DEVICE_TYPE}"
+          balena_device_uuid: "${BALENA_DEVICE_UUID}"
+          balena_device_name_at_init: "${BALENA_DEVICE_NAME_AT_INIT}"
+          balena_app_id: "${BALENA_APP_ID}"
+          balena_app_uuid: "${BALENA_APP_UUID}"
+          balena_host_os_version: "${BALENA_HOST_OS_VERSION}"

@@ -1,5 +1,5 @@
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
-index ef19f98978..c557e3548e 100644
+index 2cb7acf2a6..c18cf0b11d 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-demux.c
 @@ -42,6 +42,12 @@
@@ -29,7 +29,7 @@ index c4fc73caad..3e65addd55 100644
  /*
   * TODO: add this tag & mappings
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
-index e6144328f8..8294d67f00 100644
+index 4e9b9ac881..c40012a3c3 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-mux.c
 @@ -40,6 +40,11 @@
@@ -152,10 +152,10 @@ index e6144328f8..8294d67f00 100644
  
  static void
 diff --git a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
-index e1e35dc058..280b38f3c4 100644
+index 0149b174c9..919cd98e83 100644
 --- a/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
 +++ b/subprojects/gst-plugins-good/gst/matroska/matroska-read-common.c
-@@ -2352,7 +2352,6 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
+@@ -2354,7 +2354,6 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
  
      for (i = 0; !matched && i < G_N_ELEMENTS (tag_conv); i++) {
        const gchar *tagname_gst = tag_conv[i].gstreamer_tagname;
@@ -163,7 +163,7 @@ index e1e35dc058..280b38f3c4 100644
        const gchar *tagname_mkv = tag_conv[i].matroska_tagname;
  
        if (strcmp (tagname_mkv, tag) == 0) {
-@@ -2384,6 +2383,40 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
+@@ -2386,6 +2385,40 @@ gst_matroska_read_common_parse_metadata_id_simple_tag (GstMatroskaReadCommon *
          matched = TRUE;
        }
      }

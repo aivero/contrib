@@ -1,14 +1,5 @@
-From 6b0bdc6087b34b2f7728acb26833e8fb3923ecb7 Mon Sep 17 00:00:00 2001
-From: Jimmi Holst Christensen <jhc@dismail.de>
-Date: Mon, 25 Apr 2022 15:07:12 +0200
-Subject: [PATCH] v4l2deviceprovider: Return device even if caps is EMPTY
-
----
- subprojects/gst-plugins-good/sys/v4l2/gstv4l2deviceprovider.c | 4 ----
- 1 file changed, 4 deletions(-)
-
 diff --git a/subprojects/gst-plugins-good/sys/v4l2/gstv4l2deviceprovider.c b/subprojects/gst-plugins-good/sys/v4l2/gstv4l2deviceprovider.c
-index 7c2c87fea3..5d1fec011e 100644
+index 5eeec7dc8b..5fb3edc86f 100644
 --- a/subprojects/gst-plugins-good/sys/v4l2/gstv4l2deviceprovider.c
 +++ b/subprojects/gst-plugins-good/sys/v4l2/gstv4l2deviceprovider.c
 @@ -172,10 +172,6 @@ gst_v4l2_device_provider_probe_device (GstV4l2DeviceProvider * provider,
@@ -22,6 +13,3 @@ index 7c2c87fea3..5d1fec011e 100644
  
    device = gst_v4l2_device_new (device_path,
        device_name ? device_name : (gchar *) v4l2obj->vcap.card, caps, type,
--- 
-2.36.0
-

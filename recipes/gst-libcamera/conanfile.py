@@ -10,8 +10,9 @@ class GstLibcamera(CppGstRecipe):
         "cam": ["auto", "enabled"],
         "test": [True, False],
         "v4l2":[True, False],
+        "udev": [True, False],
     }
-    default_options = ("gstreamer=enabled", "cam=enabled", "test=True", "v4l2=True",)
+    default_options = ("gstreamer=enabled", "cam=enabled", "test=True", "v4l2=True", "udev=True")
     build_requires = (
         "git/[^2.34.1]",
         "cc/[^1.0.0]",
@@ -26,6 +27,7 @@ class GstLibcamera(CppGstRecipe):
         "gnutls/[^3.7.6]",
         "libevent/[^2.1.11]",
         "libtiff/[^4.3.0]",
+        "libgudev/[^2.3.7]"
     )
 
     def requirements(self):
@@ -45,5 +47,17 @@ class GstLibcamera(CppGstRecipe):
             "cam": self.options.cam,
             "test": self.options.test,
             "v4l2": self.options.v4l2,
+            "udev": self.options.udev,
+            "ipas": "rpi/vc4,ipu3,rkisp1,vimc"
         }
         self.meson(opts)
+
+    def package(self):
+        self.copy(pattern="*.json*", keep_path=True)
+    
+    def package_info(self):
+        self.env_info.LIBCAMERA_DATA_DIR = os.path.join(self.package_folder, "share", "libcamera")
+        self.env_info.LIBCAMERA_SYSCONF_DIR = os.path.join(self.package_folder, "etc", "libcamera")
+        self.env_info.IPA_PROXY_DIR = os.path.join(self.package_folder, "bin", "libcamera")
+        self.env_info.IPA_CONFIG_DIR = os.path.join(self.package_folder, "etc", "libcamera", "ipa") + ":" + os.path.join(self.package_folder, "share", "libcamera", "ipa")
+        self.env_info.IPA_MODULE_DIR = os.path.join(self.package_folder, "lib", "libcamera")

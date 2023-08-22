@@ -58,7 +58,7 @@ class GstPluginsBad(GstRecipe):
         "meson/[>=0.62.0]",
         "gobject-introspection/[^1.69.0]",
     )
-    requires = ("libnice/[^0.1.18]",)
+    requires = ("libnice/[^0.1.21]",)
 
     def configure(self):
         if self.settings.arch != "x86_64":
@@ -80,7 +80,7 @@ class GstPluginsBad(GstRecipe):
 
         if self.settings.arch == "x86_64" and self.options.nvcodec:
             self.build_requires("cuda/[>=11.2]")
-            self.build_requires("orc/[^0.4.31]")
+            self.build_requires("orc/[^0.4.34]")
 
     def requirements(self):
         if self.options.srtp:

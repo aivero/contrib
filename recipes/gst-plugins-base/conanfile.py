@@ -24,7 +24,7 @@ class GstPluginsBase(GstRecipe):
     requires = (
         "opus/[^1.3.1]",
         "pango/[^1.43.0]",
-        "orc/[^0.4.29]",
+        "orc/[^0.4.34]",
         "mesa/[>=20.2.1]",
     )
 

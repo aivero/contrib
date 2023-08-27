@@ -144,3 +144,10 @@
     - linux-armv8
   docker:
     file: promtail/promtail-armv8-avahi.Dockerfile
+
+- name: lunar-s3sfs
+  version: "latest"
+  profiles:
+    - linux-x86_64
+  docker:
+    file: lunar-x86_64-s3sfs.Dockerfile

@@ -121,6 +121,12 @@
   docker:
     file: focal-x86_64.Dockerfile
 
+- name: focal-deno
+  profiles:
+    - linux-x86_64
+  docker:
+    file: focal-deno-x86_64.Dockerfile
+
 - name: focal-balena
   profiles:
     - linux-x86_64

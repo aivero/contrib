@@ -14,6 +14,6 @@ COPY --from=builder /usr/local/bin/crane /usr/local/bin/crane
 COPY --from=builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
 COPY --from=deno /deno /usr/bin/deno
 RUN apt update && \
-  apt install --no-install-recommends -y python3-minimal python3-pkg-resources ca-certificates git jq && \
+  apt install --no-install-recommends -y python3-minimal python3-pkg-resources ca-certificates git curl jq && \
   rm -rf /var/lib/apt/lists/*
 

@@ -1,39 +1,3 @@
-- name: docker
-  profiles:
-    - linux-armv8
-  docker:
-    file: docker-armv8.Dockerfile
-
-- name: docker
-  profiles:
-    - linux-x86_64
-  docker:
-    file: docker-x86_64.Dockerfile
-
-- name: alpine
-  profiles:
-    - linux-armv8
-  docker:
-    file: alpine-armv8.Dockerfile
-
-- name: alpine
-  profiles:
-    - linux-armv8-bootstrap
-  docker:
-    file: alpine-armv8-bootstrap.Dockerfile
-
-- name: alpine
-  profiles:
-    - linux-x86_64
-  docker:
-    file: alpine-x86_64.Dockerfile
-
-- name: alpine
-  profiles:
-    - linux-x86_64-bootstrap
-  docker:
-    file: alpine-x86_64-bootstrap.Dockerfile
-
 - name: alpine-balena-chrony
   version: "3.15-4.1-r0"
   profiles:
@@ -47,7 +11,7 @@
     file: chrony/alpine-x86_64-chrony.Dockerfile
   profiles:
     - linux-x86_64
-    
+
 - name: alpine-chrony
   version: "3.15-4.1-r0"
   docker:

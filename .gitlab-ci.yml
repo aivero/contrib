@@ -2,7 +2,7 @@ stages:
   - build
   - test
 generate-config:
-  image: registry.gitlab.com/aivero/open-source/contrib/focal/linux-x86_64:master
+  image: registry.gitlab.com/aivero/open-source/contrib/focal-deno/linux-x86_64:master
   tags: [saas-linux-large-amd64]
   stage: build
   rules:

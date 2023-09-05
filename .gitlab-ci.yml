@@ -13,7 +13,7 @@ generate-config:
     GIT_FETCH_EXTRA_FLAGS: --prune --depth 50
     XDG_CACHE_HOME: $CI_PROJECT_DIR
   script:
-    - python3 scripts/create_aliases.py
+    - 'CI_TARGET_BRANCH_NAME=$(curl -LsS -H "PRIVATE-TOKEN: $CICD_GITLAB_ACCESS_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests?source_branch=$CI_COMMIT_REF_NAME" | jq --raw-output ".[0].target_branch") python3 scripts/create_aliases.py'
     - deno run --unstable --allow-all --import-map https://gitlab.com/aivero/open-source/cicd/-/raw/$CICD_BRANCH/import_map.json https://gitlab.com/aivero/open-source/cicd/-/raw/$CICD_BRANCH/lib/es6/src/GenerateConfig.js
   artifacts:
     paths:

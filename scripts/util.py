@@ -70,47 +70,35 @@ def get_default_branch():
     return "master"
 
 
+def get_ci_parent_branch():
+    if "CI_TARGET_BRANCH_NAME" not in os.environ:
+        print("CI_TARGET_BRANCH_NAME not defined")
+        return None
+
+    target = os.environ["CI_TARGET_BRANCH_NAME"]
+    if target == "":
+        print("CI_TARGET_BRANCH_NAME is empty")
+        return None
+
+    return target
+
+
 def find_parent_branch():
     print("Find parent branch")
 
     # Get current branch
     cur_branch = get_branch()
-    if cur_branch == get_default_branch():
+    default_branch = get_default_branch()
+    if cur_branch == default_branch:
         return None
 
-    # Get branch data
-    output = call(["git", "branch", "-a"])
-    all_branches = output[:-1].split("\n")
-    print(f"Raw branches: {all_branches}")
-    all_branches = map(lambda l: l.strip(), all_branches)
-    branches = list(
-        filter(lambda l: not (l.startswith("*") or l.endswith(cur_branch)), all_branches)
-    )
-    print(f"Filtered branches: {branches}")
+    ci_parent_branch = get_ci_parent_branch()
+    if ci_parent_branch != None:
+        print(f"Parent branch is {ci_parent_branch}")
+        return ci_parent_branch
 
-    def get_merge_base(branch):
-        print(f"Comparing {branch}")
-        (exit_code, output) = call(["git", "merge-base", cur_branch, branch], ret_exit_code=True)
-        if exit_code != 0 or output.startswith("warning:"):
-            print(f"`git merge-base {cur_branch} {branch}` Failed with output:\n{output}")
-            return [99999, "00000000000", branch]
-
-        print(f"Merge base output: {output}")
-        merge_base = output[:-1].splitlines()[-1]
-
-        output = call(["git", "rev-list", "--count", f"{cur_branch}...{merge_base}"])
-        commits_to_merge_base = output[:-1]
-
-        return [int(commits_to_merge_base), merge_base, branch]
-
-    parent_branch = functools.reduce(
-        lambda a, b: a if a[0] < b[0] else b,
-        map(get_merge_base, branches),
-    )[2]
-    if parent_branch.startswith("remotes/origin/"):
-        parent_branch = parent_branch[15:]
-    print(parent_branch)
-    return parent_branch
+    print(f"Could not find parent branch. Using {default_branch}")
+    return default_branch
 
 
 def file_contains(file, strings):

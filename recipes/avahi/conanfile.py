@@ -1,5 +1,6 @@
 from build import *
 
+
 class Avahi(Recipe):
     description = "Avahi - Service Discovery for Linux using mDNS/DNS-SD -- compatible with Bonjour"
     license = "GPL"
@@ -14,16 +15,16 @@ class Avahi(Recipe):
         "six/[^1.16.0]",
     )
 
-    def requirements(self):
-       self.requires(f"python/[~{self.settings.python}]")
-
-
     def source(self):
-        self.get(f"https://github.com/lathiat/avahi/releases/download/v{self.version}/avahi-{self.version}.tar.gz")
+        self.get(
+            f"https://github.com/lathiat/avahi/releases/download/v{self.version}/avahi-{self.version}.tar.gz"
+        )
 
     def build(self):
         # We set this variable to allow bindgen to look for extra include folders in the avahi package
-        os.environ["BINDGEN_EXTRA_CLANG_ARGS"] = f'-I"{os.path.join(self.package_folder, "include")}"'
+        os.environ[
+            "BINDGEN_EXTRA_CLANG_ARGS"
+        ] = f'-I"{os.path.join(self.package_folder, "include")}"'
 
         args = [
             "--enable-compat-libdns_sd",
@@ -38,4 +39,4 @@ class Avahi(Recipe):
         self.autotools(args)
 
     def package_info(self):
-        self.env_info.BINDGEN_EXTRA_CLANG_ARGS =  f"-I{os.path.join(self.package_folder, 'include')}"
+        self.env_info.BINDGEN_EXTRA_CLANG_ARGS = f"-I{os.path.join(self.package_folder, 'include')}"

@@ -1,9 +1,9 @@
 FROM --platform=linux/amd64 gitlab.com:443/aivero/dependency_proxy/containers/denoland/deno:bin-1.14.3 AS deno
 FROM --platform=linux/amd64 gitlab.com:443/aivero/dependency_proxy/containers/amd64/ubuntu:focal AS builder
 RUN apt update && \
-  apt install --no-install-recommends -y python3-pip python3-setuptools curl jq && \
+  apt install --no-install-recommends -y python3-pip python3-setuptools curl && \
   pip3 install --upgrade conan==1.59.0 && \
-  VERSION=$(curl -s "https://api.github.com/repos/google/go-containerregistry/releases/latest" | jq -r '.tag_name') && \
+  VERSION=v0.16.1 && \
   OS=Linux && \
   ARCH=x86_64 && \
   curl -sL "https://github.com/google/go-containerregistry/releases/download/${VERSION}/go-containerregistry_${OS}_${ARCH}.tar.gz" > go-containerregistry.tar.gz && \

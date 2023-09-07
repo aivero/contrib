@@ -93,6 +93,7 @@ class GstPluginsGood(GstRecipe):
             self.patch("0002-matroska-add-support-for-custom-video-rvl-1.22.0.patch")
 
         self.patch("0003-v4l2src-video-bitrate-control-1.22.0.patch")
+        self.patch("0004-rtpjitterbuffer-avoid-interger-overflow-1.22.0.patch")
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gst-plugins-good")

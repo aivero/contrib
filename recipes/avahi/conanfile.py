@@ -4,7 +4,6 @@ from build import *
 class Avahi(Recipe):
     description = "Avahi - Service Discovery for Linux using mDNS/DNS-SD -- compatible with Bonjour"
     license = "GPL"
-    settings = Recipe.settings + ("python",)
     build_requires = ("cc/[^1.0.0]", "autotools/[^1.0.0]")
     requires = (
         "glib/[^2.70.0]",

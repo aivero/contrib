@@ -5,6 +5,8 @@ import subprocess
 
 # Init git and conan in CICD
 if "CI" in os.environ:
+    util.git_init()
+
     fetch_repo = os.environ["CONAN_REPO_ALL"]
     print(f"Fetching from: {fetch_repo}")
     public_repo = os.environ["CONAN_REPO_PUBLIC"]

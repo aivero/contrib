@@ -10,7 +10,7 @@ generate-config:
   variables:
     CICD_BRANCH: stable
     GIT_DEPTH: 0
-    GIT_FETCH_EXTRA_FLAGS: --prune --depth 50
+    GIT_FETCH_EXTRA_FLAGS: --prune
     XDG_CACHE_HOME: $CI_PROJECT_DIR
   script:
     - 'CI_TARGET_BRANCH_NAME=$(curl -LsS -H "PRIVATE-TOKEN: $CICD_GITLAB_ACCESS_TOKEN" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests?source_branch=$CI_COMMIT_REF_NAME" | jq --raw-output ".[0].target_branch") python3 scripts/create_aliases.py'

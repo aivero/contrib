@@ -1,4 +1,4 @@
-from util import get_all_images_names, crane_auth, crane_tag, check_if_docker_image_exist
+from util import get_default_branch, get_all_images_names, crane_auth, crane_tag, check_if_docker_image_exist
 import sys
 from datetime import datetime
 
@@ -10,7 +10,12 @@ user = sys.argv[3]
 project_id = 32888992
 branch_name = sys.argv[4]
 authorized_key = sys.argv[5]
-tag_from = "master"
+tag_from = get_default_branch()
+
+if branch_name == tag_from:
+    print("Skipping default branch")
+    sys.exit(0)
+
 
 if (registry == "" or password == "" or user == "" or  authorized_key == ""):
     raise Exception("error, one of the variables is not set")

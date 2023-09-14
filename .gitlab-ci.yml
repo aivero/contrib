@@ -9,6 +9,7 @@ generate-config:
     - if: '$PACKAGE_MANAGER_SET == null && $CI_PIPELINE_SOURCE != "merge_request_event" && $TRIAGE_BOT_SCHEDULED == null'
   variables:
     CICD_BRANCH: stable
+    GIT_DEPTH: 0
     GIT_FETCH_EXTRA_FLAGS: --prune
     XDG_CACHE_HOME: $CI_PROJECT_DIR
   script:

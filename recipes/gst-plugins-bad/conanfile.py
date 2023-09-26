@@ -46,7 +46,7 @@ class GstPluginsBad(GstRecipe):
         "srtp=True",
         "sctp=True",
         "videoparsers=True",
-        "webp=True",
+        "webp=False",
         "webrtc=True",
         "x265=False",
         "onvif=True",

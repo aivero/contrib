@@ -10,12 +10,14 @@ class GstPluginsBase(GstRecipe):
         "introspection": [True, False],
         "x11": [True, False],
         "audioresample": [True, False],
+        "pango": [True, False],
     }
     default_options = (
         "shared=True",
         "introspection=True",
         "x11=True",
         "audioresample=True",
+        "pango=False",
     )
     build_requires = (
         "cc/[^1.0.0]",
@@ -23,7 +25,6 @@ class GstPluginsBase(GstRecipe):
     )
     requires = (
         "opus/[^1.3.1]",
-        "pango/[^1.43.0]",
         "orc/[^0.4.34]",
         "mesa/[>=20.2.1]",
     )
@@ -33,6 +34,9 @@ class GstPluginsBase(GstRecipe):
         # That way we can still build for a lower gst minor release (i.e. 1.18), despite a newer one being in your conan (i.e. 1.19)
         # [^1.18] will match any `1.` version - not what we need
         self.requires(f"gst/[~{self.settings.gstreamer}]")
+        if self.options.pango:
+            self.requires("pango/[^1.43.0]")
+
 
     def validate(self):
         if str(self.settings.gstreamer) not in str(self.version):
@@ -64,20 +68,14 @@ class GstPluginsBase(GstRecipe):
             "typefind": True,
             "orc": True,
             "opus": True,
-            "pango": True,
+            "pango": self.options.pango,
             "audioconvert": True,
             "compositor": True,
             "encoding": True,
             "audiomixer": True,
             "videorate": True,
             "tools": True,
+            "videoconvertscale": True
         }
-        if "1.22" in self.version:
-            opts["videoconvertscale"] = True
-        elif "1.21" in self.version:
-            opts["videoconvertscale"] = True
-        else:
-            opts["videoconvert"] = True
-            opts["videoscale"] = True
 
         self.meson(opts, source_folder)

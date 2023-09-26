@@ -32,10 +32,10 @@ class GstPluginsGood(GstRecipe):
         "aivero_rvl_matroska=True",
         "autodetect=True",
         "isomp4=True",
-        "jpeg=True",
+        "jpeg=False",
         "matroska=True",
         "multifile=True",
-        "png=True",
+        "png=False",
         "rtp=True",
         "rtsp=True",
         "udp=True",
@@ -75,8 +75,8 @@ class GstPluginsGood(GstRecipe):
         self.requires(f"libgudev/[^2.3.7]")
 
         # gst-plugins-bad -> pango -> freetype -> png
-        # if self.options.png:
-        #     self.requires("libpng/[^1.6.37]")
+        if self.options.png:
+            self.requires("libpng/[^1.6.37]")
         if self.options.vpx:
             self.requires("libvpx/[^1.8.0]")
         if self.options.jpeg:
@@ -101,10 +101,10 @@ class GstPluginsGood(GstRecipe):
         opts = {
             "autodetect": True,
             "isomp4": True,
-            "jpeg": True,
+            "jpeg": self.options.jpeg,
             "matroska": True,
             "multifile": True,
-            "png": True,
+            "png": self.options.png,
             "rtp": True,
             "rtpmanager": True,
             "rtsp": True,

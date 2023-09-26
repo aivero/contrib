@@ -6,3 +6,4 @@
     - linux-armv8-l4t-t186
     - linux-armv8
     - linux-x86_64
+    - linux-x86_64-dev

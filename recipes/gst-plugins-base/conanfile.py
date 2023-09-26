@@ -11,6 +11,7 @@ class GstPluginsBase(GstRecipe):
         "x11": [True, False],
         "audioresample": [True, False],
         "pango": [True, False],
+        "opus": [True, False],
     }
     default_options = (
         "shared=True",
@@ -18,13 +19,13 @@ class GstPluginsBase(GstRecipe):
         "x11=True",
         "audioresample=True",
         "pango=False",
+        "opus=False",
     )
     build_requires = (
         "cc/[^1.0.0]",
         "meson/[>=0.62.0]",
     )
     requires = (
-        "opus/[^1.3.1]",
         "orc/[^0.4.34]",
         "mesa/[>=20.2.1]",
     )
@@ -36,6 +37,8 @@ class GstPluginsBase(GstRecipe):
         self.requires(f"gst/[~{self.settings.gstreamer}]")
         if self.options.pango:
             self.requires("pango/[^1.43.0]")
+        if self.options.opus:
+            self.requires("opus/[^1.3.1]")
 
 
     def validate(self):
@@ -67,7 +70,7 @@ class GstPluginsBase(GstRecipe):
             "playback": True,
             "typefind": True,
             "orc": True,
-            "opus": True,
+            "opus": self.options.opus,
             "pango": self.options.pango,
             "audioconvert": True,
             "compositor": True,

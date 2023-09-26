@@ -74,9 +74,9 @@ class GstPluginsGood(GstRecipe):
 
         self.requires(f"libgudev/[^2.3.7]")
 
-        # gst-plugins-bad -> pango -> freetype -> png
-        if self.options.png:
-            self.requires("libpng/[^1.6.37]")
+        # freetype -> png
+        # if self.options.png:
+        #     self.requires("libpng/[^1.6.37]")
         if self.options.vpx:
             self.requires("libvpx/[^1.8.0]")
         if self.options.jpeg:

@@ -1,5 +1,4 @@
 - version: 0.1.0
   profiles:
     - linux-x86_64
-    - linux-x86_64-dev
     - linux-armv8

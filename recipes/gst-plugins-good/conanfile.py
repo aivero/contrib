@@ -35,7 +35,7 @@ class GstPluginsGood(GstRecipe):
         "jpeg=False",
         "matroska=True",
         "multifile=True",
-        "png=False",
+        "png=True",
         "rtp=True",
         "rtsp=True",
         "udp=True",

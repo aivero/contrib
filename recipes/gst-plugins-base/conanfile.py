@@ -18,7 +18,7 @@ class GstPluginsBase(GstRecipe):
         "introspection=True",
         "x11=True",
         "audioresample=True",
-        "pango=False",
+        "pango=True",
         "opus=False",
     )
     build_requires = (

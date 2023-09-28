@@ -203,41 +203,12 @@ pub fn replace_tag(buffer: &mut gst::BufferRef, tag: &str) -> Result<(), gst::Er
     Ok(())
 }
 
-/// Removes the specific auxiliary buffers attached to the `main_buffer` based on the specified `tags`.
-///
-/// # Arguments
-/// * `main_buffer` - The main buffer to remove auxiliary buffers from.
-/// * `tags` - The tags that specify what buffers to remove.
-///
-/// # Returns
-/// * `Ok()` on success.
-/// * `Err(gst::ErrorMessage)` on failure, occurs only if mutable references to tags cannot be obtained.
-pub fn remove_aux_buffers_with_tags(
-    main_buffer: &mut gst::BufferRef,
-    tags: &[&str],
-) -> Result<(), gst::ErrorMessage> {
-    // Loop over all auxiliary buffers
-    main_buffer.foreach_meta_mut(|meta| {
-        if let Some(meta) = meta.as_ref().downcast_ref::<BufferMeta>() {
-            let auxiliary_buffer = meta.buffer();
-            let tag = match get_tag(auxiliary_buffer) {
-                Err(_) => return Continue(Keep),
-                Ok(tag) => tag,
-            };
-
-            if tags.contains(&&*tag) {
-                // Remove buffers with the corresponding tags
-                Continue(Remove)
-            } else {
-                Continue(Keep)
-            }
-        } else {
-            Continue(Keep)
-        }
+/// Removes  auxiliary buffers attached to the `main_buffer`
+pub fn remove_aux_buffers(main_buffer: &mut gst::BufferRef) {
+    main_buffer.foreach_meta_mut(|meta| match meta.as_ref().downcast_ref::<BufferMeta>() {
+        Some(_) => Continue(Remove),
+        _ => Continue(Keep),
     });
-
-    // Return Ok() if everything went fine
-    Ok(())
 }
 
 /// Converts the given `caps` and `framerate` into a `gst::VideoInfo` for the stream with the given
@@ -443,66 +414,5 @@ mod tests {
 
         // Make sure the tag changed
         assert_eq!(tag, new_tag);
-    }
-
-    #[test]
-    fn remove_specific_aux_buffers() {
-        gst::init().unwrap();
-
-        let mut main_buffer = Buffer::new();
-        let mut buffer_depth = Buffer::new();
-        let mut buffer_color = Buffer::new();
-        let original_tag_main = "infra";
-        let original_tag_depth = "depth";
-        let original_tag_color = "color";
-
-        // Create main buffer with a tag
-        tag_buffer_with_title(main_buffer.get_mut().unwrap(), original_tag_main).unwrap();
-
-        // Attach buffers to the main buffer
-        attach_aux_buffer_and_tag(
-            main_buffer.get_mut().unwrap(),
-            &mut buffer_depth,
-            original_tag_depth,
-        )
-        .unwrap();
-        attach_aux_buffer_and_tag(
-            main_buffer.get_mut().unwrap(),
-            &mut buffer_color,
-            original_tag_color,
-        )
-        .unwrap();
-
-        // Get the auxiliary buffers
-        let all_buffers: Vec<gst::Buffer> = get_all_aux_buffers(&main_buffer).collect();
-
-        // Make sure the length is correct
-        assert_eq!(all_buffers.len(), 2);
-
-        // Extract the tag from the buffer
-        let tag_depth = get_tag(&all_buffers[0]).unwrap();
-        let tag_color = get_tag(&all_buffers[1]).unwrap();
-
-        // Make sure the tags stayed the same
-        assert_eq!(tag_depth, original_tag_depth);
-        assert_eq!(tag_color, original_tag_color);
-
-        // let mut main_buffer = all_buffers[0];
-        // Remove depth and color
-        remove_aux_buffers_with_tags(
-            main_buffer.get_mut().unwrap(),
-            &[original_tag_color, original_tag_depth],
-        )
-        .unwrap();
-
-        // Get the auxiliary buffers
-        let all_buffers = get_all_buffers(main_buffer);
-
-        // Make sure the length is correct
-        assert_eq!(all_buffers.len(), 1);
-
-        // Make sure the correct buffer remains (infra)
-        let tag_main = get_tag(&all_buffers[0]).unwrap();
-        assert_eq!(tag_main, original_tag_main);
     }
 }

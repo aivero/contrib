@@ -608,6 +608,7 @@ impl RgbdDemux {
                 buffer.set_duration(common_duration);
             }
 
+            rgbd::remove_aux_buffers(buffer);
             flow_combiner.update_flow(self.push_buffer_to_corresponding_pad(
                 element,
                 &src_pads,

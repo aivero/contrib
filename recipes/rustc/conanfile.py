@@ -30,7 +30,7 @@ class Rustc(PythonRecipe):
 
     def build(self):
         rust_folder = os.path.join(self.build_folder, self.src, "rust")
-        os.environ["RUSTFLAGS"] = "-g -Clinker-plugin-lto -Copt-level=2"
+        os.environ["RUSTFLAGS"] = "-Clinker-plugin-lto -Copt-level=2"
 
         arch = {"x86_64": "x86_64", "armv8": "aarch64"}[str(self.settings.arch)]
         triple = f"{arch}-unknown-linux-gnu"
@@ -63,5 +63,3 @@ class Rustc(PythonRecipe):
             ],
         )
 
-    def package_info(self):
-        self.env_info.RUSTFLAGS = "-g -Copt-level=2"

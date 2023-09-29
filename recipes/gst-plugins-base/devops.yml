@@ -1,5 +1,2 @@
-- version: 1.22.5
-  profiles:
-    - linux-x86_64
-    - linux-armv8
+- version: 1.22.6
 

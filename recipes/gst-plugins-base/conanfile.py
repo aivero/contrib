@@ -5,6 +5,7 @@ from conans.errors import ConanInvalidConfiguration
 class GstPluginsBase(GstRecipe):
     description = "A well-groomed and well-maintained collection of GStreamer plugins and elements"
     license = "LGPL"
+    exports = "*.patch"
     options = {
         "shared": [True, False],
         "introspection": [True, False],
@@ -55,6 +56,7 @@ class GstPluginsBase(GstRecipe):
         self.get(
             f"https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/{self.version}.tar.gz"
         )
+        self.patch("0006-rtpbasedepayload-fix-hdrext-handling-for-aggregated-out-buffer.patch")
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gst-plugins-base")

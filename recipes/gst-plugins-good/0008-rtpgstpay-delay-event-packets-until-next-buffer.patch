@@ -1,0 +1,106 @@
+commit e56dfff561cc4590e02f4963ca6fc36a5ff31cd7
+Author: Sebastian Dröge <sebastian@centricular.com>
+Date:   Fri Aug 11 13:06:24 2023 +0300
+
+    rtpgstpay: Delay pushing of event packets until the next buffer
+    
+    And also re-timestamp them with the current buffer's PTS.
+    
+    Not doing so keeps the timestamps of event packets as
+    GST_CLOCK_TIME_NONE or the timestamp of the previous buffer, both of
+    which are bogus.
+    
+    Making sure that (especially) the first packet has a valid timestamp
+    allows putting e.g. the NTP timestamp RTP header extension on it.
+    
+    Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/5173>
+
+diff --git a/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.c b/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.c
+index 5dba040bf0..71e89e41bf 100644
+--- a/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.c
++++ b/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.c
+@@ -182,7 +182,6 @@ gst_rtp_gst_pay_reset (GstRtpGSTPay * rtpgstpay, gboolean full)
+     rtpgstpay->current_CV = 0;
+     rtpgstpay->next_CV = 0;
+   }
+-  rtpgstpay->received_buffer = FALSE;
+ }
+ 
+ static void
+@@ -366,6 +365,16 @@ gst_rtp_gst_pay_create_from_adapter (GstRtpGSTPay * rtpgstpay,
+   return TRUE;
+ }
+ 
++static gboolean
++retimestamp_buffer (GstBuffer ** buffer, guint idx, gpointer user_data)
++{
++  GstClockTime *timestamp = user_data;
++
++  GST_BUFFER_PTS (*buffer) = *timestamp;
++
++  return TRUE;
++}
++
+ static GstFlowReturn
+ gst_rtp_gst_pay_flush (GstRtpGSTPay * rtpgstpay, GstClockTime timestamp)
+ {
+@@ -373,13 +382,14 @@ gst_rtp_gst_pay_flush (GstRtpGSTPay * rtpgstpay, GstClockTime timestamp)
+ 
+   gst_rtp_gst_pay_create_from_adapter (rtpgstpay, timestamp);
+ 
+-  if (!rtpgstpay->received_buffer) {
+-    GST_DEBUG_OBJECT (rtpgstpay,
+-        "Can't flush without having received a buffer yet");
+-    return GST_FLOW_OK;
+-  }
+-
+   if (rtpgstpay->pending_buffers) {
++    // make sure all buffers in the buffer list have the correct timestamp.
++    // If we created packets based on an event they would have
++    // GST_CLOCK_TIME_NONE as PTS.
++
++    gst_buffer_list_foreach (rtpgstpay->pending_buffers, retimestamp_buffer,
++        &timestamp);
++
+     /* push the whole buffer list at once */
+     ret = gst_rtp_base_payload_push_list (GST_RTP_BASE_PAYLOAD (rtpgstpay),
+         rtpgstpay->pending_buffers);
+@@ -584,12 +594,10 @@ gst_rtp_gst_pay_sink_event (GstRTPBasePayload * payload, GstEvent * event)
+     GST_DEBUG_OBJECT (rtpgstpay, "make event type %d for %s",
+         etype, GST_EVENT_TYPE_NAME (event));
+     gst_rtp_gst_pay_send_event (rtpgstpay, etype, event);
+-    /* Do not send stream-start right away since caps/new-segment were not yet
+-       sent, so our data would be considered invalid */
+-    if (etype != 4) {
+-      /* flush the adapter immediately */
+-      gst_rtp_gst_pay_flush (rtpgstpay, GST_CLOCK_TIME_NONE);
+-    }
++    // do not flush events here yet as they would get no timestamp at all or
++    // the timestamp of the previous buffer, both of which are bogus. We need
++    // to wait until the next actual input frame to know the timestamp that
++    // applies to the event.
+   }
+ 
+   gst_event_unref (event);
+@@ -654,8 +662,6 @@ gst_rtp_gst_pay_handle_buffer (GstRTPBasePayload * basepayload,
+ 
+   rtpgstpay = GST_RTP_GST_PAY (basepayload);
+ 
+-  rtpgstpay->received_buffer = TRUE;
+-
+   timestamp = GST_BUFFER_PTS (buffer);
+   running_time =
+       gst_segment_to_running_time (&basepayload->segment, GST_FORMAT_TIME,
+diff --git a/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.h b/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.h
+index 671186bf70..3db3d61694 100644
+--- a/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.h
++++ b/subprojects/gst-plugins-good/gst/rtp/gstrtpgstpay.h
+@@ -57,8 +57,6 @@ struct _GstRtpGSTPay
+   guint config_interval;
+   GstClockTime last_config;
+   gboolean force_config;
+-
+-  gboolean received_buffer;
+ };
+ 
+ struct _GstRtpGSTPayClass

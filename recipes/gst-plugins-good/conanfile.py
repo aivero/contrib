@@ -94,6 +94,9 @@ class GstPluginsGood(GstRecipe):
 
         self.patch("0003-v4l2src-video-bitrate-control-1.22.0.patch")
         self.patch("0005-rtpsource-dont-store-invalid-running-times-and-calculate-with-it-1.22.0.patch")
+        self.patch("0006-rtpbasedepayload-fix-hdrext-handling-for-aggregated-out-buffer.patch")
+        self.patch("0007-rtpgstpay-enable-hdrext-aggregation.patch")
+        self.patch("0008-rtpgstpay-delay-event-packets-until-next-buffer.patch")
 
     def build(self):
         source_folder = os.path.join(self.src, "subprojects", "gst-plugins-good")

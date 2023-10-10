@@ -447,8 +447,13 @@ impl RealsenseSrc {
             // Load JSON if `config` is defined
             let device = Self::find_device(&context, serial)?
                 .ok_or_else(|| rs2::Error::new("Could not find device", "", ""))?;
+
+            if !device.is_enabled()? {
+                device.set_advanced_mode(true)?;
+            }
+
             self.internals.lock().unwrap().old_camera_config = Some(device.serialize_json()?);
-            Self::load_json(&device, config)?;
+            device.load_json(config)?;
         }
 
         // Crate new RealSense pipeline
@@ -568,25 +573,6 @@ impl RealsenseSrc {
         // fixme: Change to a yet to be created `gst_base_src_set_tags` API
         pad.store_sticky_event(&gst::event::Tag::new(tags))
             .map_err(|e| gst::error_msg!(gst::StreamError::Failed, ["{}", e]))?;
-        Ok(())
-    }
-
-    /// Configure the device with the JSON file specified on the given `json_location`.
-    /// # Arguments
-    /// * `device` - Device to configure.
-    /// * `json_location` - The absolute path to the file containing the JSON configuration.
-    /// # Returns
-    /// * `Ok()` on success.
-    /// * `Err(RealsenseError)` if
-    ///     * Invalid `serial` is passed
-    ///     * Json file cannot be read
-    ///     * Json config is invalid
-    fn load_json(device: &rs2::Device, config: &str) -> Result<(), rs2::Error> {
-        if !device.is_enabled()? {
-            device.set_advanced_mode(true)?;
-        }
-
-        device.load_json(config)?;
         Ok(())
     }
 

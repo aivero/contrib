@@ -1,0 +1,3 @@
+[submodule "helm/nhost"]
+	path = helm/nhost
+	url = git@github.com:aivero/nhost-helm.git
